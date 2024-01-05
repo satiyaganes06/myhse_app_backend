@@ -1,5 +1,7 @@
 <x-app-layout>
-    
+    <!-- BCS3453 [PROJECT]-SEMESTER 2324/1
+Student ID: CB21132
+Student Name: SHATTHIYA GANES A/L SIVAKUMARAN -->
 
     <div class="d-flex justify-content-center">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">

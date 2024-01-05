@@ -8,6 +8,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 
+//BCS3453 [PROJECT]-SEMESTER 2324/1
+// Student ID: CB21132
+// Student Name: SHATTHIYA GANES A/L SIVAKUMARAN 
+
 class PasswordController extends Controller
 {
     /**

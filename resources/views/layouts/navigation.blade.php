@@ -1,3 +1,7 @@
+<!-- BCS3453 [PROJECT]-SEMESTER 2324/1
+Student ID: CB21132
+Student Name: SHATTHIYA GANES A/L SIVAKUMARAN -->
+
 <nav x-data="{ open: false }" class="text-white border-gray-100 dark:border-gray-700" style="background-color: #22242c;">
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

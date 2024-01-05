@@ -17,6 +17,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+// BCS3453 [PROJECT]-SEMESTER 2324/1
+// Student ID: CB21132
+// Student Name: SHATTHIYA GANES A/L SIVAKUMARAN
+
+
 Route::get('/', function () {
     return view('auth.login');
 });
@@ -48,7 +53,7 @@ Route::middleware(['auth', 'adminAccess'])->group(function () {
     Route::get('/adminDeleteGame/{gameID}', [GameController::class, 'deleteGameView'])->name('deleteGame');
 });
 
-Route::middleware(['auth', 'httpss'])->group(function () {
+Route::middleware(['auth'])->group(function () {
     // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

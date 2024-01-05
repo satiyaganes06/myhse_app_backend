@@ -6,6 +6,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\RentedGame;
 
+// BCS3453 [PROJECT]-SEMESTER 2324/1
+// Student ID: CB21132
+// Student Name: SHATTHIYA GANES A/L SIVAKUMARAN 
+
 class Game extends Model
 {
     use HasFactory;

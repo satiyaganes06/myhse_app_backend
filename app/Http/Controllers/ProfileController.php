@@ -9,6 +9,10 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 
+//BCS3453 [PROJECT]-SEMESTER 2324/1
+// Student ID: CB21132
+// Student Name: SHATTHIYA GANES A/L SIVAKUMARAN 
+
 class ProfileController extends Controller
 {
     /**

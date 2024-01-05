@@ -7,6 +7,10 @@ use Illuminate\Http\Request;
 use App\Models\RentedGame;
 use Illuminate\Support\Facades\Validator;
 
+//BCS3453 [PROJECT]-SEMESTER 2324/1
+// Student ID: CB21132
+// Student Name: SHATTHIYA GANES A/L SIVAKUMARAN 
+
 class RentingGameController extends Controller
 {
     public function addRentingGameView($gameID)
