@@ -30,10 +30,12 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
-
+        if($request->input('phone_number') > 12){
+            return Redirect::route('profile.edit')->with('status', 'phone-number-too-long');
+        }else{
+            $request->user()->fill($request->validated());
+        }
         
-
         $request->user()->save();
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
