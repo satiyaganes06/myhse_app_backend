@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Common;
 
 use App\Http\Controllers\Base\BaseController as BaseController;
 use App\Http\Controllers\Controller;
+use App\Models\Common\CompetentPersonTypes;
 use App\Models\Common\ServiceMain;
 use App\Models\Common\SubService;
 use App\Models\Common\State;
@@ -12,21 +13,39 @@ use Illuminate\Http\Request;
 class CommonDataController extends BaseController
 {
     public function getStateList(){
-        $stateList = State::all();
-
-        return $this->sendResponse('get state list', '', $stateList);
+        try {
+            $stateList = State::all();
+            return $this->sendResponse('get state list', '', $stateList);
+        } catch (\Exception $e) {
+            return $this->sendError('Error : ' . $e, 500);
+        }
     }
 
     public function getServiceMainList(){
-        $serviceList = ServiceMain::all();
-
-        return $this->sendResponse('get service main list', '', $serviceList);
+       try {
+            $serviceMainList = ServiceMain::all();
+            return $this->sendResponse('get service main list', '', $serviceMainList);
+        } catch (\Exception $e) {
+            return $this->sendError('Error : ' . $e, 500);
+        }
     }
 
     public function getSubServiceList(){
-        $subServiceList = SubService::all();
+       try {
+            $subServiceList = SubService::all();
+            return $this->sendResponse('get sub service list', '', $subServiceList);
+        } catch (\Exception $e) {
+            return $this->sendError('Error : ' . $e, 500);
+        }
+    }
 
-        return $this->sendResponse('get sub service list', '', $subServiceList);
+    public function getCompententPersonTypeList(){
+        try {
+            $competentPersonTypeList = CompetentPersonTypes::all();
+            return $this->sendResponse('get competent person type list', '', $competentPersonTypeList);
+        } catch (\Exception $e) {
+            return $this->sendError('Error : ' . $e, 500);
+        }
     }
 
 

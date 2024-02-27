@@ -9,6 +9,7 @@ use App\Http\Controllers\Service\ServiceController;
 use App\Http\Controllers\Job\JobMainController;
 use App\Http\Controllers\Booking\BookingMainController;
 use App\Http\Controllers\Base\BaseController;
+use App\Http\Controllers\Certificate\CertificateController;
 use App\Http\Controllers\PaymentSubscribeController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -45,10 +46,11 @@ Route::post("/cp/getEmailVerificationStatus", [CpDetailsController::class, 'cpEm
 Route::post("/cp/updateEmailVerificationStatus", [CpDetailsController::class, 'cpEmailVerificationStatusUpdate']);
 Route::post("/cp/getFirstTimeStatus", [CpDetailsController::class, 'cpFirstTimeStatusCheck']);
 
-
+//Common
 Route::get("/cp/getStateList", [CommonDataController::class, 'getStateList']);
 Route::get("/cp/getServiceMainList", [CommonDataController::class, 'getServiceMainList']);
 Route::get("/cp/getSubServiceList", [CommonDataController::class, 'getSubServiceList']);
+Route::get("/cp/getCompetentPersonTypeList", [CommonDataController::class, 'getCompententPersonTypeList']);
 
 Route::put('/cp/completeProfile', [CpDetailsController::class, 'cpCompleteProfile']);
 Route::put('/cp/updateCpProfileInfo', [CpDetailsController::class, 'updateProfileInfo']);
@@ -75,6 +77,9 @@ Route::post('/cp/getCpServiceList', [CommonDataController::class, 'getServiceLis
 Route::post('/cp/addServiceInfo', [ServiceController::class, 'addServiceDetails']);
 Route::post('/cp/getMyServiceDetailsList', [ServiceController::class, 'getMyServiceDetailsList']);
 
+//Certificate Operations
+Route::post('/cp/getMyCertificateDetailsList', [CertificateController::class, 'getMyCertificateDetailsList']);
+Route::post('/cp/addCertificateInfo', [CertificateController::class, 'addCertificateDetails']);
 
 //Subscription Operations
 Route::post('/cp/uploadSubscriptionPayment', [PaymentSubscribeController::class, 'uploadSubscriptionPaymentData']);

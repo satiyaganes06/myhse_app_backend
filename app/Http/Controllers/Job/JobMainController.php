@@ -78,15 +78,33 @@ class JobMainController extends BaseController
   public function cpAddJobResultDetails(Request $request)
   {
     try {
-      
 
-      $file = $request->file('filePdf');
-     // dd($file);
-       $filePath = $file->store('reports', 'public');
 
-      // $pdf = $request->file('pdf');
-      // $path = $pdf->store('uploads/documents');
-    // $path = Storage::disk('local')->put('uploads/documents', $pdf);
+      if ($request->hasFile('pdf') && $request->file('pdf')->isValid()) {
+        $file = $request->file('pdf');
+
+        try {
+          // Specify the destination folder outside of the Laravel public directory
+          $destinationPath = 'myhse/uploads/test';
+
+          // Generate a unique filename
+          $fileName = time() . '_' . $file->getClientOriginalName();
+
+          // Move the uploaded file to the destination folder
+          $file->move($destinationPath, $fileName);
+
+          // Get the full path of the uploaded file
+          $filePath = $destinationPath . '/' . $fileName;
+
+        } catch (\Throwable $th) {
+          
+          return $this->sendResponse("Error: " . $th->getMessage(), '', 500);
+        }
+      } else {
+
+        return $this->sendError('Invalid file or file upload failed.', '');
+
+      }
 
       $jobResult = new JobResult(
         [
@@ -100,7 +118,7 @@ class JobMainController extends BaseController
       $jobResult->save();
 
 
-      return $this->sendResponse('booking list', '', $jobResult);
+      return $this->sendResponse('Progress report sent successfully', '', $jobResult);
     } catch (Exception $e) {
       return $this->sendError('Error : ' . $e->getMessage(), 500);
     }
@@ -111,8 +129,8 @@ class JobMainController extends BaseController
     try {
 
       $jobResult = JobResult::where('jr_int_job_ref', '=', $request->input('jobResultID'))
-      ->where('jr_bool_is_final_document', '=', $request->input('status'))
-      ->get();
+        ->where('jr_bool_is_final_document', '=', $request->input('status'))
+        ->get();
 
 
       return $this->sendResponse('join result list', '', $jobResult);
@@ -139,19 +157,17 @@ class JobMainController extends BaseController
     }
   }
 
-  // app/Http/Controllers/FileController.php
-
   public function uploadJobResultFinalDocument(Request $request)
   {
-    try{
+    try {
       $request->validate([
         'pdf' => 'required|mimes:pdf|max:10240', // Adjust the file size limit as needed
       ]);
-  
+
       $pdf = $request->file('pdf');
-     // $path = $pdf->store('uploads/documents'); // 'pdfs' is the storage folder, you can change it as needed
+      // $path = $pdf->store('uploads/documents'); // 'pdfs' is the storage folder, you can change it as needed
       $path = Storage::disk('local')->put('uploads/documents', $pdf);
-  
+
       $jobResult = new JobResult(
         [
           'jr_int_job_ref' => $request->input('jobMainID'),
@@ -160,11 +176,28 @@ class JobMainController extends BaseController
           'jr_bool_is_final_document' => 1,
         ]
       );
-  
+
       $jobResult->save();
-  
-  
+
+      $this->updateCpJobMainStatus($request);
+      
       return $this->sendResponse('Send succeffully', '',);
+    } catch (Exception $e) {
+      return $this->sendError('Error : ' . $e->getMessage(), 500);
+    }
+  }
+
+  public function updateCpJobMainStatus(Request $request)
+  {
+    try {
+
+      JobMain::where('jm_int_ref', $request->input('jobMainID'))->update(
+        array(
+          'jm_int_status' => $request->input('jobMainStatus')
+        )
+      );
+
+      return ;
 
     } catch (Exception $e) {
       return $this->sendError('Error : ' . $e->getMessage(), 500);
