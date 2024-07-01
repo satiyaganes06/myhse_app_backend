@@ -8,9 +8,9 @@ use Illuminate\Http\Request;
 
 class test extends Controller
 {
-    public function test()
-    {   
-        
+    public function testttt()
+    {
+
         $data = UserProfile::all();
         return response()->json($data);
     }

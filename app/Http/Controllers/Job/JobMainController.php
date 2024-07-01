@@ -114,6 +114,7 @@ class JobMainController extends BaseController
           'jr_bool_is_final_document' => 0,
         ]
       );
+      
 
       $jobResult->save();
 

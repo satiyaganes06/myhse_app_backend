@@ -57,13 +57,13 @@ class CertificateController extends BaseController
                 [
                     'cc_int_user_ref ' => $request->input('cpID'),
                     'cc_int_cpt_ref ' => $request->input('cptID'),
-                    'cc_var_registration_no' =>$request->input('certRegistrationNo'),
+                    'cc_var_registration_no' => $request->input('certRegistrationNo'),
                     'cc_date_expiry_date' => $request->input('certExpiryDate'),
                     'cc_var_path_document' => $filePath,
                     'cc_int_status' => 0
                 ]
             );
-           
+
 
             $ccResult->save();
 
@@ -88,6 +88,70 @@ class CertificateController extends BaseController
 
 
             return $this->sendResponse('Certificate Details', '', $certificate, 200);
+        } catch (Exception $e) {
+            return $this->sendError('Error : ' . $e, 500);
+        }
+    }
+
+    public function updateCertificateDetails(Request $request)
+    {
+        // $data = $request->all();
+        try {
+            if ($request->input('isFile') == 'false') {
+                CpCertificate::where('cc_int_ref', $request->input('ccID'))->update(
+                    array(
+                        'cc_int_cpt_ref' => $request->input('cptID'),
+                        'cc_var_registration_no' => $request->input('certRegistrationNo'),
+                        'cc_date_expiry_date' => $request->input('certExpiryDate'),
+                        'cc_int_status' => 0
+                    )
+                );
+            } else {
+                if ($request->hasFile('certificatePDF') && $request->file('certificatePDF')->isValid()) {
+                    $file = $request->file('certificatePDF');
+
+                    try {
+
+                        $destinationPath = 'myhse/uploads/certificates';
+
+                        // Generate a unique filename
+                        $fileName = time() . '_' . $file->getClientOriginalName();
+
+                        // Move the uploaded file to the destination folder
+                        $file->move($destinationPath, $fileName);
+
+                        // Get the full path of the uploaded file
+                        $filePath = $destinationPath . '/' . $fileName;
+                    } catch (\Throwable $th) {
+
+                        return $this->sendResponse("Error: " . $th->getMessage(), '', 500);
+                    }
+                } else {
+
+                    return $this->sendError('Invalid file or file upload failed.', '');
+                }
+
+                CpCertificate::where('cc_int_ref', $request->input('ccID'))->update(
+                    array(
+                        'cc_int_cpt_ref' => $request->input('cptID'),
+                        'cc_var_registration_no' => $request->input('certRegistrationNo'),
+                        'cc_date_expiry_date' => $request->input('certExpiryDate'),
+                        'cc_var_path_document' => $filePath,
+                        'cc_int_status' => 0
+                    )
+                );
+            }
+
+            return $this->sendResponse('Updated Successfully', '');
+        } catch (Exception $e) {
+            return $this->sendError('Error : ' . $e, 500);
+        }
+    }
+
+    public function deleteCertificateDetails(Request $request){
+        try {
+            CpCertificate::where('cc_int_ref', $request->input('ccID'))->delete();
+            return $this->sendResponse('Certificate Deleted Successfully', '');
         } catch (Exception $e) {
             return $this->sendError('Error : ' . $e, 500);
         }

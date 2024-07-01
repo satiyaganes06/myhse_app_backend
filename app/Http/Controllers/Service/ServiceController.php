@@ -35,6 +35,7 @@ class ServiceController extends BaseController
             $service->cps_certification_ref = $request->input('certificateID');
             $service->cps_txt_description = $request->input('serviceDesc');
             $service->cps_var_starting_price = $request->input('startingPrice');
+            $service->cps_int_status = 0;
             $service->save();
 
             $states = json_decode($data['serviceState'], true);
@@ -53,22 +54,6 @@ class ServiceController extends BaseController
         }
     }
 
-    // $bookingDetails = BookingMain::join('competent_person_services', 'booking_main.bm_int_competent_person_service_id', '=', 'competent_person_services.cps_int_ref')
-    //         ->join('service_main', 'competent_person_services.cps_int_service_ref', '=', 'service_main.sm_int_ref')
-    //         ->where('competent_person_services.cps_int_user_ref',  $request->input('cpID'))
-    //         ->where('booking_main.bm_int_status', $request->input('status'))
-    //         ->select(
-    //             'booking_main.*',
-    //             'competent_person_services.*',
-    //             'service_main.sm_int_ref',
-    //             'service_main.sm_var_name',
-    //             'service_main.sm_var_img_path',
-    //             'service_main.sm_int_status',
-    //             'service_main.sm_ts_created_at',
-    //             'service_main.sm_ts_updated_at'
-    //         )
-    //         ->get();
-
     public function getMyServiceDetailsList(Request $request)
     {
         // $data = $request->all();
@@ -80,8 +65,10 @@ class ServiceController extends BaseController
                 ->where('cps_int_user_ref', $request->input('cpID'))
                 ->select(
                     'competent_person_services.*',
+                    'service_sub_list.ssl_int_ref',
                     'service_sub_list.ssl_var_subservice_name',
                     'service_sub_list.ssl_var_img_path',
+                    'service_main.sm_int_ref',
                     'service_main.sm_var_name',
                     'service_main.sm_var_img_path',
                     'cp_certificate.cc_var_registration_no',
@@ -106,8 +93,41 @@ class ServiceController extends BaseController
             //     GROUP BY cps.cps_int_ref, cps.cps_int_user_ref, cps.cps_int_service_ref, cps.cps_certification_ref, cps.cps_txt_description, cps.cps_var_starting_price, cps.cps_int_status, cps.cps_ts_created_at, cps.cps_ts_updated_at,
             // ");
 
-           
+
             return $this->sendResponse('Service Details', '', $service);
+        } catch (Exception $e) {
+            return $this->sendError('Error : ' . $e, 500);
+        }
+    }
+
+    public function updateServiceDetails(Request $request)
+    {
+        // $data = $request->all();
+        try {
+
+            CompetentPersonService::where('cps_int_ref', $request->input('cpsID'))->update(
+                array(
+                    'cps_int_service_ref' => $request->input('subServiceID'),
+                    'cps_certification_ref ' => $request->input('certificateID'),
+                    'cps_txt_description' => $request->input('serviceDesc'),
+                    'cps_var_starting_price' => $request->input('startingPrice'),
+                    'cps_int_publish_status' => $request->input('publishStatus'),
+                    'cps_int_status' => 0
+                )
+            );
+
+
+            return $this->sendResponse('Updated Successfully', '');
+        } catch (Exception $e) {
+            return $this->sendError('Error : ' . $e, 500);
+        }
+    }
+
+    public function deleteServiceDetails(Request $request)
+    {
+        try {
+            CompetentPersonService::where('cps_int_ref', $request->input('cpsID'))->delete();
+            return $this->sendResponse('Service Deleted Successfully', '');
         } catch (Exception $e) {
             return $this->sendError('Error : ' . $e, 500);
         }

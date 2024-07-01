@@ -28,13 +28,13 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function () {
 
-    Route::group(['prefix' => 'competent-person'], function(){
-       
-        Route::get("/test/getData", [test::class, 'test']);
-        
-        
+    Route::group(['prefix' => 'v2/competent-person'], function(){
+
+        Route::get("/test/getData", [test::class, 'testttt']);
+
+
     });
-    
+
 });
 
 //Test
@@ -76,10 +76,14 @@ Route::post('/cp/uploadJobResultFinalReport', [JobMainController::class, 'upload
 Route::post('/cp/getCpServiceList', [CommonDataController::class, 'getServiceList']);
 Route::post('/cp/addServiceInfo', [ServiceController::class, 'addServiceDetails']);
 Route::post('/cp/getMyServiceDetailsList', [ServiceController::class, 'getMyServiceDetailsList']);
+Route::post('/cp/updateServiceDetails', [ServiceController::class, 'updateServiceDetails']);
+Route::post('/cp/deleteServiceDetails', [ServiceController::class, 'deleteServiceDetails']);
 
 //Certificate Operations
 Route::post('/cp/getMyCertificateDetailsList', [CertificateController::class, 'getMyCertificateDetailsList']);
 Route::post('/cp/addCertificateInfo', [CertificateController::class, 'addCertificateDetails']);
+Route::post('/cp/updateCertificateDetails', [CertificateController::class, 'updateCertificateDetails']);
+Route::post('/cp/deleteCertificateDetails', [CertificateController::class, 'deleteCertificateDetails']);
 
 //Subscription Operations
 Route::post('/cp/uploadSubscriptionPayment', [PaymentSubscribeController::class, 'uploadSubscriptionPaymentData']);
