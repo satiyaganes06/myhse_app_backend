@@ -5,51 +5,61 @@ namespace App\Http\Controllers\Base;
 use App\Http\Controllers\Controller;
 use App\Models\User\UserLogin;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class BaseController extends Controller
 {
-    public function sendResponse($message, $token, $result = ''){
+    public function sendResponse($message, $token = '', $result = '', $code = 200)
+    {
         $response = [
             'success' => true,
             'message' => $message,
-            'token' => $token
         ];
 
-        if(!empty($result)){
+        if (!empty($result)) {
             $response['data'] = $result;
         }
 
-       // $ul = $this->encode_data($response);
-        return response()->json($response, 200);
+        if (!empty($token)) {
+            $response['token'] = $token;
+        }
+
+        // $ul = $this->encode_data($response);
+        return response()->json($response, $code);
     }
 
-    public function sendError($errorMEssage, $code){
+    public function sendError($errorMEssage, $code)
+    {
         $response = [
             'success' => false,
-            'message' => $errorMEssage,
+            'message' => $errorMEssage
         ];
 
-        // if(!empty($errorMEssage)){
-        //     $response['data'] = $errorMEssage;
-        // }
-
         return response()->json($response, $code);
-
     }
 
-    public function encode_data($data) {
-      $encData = base64_encode($data);
+    protected function isAuthorizedUser($id)
+    {
+        return Auth::user()->ul_int_profile_ref == $id;
+    }
+
+
+    public function encode_data($data)
+    {
+        $encData = base64_encode($data);
         $encURI = urlencode($data);
         return str_split($encURI);
     }
 
-    public function decode_data($data) {
+    public function decode_data($data)
+    {
         $decData = urldecode($data);
         $decData = base64_decode($decData);
         return $decData;
     }
 
-    public function getCpProfileDetails($userLoginID){
+    protected function getCpProfileDetails($userLoginID)
+    {
         $userLoginDetails = UserLogin::where('ul_int_ref', $userLoginID)->value('ul_int_profile_ref');
 
         return $userLoginDetails;

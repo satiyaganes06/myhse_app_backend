@@ -27,5 +27,5 @@ class ServiceSub extends Model
     const CREATED_AT = 'ssl_ts_created_at';
     const UPDATED_AT = 'sll_ts_updated_at';
 
-    
+
 }

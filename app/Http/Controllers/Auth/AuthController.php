@@ -21,7 +21,7 @@ class AuthController extends BaseController
     public function register(Request $request)
     {
         try {
-            $user = UserLogin::where('ul_var_emailaddress', $request->input('upEmailContact'))->first();
+            $user = User::where('ul_var_emailaddress', $request->input('upEmailContact'))->first();
 
             if ($user) {
                 return $this->sendError('Email already exists', 500);
@@ -56,7 +56,7 @@ class AuthController extends BaseController
                     $userProfile->save();
 
                     //Insert into user_login
-                    $userLogin = new UserLogin([
+                    $userLogin = new User([
                         'ul_int_profile_ref' => $userProfile->up_int_ref,
                         'ul_var_emailaddress' => $request->input('upEmailContact'),
                         'ul_var_password' => Hash::make($request->input('ulPassword')),
@@ -105,7 +105,7 @@ class AuthController extends BaseController
             //     return response()->json(['success' => false, 'message' => 'Email or Password does not match'], 401);
             // }
 
-            $user = UserLogin::where('ul_var_emailaddress', $request->input('ulEmail'))->first();
+            $user = User::where('ul_var_emailaddress', $request->input('ulEmail'))->first();
 
             if (!$user || !Hash::check($request->input('ulPassword'), $user->ul_var_password)) {
                 return $this->sendError('Email or Password does not match', 401);
@@ -120,15 +120,7 @@ class AuthController extends BaseController
         }
     }
 
-    public function logout(Request $request)
-    {
-        try {
-            PersonalAccessToken::where('id', $request->input('id'))->delete();
-            return $this->sendResponse('Logout successfully.', '');
-        } catch (\Exception $e) {
-            return $this->sendError('Error : ' . $e->getMessage(), 500);
-        }
-    }
+    // Version 2
 
     public function registerV2(Request $request)
     {
@@ -143,45 +135,54 @@ class AuthController extends BaseController
         ]);
 
         if ($validator->fails()) {
-            return $this->sendError('Error : ' . $validator->errors(), 400); //Bad request
+            return $this->sendError(errorMEssage: 'Error : ' . $validator->errors(), code: 400); //Bad request
         }
 
-        try {
-            DB::beginTransaction();
+        $user = User::where('ul_var_emailaddress', $request->input('upEmailContact'))->first();
 
-            // Insert into user_profile
-            $userProfile = new UserProfile([
-                'up_var_first_name' => $request->input('upfirstName'),
-                'up_var_last_name' => $request->input('upLastName'),
-                'up_var_nric' => $request->input('upNric'),
-                'up_var_email_contact' => $request->input('upEmailContact'),
-                'up_var_contact_no' => $request->input('upContactNo'),
-            ]);
-            $userProfile->save();
+        if ($user) {
+            return $this->sendError(errorMEssage: 'Email already exists', code: 500);
+        } else {
+            try {
+                DB::beginTransaction();
 
-            //Insert into user_login
-            $userLogin = new User([
-                'ul_int_profile_ref' => $userProfile->up_int_ref,
-                'ul_var_emailaddress' => $request->input('upEmailContact'),
-                'ul_var_password' => Hash::make($request->input('ulPassword')),
-            ]);
-            $userLogin->save();
+                // Insert into user_profile
+                $userProfile = new UserProfile([
+                    'up_var_first_name' => $request->input('upfirstName'),
+                    'up_var_last_name' => $request->input('upLastName'),
+                    'up_var_nric' => $request->input('upNric'),
+                    'up_var_email_contact' => $request->input('upEmailContact'),
+                    'up_var_contact_no' => $request->input('upContactNo'),
+                ]);
+                $userProfile->save();
 
-            // Insert into role_login
-            $roleLogin = new RoleLogin([
-                'rl_int_user_ref' => $userProfile->up_int_ref,
-                'rl_int_role_ref' => 4, // Assign desired role here
-            ]);
-            $roleLogin->save();
+                //Insert into user_login
+                $userLogin = new User([
+                    'ul_int_profile_ref' => $userProfile->up_int_ref,
+                    'ul_var_emailaddress' => $request->input('upEmailContact'),
+                    'ul_var_password' => Hash::make($request->input('ulPassword'), [
+                        'rounds' => 12,
+                        'salt' => uniqid(bin2hex(random_bytes(8)))
+                    ]),
+                ]);
+                $userLogin->save();
 
-            $token = $userLogin->createToken(bin2hex('developmentRegisterApiToken'))->plainTextToken;
+                // Insert into role_login
+                $roleLogin = new RoleLogin([
+                    'rl_int_user_ref' => $userProfile->up_int_ref,
+                    'rl_int_role_ref' => 4, // Assign desired role here
+                ]);
+                $roleLogin->save();
 
-            DB::commit();
+                $token = $userLogin->createToken('developmentRegisterApiToken')->plainTextToken;
 
-            return $this->sendResponse('User registered successfully.', $token);
-        } catch (\Throwable $th) {
-            DB::rollBack();
-            return $this->sendError('Error : ' . $th->getMessage(), 500);
+                DB::commit();
+
+                return $this->sendResponse(message: 'User registered successfully.', result: $token);
+            } catch (\Throwable $th) {
+                DB::rollBack();
+                return $this->sendError(errorMEssage: 'Error : ' . $th->getMessage(), code: 500);
+            }
         }
     }
 
@@ -194,31 +195,44 @@ class AuthController extends BaseController
         ]);
 
 
-        if($validator->fails()){
-            return $this->sendError('Error : ' . $validator->errors(), 400); //Bad request
+        if ($validator->fails()) {
+            return $this->sendError(errorMEssage: 'Error : ' . $validator->errors(), code: 400); //Bad request
         }
 
         try {
 
             $credentials = [
                 'ul_var_emailaddress' => $request->input('ulEmail'),
-                'ul_var_password' => $request->input('ulPassword')
+                'password' => $request->input('ulPassword')
             ];
 
-            if(Auth::attempt($credentials)){
+            if (Auth::attempt($credentials)) {
                 $user = Auth::user();
                 $token = $user->createToken('developmentLoginApiToken')->plainTextToken;
 
-                return $this->sendResponse('Login successfully.', $token);
-
-            }else{
-                return $this->sendError('Email or Password does not match', 401);
+                return $this->sendResponse(message: 'Login successfully.', result: $token);
+            } else {
+                $user  = User::where('ul_var_emailaddress', $request->input('ulEmail'))->first();
+                if ($user) {
+                    return $this->sendError(errorMEssage: 'Email or Password does not match', code: 401);
+                } else {
+                    return $this->sendError(errorMEssage: 'Email does not exist', code: 401);
+                }
             }
         } catch (\Throwable $th) {
-            return $this->sendError('Error : ' . $th->getMessage(), 500);
+            return $this->sendError(errorMEssage: 'Error : ' . $th->getMessage(), code: 500);
         }
     }
 
+    public function logout()
+    {
+        try {
+            Auth::user()->tokens()->delete();
+            return $this->sendResponse(message: 'Logout successfully.');
+        } catch (\Exception $e) {
+            return $this->sendError(errorMEssage: 'Error : ' . $e->getMessage(), code: 500);
+        }
+    }
 }
 
 // public function register(){

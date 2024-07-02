@@ -11,6 +11,7 @@ use App\Http\Controllers\Booking\BookingMainController;
 use App\Http\Controllers\Base\BaseController;
 use App\Http\Controllers\Certificate\CertificateController;
 use App\Http\Controllers\PaymentSubscribeController;
+use App\Http\Controllers\State\StateController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -25,6 +26,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+//!! Version 2 with Access Token
+
 Route::group(['prefix' => 'v2/auth'], function(){
     Route::post('/register', [AuthController::class, 'registerV2']);
     Route::post('/login', [AuthController::class, 'loginV2']);
@@ -34,31 +37,51 @@ Route::group(['prefix' => 'v2/auth'], function(){
 Route::middleware('auth:sanctum')->group(function () {
 
     Route::group(['prefix' => 'v2/competent-person'], function(){
-
+        //Test Routes
         Route::get("/test/getData", [test::class, 'testttt']);
 
+
+        Route::get('/logout', [AuthController::class, 'logout']);
+
+        // Manage User
+        Route::get("/getCpProfileDetailsByID/{id}", [CpDetailsController::class, 'getCpProfileDetailsByID']);
+        Route::patch("/updateCpProfileDetailsByID/{id}", [CpDetailsController::class, 'updateCpProfileDetailsByID']);
+        Route::get("/getEmailStatusByID/{id}", [CpDetailsController::class, 'getEmailStatusByID']);
+        Route::patch("/updateEmailStatusByID/{id}", [CpDetailsController::class, 'updateEmailStatusByID']);
+        Route::get("/getCpFirstTimeStatusByID/{id}", [CpDetailsController::class, 'getCpFirstTimeStatusByID']);
+        Route::get("/getCompetentPersonTypeList", [CpDetailsController::class, 'getCompententPersonTypeList']);
+
+        // Service
+        Route::get("/getServiceMainList", [ServiceController::class, 'getServiceMainList']);
+        Route::get("/getSubServiceList", [ServiceController::class, 'getSubServiceList']);
+
+        //State
+        Route::get("/getStateList", [StateController::class, 'getStateList']);
 
     });
 
 });
 
+
+//!! Version 1
+
 //Test
 Route::post('/cp/test', [BaseController::class, 'getCpProfileDetails']);
 
 //App Operations
-Route::post("/cp/getCpProfileDetails", [CpDetailsController::class, 'cpProfileDetails']);
-Route::post("/cp/getEmailVerificationStatus", [CpDetailsController::class, 'cpEmailVerificationStatusCheck']);
-Route::post("/cp/updateEmailVerificationStatus", [CpDetailsController::class, 'cpEmailVerificationStatusUpdate']);
-Route::post("/cp/getFirstTimeStatus", [CpDetailsController::class, 'cpFirstTimeStatusCheck']);
+Route::post("/cp/getCpProfileDetails/{id}", [CpDetailsController::class, 'cpProfileDetails']); // Done to V2
+Route::post("/cp/getEmailVerificationStatus", [CpDetailsController::class, 'cpEmailVerificationStatusCheck']); // Done to V2
+Route::post("/cp/updateEmailVerificationStatus", [CpDetailsController::class, 'cpEmailVerificationStatusUpdate']); // Done to V2
+Route::post("/cp/getFirstTimeStatus", [CpDetailsController::class, 'cpFirstTimeStatusCheck']); // Done to V2
 
 //Common
-Route::get("/cp/getStateList", [CommonDataController::class, 'getStateList']);
-Route::get("/cp/getServiceMainList", [CommonDataController::class, 'getServiceMainList']);
-Route::get("/cp/getSubServiceList", [CommonDataController::class, 'getSubServiceList']);
-Route::get("/cp/getCompetentPersonTypeList", [CommonDataController::class, 'getCompententPersonTypeList']);
+Route::get("/cp/getStateList", [CommonDataController::class, 'getStateList']); // Done to V2
+Route::get("/cp/getServiceMainList", [CommonDataController::class, 'getServiceMainList']); // Done to V2
+Route::get("/cp/getSubServiceList", [CommonDataController::class, 'getSubServiceList']); // Done to V2
+Route::get("/cp/getCompetentPersonTypeList", [CommonDataController::class, 'getCompententPersonTypeList']); // Done to V2
 
-Route::put('/cp/completeProfile', [CpDetailsController::class, 'cpCompleteProfile']);
-Route::put('/cp/updateCpProfileInfo', [CpDetailsController::class, 'updateProfileInfo']);
+Route::put('/cp/completeProfile', [CpDetailsController::class, 'cpCompleteProfile']); // Done to V2
+Route::put('/cp/updateCpProfileInfo', [CpDetailsController::class, 'updateProfileInfo']); // Done to V2
 
 //Booking Operations
 Route::post('/cp/bookingMainList', [BookingMainController::class, 'cpBookingInfo']);

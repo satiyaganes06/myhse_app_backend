@@ -5,130 +5,258 @@ namespace App\Http\Controllers\User;
 use App\Http\Controllers\Base\BaseController as BaseController;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
-use App\Models\UserLogin;
+use App\Models\User\UserLogin;
 use Illuminate\Http\Request;
-use App\Models\UserProfile;
+use App\Models\User\UserProfile;
 use Exception;
-use Nette\Schema\Expect;
+use Illuminate\Support\Facades\DB;
+use App\Models\Common\CompetentPersonTypes;
 
 class CpDetailsController extends BaseController
 {
-    public function cpProfileDetails(Request $request)
+
+    //!! Version 1
+    // public function cpProfileDetails(Request $request)
+    // {
+
+    //     try {
+    //         $userProfileDetails = UserProfile::where('up_int_ref', $request->input('cpID'))->first();
+
+    //         return $this->sendResponse('get cp info', '', $userProfileDetails);
+    //     } catch (Exception $e) {
+
+    //         return $this->sendError('Error : ' . $e->getMessage(), 500);
+    //     }
+    // }
+
+    // public function cpEmailVerificationStatusCheck(Request $request)
+    // {
+
+    //     try {
+    //         $status = UserLogin::select('ul_ts_email_verified_at')->where('ul_var_emailaddress', $request->input('cpEmail'))->first();
+    //        // view('emailVerification', ['status' => $status]);
+    //         return $this->sendResponse('cp email verification status', '', $status);
+    //     } catch (Exception $e) {
+
+    //         return $this->sendError('Error : ' . $e->getMessage(), 500);
+    //     }
+    // }
+
+    // public function cpFirstTimeStatusCheck(Request $request)
+    // {
+
+    //     try {
+    //         $status = UserLogin::select('ul_int_first_time_login')->where('ul_var_emailaddress', $request->input('cpEmail'))->first();
+
+    //         return $this->sendResponse('cp first time status', '', $status);
+    //     } catch (Exception $e) {
+
+    //         return $this->sendError('Error : ' . $e->getMessage(), 500);
+    //     }
+    // }
+
+    // public function cpEmailVerificationStatusUpdate(Request $request)
+    // {
+
+    //     try {
+    //         $status  = UserLogin::where('ul_var_emailaddress', $request->input('cpEmail'))->update(array('ul_ts_email_verified_at' => date('Y-m-d H:i:s')));
+
+    //         return $this->sendResponse('Verified', '', $status);
+    //     } catch (Exception $e) {
+
+    //         return $this->sendError('Error : ' . $e->getMessage(), 500);
+    //     }
+    // }
+
+    // public function cpCompleteProfile(Request $request)
+    // {
+
+    //     try {
+
+    //         $validatorUser = Validator::make($request->all(), [
+    //             'cpID' => 'required|integer',
+    //             'cpAddress' => 'required|string|max:255',
+    //             'cpZipCode' => 'required|integer',
+    //             'cpState' => 'required|string|max:255'
+    //         ]);
+
+    //         UserProfile::where('up_int_ref', $request->input('cpID'))->update(
+    //             array(
+    //                 'up_var_address' => $request->input('cpAddress'),
+    //                 'up_int_zip_code' => $request->input('cpZipCode'),
+    //                 'up_var_state' => $request->input('cpState'),
+
+    //             )
+    //         );
+
+    //         UserLogin::where('ul_int_profile_ref', $request->input('cpID'))->update(
+    //             array(
+    //                 'ul_int_first_time_login' => 1,
+    //             )
+    //         );
+
+
+    //         return $this->sendResponse('Successfully complete your profile', '');
+    //     } catch (Exception $e) {
+
+    //         return $this->sendError('Error : ' . $e->getMessage(), 500);
+    //     }
+    // }
+
+    // public function updateProfileInfo(Request $request){
+    //     try {
+
+    //         UserProfile::where('up_int_ref', $request->input('cpID'))->update(
+    //             array(
+    //                 'up_var_first_name' => $request->input('cpFirstName'),
+    //                 'up_var_last_name' => $request->input('cpLastName'),
+    //                 'up_var_nric' => $request->input('cpNRIC'),
+    //                 'up_var_email_contact' => $request->input('cpEmail'),
+    //                 'up_var_contact_no' => $request->input('cpPhoneNumber'),
+    //                 'up_var_address' => $request->input('cpAddress'),
+    //                 'up_int_zip_code' => $request->input('cpZipCode'),
+    //                 'up_var_state' => $request->input('cpState')
+    //             )
+    //         );
+
+    //         UserLogin::where('ul_int_profile_ref', $request->input('cpID'))->update(
+    //             array(
+    //                 'ul_int_first_time_login' => 1,
+    //             )
+    //         );
+
+
+    //         return $this->sendResponse('Successfully complete your profile', '');
+    //     } catch (Exception $e) {
+
+    //         return $this->sendError('Error : ' . $e->getMessage(), 500);
+    //     }
+    // }
+
+
+    //!! Version 2
+
+    public function getCpProfileDetailsByID($id)
+    {
+        try {
+
+            if ($this->isAuthorizedUser($id)) {
+                $userProfile = UserProfile::where('up_int_ref', $id)->first();
+                return $this->sendResponse(message: 'Get CP Profile Informations', result: $userProfile);
+            }
+
+            return $this->sendError('Unauthorized Request', 401);
+        } catch (Exception $e) {
+
+            return $this->sendError(errorMEssage: 'Error : ' . $e->getMessage(), code: 500);
+        }
+    }
+    // John Doe: 63|ksDgiSwEaT21xsTBh4GGMsqRFLcvFgE0vLYAysQx76ed7af1
+    // Pan Doe: 62|S7NbS7Ef0Fd2yk17Yj7EuJl2MqDE7esUGG3R2hMie742015e
+
+    public function getEmailStatusByID($id)
+    {
+        try {
+            if ($this->isAuthorizedUser($id)) {
+                $status = UserLogin::select('ul_ts_email_verified_at')->where('ul_int_profile_ref', $id)->first();
+                return $this->sendResponse(message: 'Get Email Verification Status', result: $status);
+            }
+
+            return $this->sendError('Unauthorized Request', 401);
+        } catch (Exception $e) {
+
+            return $this->sendError(errorMEssage: 'Error : ' . $e->getMessage(), code: 500);
+        }
+    }
+
+    public function updateEmailStatusByID(Request $request, $id)
     {
 
         try {
-            $userProfileDetails = UserProfile::where('up_int_ref', $request->input('cpID'))->first();
+            $status  = UserLogin::where('ul_int_profile_ref', $id)->update(array('ul_ts_email_verified_at' => now()));
 
-            return $this->sendResponse('get cp info', '', $userProfileDetails);
+            return $this->sendResponse(message: 'Email Verified Successfully', result: $status);
         } catch (Exception $e) {
 
-            return $this->sendError('Error : ' . $e->getMessage(), 500);
+            return $this->sendError(errorMEssage: 'Error : ' . $e->getMessage(), code: 500);
         }
     }
 
-    public function cpEmailVerificationStatusCheck(Request $request)
+    public function getCpFirstTimeStatusByID($id)
     {
-
         try {
-            $status = UserLogin::select('ul_ts_email_verified_at')->where('ul_var_emailaddress', $request->input('cpEmail'))->first();
-           // view('emailVerification', ['status' => $status]);
-            return $this->sendResponse('cp email verification status', '', $status);
+            if ($this->isAuthorizedUser($id)) {
+                $status = UserLogin::select('ul_int_first_time_login')->where('ul_int_profile_ref', $id)->first();
+
+                return $this->sendResponse(message: 'Get CP first time status', result: $status);
+            }
+
+            return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
         } catch (Exception $e) {
 
-            return $this->sendError('Error : ' . $e->getMessage(), 500);
+            return $this->sendError(errorMEssage: 'Error : ' . $e->getMessage(), code: 500);
         }
     }
 
-    public function cpFirstTimeStatusCheck(Request $request)
+    public function updateCpProfileDetailsByID(Request $request, $id)
     {
-
         try {
-            $status = UserLogin::select('ul_int_first_time_login')->where('ul_var_emailaddress', $request->input('cpEmail'))->first();
 
-            return $this->sendResponse('cp first time status', '', $status);
+            if($this->isAuthorizedUser($id)){
+                $validator = validator::make(
+                    $request->all(),
+                    [
+                        'up_var_first_name' => 'required|string|max:255',
+                        'up_var_last_name' => 'required|string|max:255',
+                        'up_var_nric' => 'required|string|max:255',
+                        'up_var_email_contact' => 'required|string|max:255',
+                        'up_var_contact_no' => 'required|string|max:255',
+                        'up_int_iscompany' => 'required|integer',
+                        'up_var_address' => 'required|string|max:255',
+                        'up_int_zip_code' => 'required|integer',
+                        'up_var_state' => 'required|string|max:255'
+                    ]
+                );
+
+                if($validator->fails()){
+                    return $this->sendError(errorMEssage: 'Validation Error', code: 400);
+                }
+
+                DB::beginTransaction();
+
+                UserProfile::where('up_int_ref', $id)->update(
+                    $request->all()
+                );
+
+                UserLogin::where('ul_int_profile_ref', $id)->update(
+                    array(
+                        'ul_int_first_time_login' => 1,
+                    )
+                );
+
+                DB::commit();
+
+
+                $userProfileInfo = UserProfile::find($id);
+
+                return $this->sendResponse(message: 'Profile Updated Successfully', result: $userProfileInfo);
+            }
+
+            return $this->sendError('Unauthorized Request', 401);
+
         } catch (Exception $e) {
 
+            DB::rollBack();
             return $this->sendError('Error : ' . $e->getMessage(), 500);
         }
     }
 
-    public function cpEmailVerificationStatusUpdate(Request $request)
-    {
-
+    public function getCompententPersonTypeList(){
         try {
-            $status  = UserLogin::where('ul_var_emailaddress', $request->input('cpEmail'))->update(array('ul_ts_email_verified_at' => date('Y-m-d H:i:s')));
-
-            return $this->sendResponse('Verified', '', $status);
-        } catch (Exception $e) {
-
-            return $this->sendError('Error : ' . $e->getMessage(), 500);
+            $competentPersonTypeList = CompetentPersonTypes::all();
+            return $this->sendResponse(message: 'Get Competent Person Type List', result: $competentPersonTypeList);
+        } catch (\Exception $e) {
+            return $this->sendError(errorMEssage: 'Error : ' . $e, code: 500);
         }
     }
-
-    public function cpCompleteProfile(Request $request)
-    {
-
-        try {
-
-            $validatorUser = Validator::make($request->all(), [
-                'cpID' => 'required|integer',
-                'cpAddress' => 'required|string|max:255',
-                'cpZipCode' => 'required|integer',
-                'cpState' => 'required|string|max:255'
-            ]);
-            
-            UserProfile::where('up_int_ref', $request->input('cpID'))->update(
-                array(
-                    'up_var_address' => $request->input('cpAddress'),
-                    'up_int_zip_code' => $request->input('cpZipCode'),
-                    'up_var_state' => $request->input('cpState'),
-
-                )
-            );
-
-            UserLogin::where('ul_int_profile_ref', $request->input('cpID'))->update(
-                array(
-                    'ul_int_first_time_login' => 1,
-                )
-            );
-
-
-            return $this->sendResponse('Successfully complete your profile', '');
-        } catch (Exception $e) {
-
-            return $this->sendError('Error : ' . $e->getMessage(), 500);
-        }
-    }
-
-    public function updateProfileInfo(Request $request){
-        try {
-
-            UserProfile::where('up_int_ref', $request->input('cpID'))->update(
-                array(
-                    'up_var_first_name' => $request->input('cpFirstName'),
-                    'up_var_last_name' => $request->input('cpLastName'),
-                    'up_var_nric' => $request->input('cpNRIC'),
-                    'up_var_email_contact' => $request->input('cpEmail'),
-                    'up_var_contact_no' => $request->input('cpPhoneNumber'),
-                    'up_var_address' => $request->input('cpAddress'),
-                    'up_int_zip_code' => $request->input('cpZipCode'),
-                    'up_var_state' => $request->input('cpState')
-                )
-            );
-
-            UserLogin::where('ul_int_profile_ref', $request->input('cpID'))->update(
-                array(
-                    'ul_int_first_time_login' => 1,
-                )
-            );
-
-
-            return $this->sendResponse('Successfully complete your profile', '');
-        } catch (Exception $e) {
-
-            return $this->sendError('Error : ' . $e->getMessage(), 500);
-        }
-    }
-
-
 }

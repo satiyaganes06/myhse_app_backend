@@ -13,6 +13,8 @@ use App\Models\UserLogin;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Models\UserProfile;
+use App\Models\Services\ServiceMain;
+use App\Models\Services\ServiceSub;
 
 use Exception;
 use Nette\Schema\Expect;
@@ -20,6 +22,24 @@ use Symfony\Component\Console\Input\Input;
 
 class ServiceController extends BaseController
 {
+
+    public function getServiceMainList(){
+        try {
+             $serviceMainList = ServiceMain::all();
+             return $this->sendResponse(message: 'Get Service Main List', result: $serviceMainList);
+         } catch (\Exception $e) {
+             return $this->sendError(errorMEssage: 'Error : ' . $e, code: 500);
+         }
+     }
+
+     public function getSubServiceList(){
+        try {
+             $subServiceList = ServiceSub::all();
+             return $this->sendResponse(message: 'Get Sub Service List', result: $subServiceList);
+         } catch (\Exception $e) {
+             return $this->sendError(errorMEssage: 'Error : ' . $e, code: 500);
+         }
+     }
 
 
     public function addServiceDetails(Request $request)
@@ -76,7 +96,7 @@ class ServiceController extends BaseController
                 )->get();
 
             // $userServices =  DB::select("
-            //     SELECT 
+            //     SELECT
             //         cps.cps_int_ref,
             //         cps.cps_int_user_ref,
             //         cps.cps_int_service_ref,
