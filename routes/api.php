@@ -25,6 +25,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::group(['prefix' => 'v2/auth'], function(){
+    Route::post('/register', [AuthController::class, 'registerV2']);
+    Route::post('/login', [AuthController::class, 'loginV2']);
+});
+
 
 Route::middleware('auth:sanctum')->group(function () {
 

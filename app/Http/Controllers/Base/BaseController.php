@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Base;
 
 use App\Http\Controllers\Controller;
-use App\Models\UserLogin;
+use App\Models\User\UserLogin;
 use Illuminate\Http\Request;
 
 class BaseController extends Controller
@@ -42,7 +42,7 @@ class BaseController extends Controller
         $encURI = urlencode($data);
         return str_split($encURI);
     }
-    
+
     public function decode_data($data) {
         $decData = urldecode($data);
         $decData = base64_decode($decData);

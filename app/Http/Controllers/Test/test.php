@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Test;
 
 use App\Http\Controllers\Controller;
-use App\Models\UserProfile;
+use App\Models\User\UserProfile;
 use Illuminate\Http\Request;
 
 class test extends Controller

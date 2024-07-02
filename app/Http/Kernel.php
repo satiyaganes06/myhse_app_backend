@@ -43,6 +43,14 @@ class Kernel extends HttpKernel
             'throttle:api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
+
+        'adminer' => [
+            \App\Http\Middleware\EncryptCookies::class,
+            \Illuminate\Session\Middleware\StartSession::class,
+            // TODO: you may create customized middleware to fit your needs
+            // example uses Laravel default authentication (default protection)
+            \Illuminate\Auth\Middleware\Authenticate::class,
+        ],
     ];
 
     /**
