@@ -12,44 +12,12 @@ use Illuminate\Http\Request;
 
 class CommonDataController extends BaseController
 {
-    public function getStateList(){
-        try {
-            $stateList = State::all();
-            return $this->sendResponse('get state list', '', $stateList);
-        } catch (\Exception $e) {
-            return $this->sendError('Error : ' . $e, 500);
-        }
+    public function imageView($filename)
+    {
+
     }
 
-    public function getServiceMainList(){
-       try {
-            $serviceMainList = ServiceMain::all();
-            return $this->sendResponse('get service main list', '', $serviceMainList);
-        } catch (\Exception $e) {
-            return $this->sendError('Error : ' . $e, 500);
-        }
-    }
-
-    public function getSubServiceList(){
-       try {
-            $subServiceList = SubService::all();
-            return $this->sendResponse('get sub service list', '', $subServiceList);
-        } catch (\Exception $e) {
-            return $this->sendError('Error : ' . $e, 500);
-        }
-    }
-
-    public function getCompententPersonTypeList(){
-        try {
-            $competentPersonTypeList = CompetentPersonTypes::all();
-            return $this->sendResponse('get competent person type list', '', $competentPersonTypeList);
-        } catch (\Exception $e) {
-            return $this->sendError('Error : ' . $e, 500);
-        }
-    }
-
-
-    public function pdfView($filename)
+    public function fileView($filename)
     {
         $path = storage_path("app/uploads/documents/{$filename}");
 
@@ -59,5 +27,10 @@ class CommonDataController extends BaseController
             abort(404);
         }
     }
-    
+
+    public function downloadFileNImage($filename)
+    {
+
+    }
+
 }

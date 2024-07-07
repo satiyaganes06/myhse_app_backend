@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User\UserLogin;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Exception;
 
 class BaseController extends Controller
 {
@@ -13,6 +14,7 @@ class BaseController extends Controller
     {
         $response = [
             'success' => true,
+            'status-code' => $code,
             'message' => $message,
         ];
 
@@ -25,22 +27,41 @@ class BaseController extends Controller
         }
 
         // $ul = $this->encode_data($response);
-        return response()->json($response, $code);
+        return response()->json(data: $response, status: $code);
     }
 
     public function sendError($errorMEssage, $code)
     {
         $response = [
             'success' => false,
+            'status-code' => $code,
             'message' => $errorMEssage
         ];
 
-        return response()->json($response, $code);
+        return response()->json(data: $response, status: $code);
     }
 
     protected function isAuthorizedUser($id)
     {
         return Auth::user()->ul_int_profile_ref == $id;
+    }
+
+    protected function uploadFile($file)
+    {
+        try {
+
+            $fileName = time() . '_' . $file->getClientOriginalName();
+
+            $path = $file->storeAs('uploads/pdf', $fileName);
+
+            //    // $path = $file->store('uploads/images/profile'); // 'pdfs' is the storage folder, you can change it as needed
+            // $path = $file->store('uploads/images'); // 'pdfs' is the storage folder, you can change it as needed
+            // //  $path = Storage::disk('local')->put('uploads/documents', $pdf);
+
+            return $path;
+        } catch (Exception $e) {
+            return $path;
+        }
     }
 
 

@@ -29,34 +29,64 @@ use Illuminate\Support\Facades\Route;
 //!! Version 2 with Access Token
 
 Route::group(['prefix' => 'v2/auth'], function(){
-    Route::post('/register', [AuthController::class, 'registerV2']);
-    Route::post('/login', [AuthController::class, 'loginV2']);
+    Route::post('/register', [AuthController::class, 'registration']);
+    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+    Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 });
 
+// John Doe: 63|ksDgiSwEaT21xsTBh4GGMsqRFLcvFgE0vLYAysQx76ed7af1
+// Pan Doe: 62|S7NbS7Ef0Fd2yk17Yj7EuJl2MqDE7esUGG3R2hMie742015e
 
 Route::middleware('auth:sanctum')->group(function () {
 
     Route::group(['prefix' => 'v2/competent-person'], function(){
+
         //Test Routes
         Route::get("/test/getData", [test::class, 'testttt']);
 
-
-        Route::get('/logout', [AuthController::class, 'logout']);
+        // Auth
+        Route::get('/auth/logout', [AuthController::class, 'logout']);
+        Route::get('/auth/getUserID', [AuthController::class, 'getUserID']);
 
         // Manage User
-        Route::get("/getCpProfileDetailsByID/{id}", [CpDetailsController::class, 'getCpProfileDetailsByID']);
-        Route::patch("/updateCpProfileDetailsByID/{id}", [CpDetailsController::class, 'updateCpProfileDetailsByID']);
-        Route::get("/getEmailStatusByID/{id}", [CpDetailsController::class, 'getEmailStatusByID']);
-        Route::patch("/updateEmailStatusByID/{id}", [CpDetailsController::class, 'updateEmailStatusByID']);
-        Route::get("/getCpFirstTimeStatusByID/{id}", [CpDetailsController::class, 'getCpFirstTimeStatusByID']);
-        Route::get("/getCompetentPersonTypeList", [CpDetailsController::class, 'getCompententPersonTypeList']);
+        Route::get("/manage-user/getCpProfileDetailsByID/{id}", [CpDetailsController::class, 'getCpProfileDetailsByID']);
+        Route::get("/manage-user/getClientUserProfileDetailByID/{id}/{clientID}", [CpDetailsController::class, 'getClientUserProfileDetailByID']);
+        Route::patch("/manage-user/updateCpProfileDetailsByID/{id}", [CpDetailsController::class, 'updateCpProfileDetailsByID']);
+        Route::get("/manage-user/getEmailStatusByID/{id}", [CpDetailsController::class, 'getEmailStatusByID']);
+        Route::patch("/manage-user/updateEmailStatusByID/{id}", [CpDetailsController::class, 'updateEmailStatusByID']);
+        Route::get("/manage-user/getCpFirstTimeStatusByID/{id}", [CpDetailsController::class, 'getCpFirstTimeStatusByID']);
+        Route::get("/manage-user/getCompetentPersonTypeList", [CpDetailsController::class, 'getCompententPersonTypeList']);
+
+        // Certificate
+        Route::get("/certificate/getCertificatesDetailByID/{id}", [CertificateController::class, 'getCertificatesDetailByID']);
+        Route::post("/certificate/addCertificateDetail", [CertificateController::class, 'addCertificateDetail']);
+        Route::patch("/certificate/updateCertificateDetail/{id}", [CertificateController::class, 'updateCertificateDetail']);
+        Route::delete("/certificate/deleteCertificateDetailByID/{id}/{ccID}", [CertificateController::class, 'deleteCertificateDetailByID']);
 
         // Service
-        Route::get("/getServiceMainList", [ServiceController::class, 'getServiceMainList']);
-        Route::get("/getSubServiceList", [ServiceController::class, 'getSubServiceList']);
+        Route::get("/service/getServiceMainList", [ServiceController::class, 'getServiceMainList']);
+        Route::get("/service/getSubServiceList", [ServiceController::class, 'getSubServiceList']);
 
-        //State
-        Route::get("/getStateList", [StateController::class, 'getStateList']);
+        Route::get('/service/getServicesDetailByID/{id}', [ServiceController::class, 'getServicesDetailByID']);
+        Route::post('/service/addServiceDetail', [ServiceController::class, 'addServiceDetail']);
+        Route::patch('/service/updateServiceDetail/{id}', [ServiceController::class, 'updateServiceDetail']);
+        Route::delete('/service/deleteServiceDetails/{id}/{cpsID}', [ServiceController::class, 'deleteServiceDetails']);
+
+        // State
+        Route::get("/state/getStateList", [StateController::class, 'getStateList']);
+
+        // Booking
+        Route::get('/booking/getBookingsDetailByID/{id}', [BookingMainController::class, 'getBookingsDetailByID']);
+        Route::get('/booking/getBookingRequestDetailByID/{id}/{brID}', [BookingMainController::class, 'getBookingRequestDetailByID']);
+        Route::post('/booking/addBookingRequestDetail', [BookingMainController::class, 'addBookingRequestDetail']);
+        Route::patch('/booking/updateBookingRequestStatusByID/{id}', [BookingMainController::class, 'updateBookingRequestStatusByID']);
+        Route::patch('/booking/updateBookingMainStatusByID/{id}', [BookingMainController::class, 'updateBookingMainStatusByID']); // Un-finished
+
+        //Image and File Viewer
+        Route::get('/viewer/pdfviewer/{filename}', [CommonDataController::class, 'fileView'])->where('filename', '.*'); // Un-finished
+        Route::get('/viewer/imageviewer/{filename}', [CommonDataController::class, 'imageView'])->where('filename', '.*'); // Un-finished
+        Route::get('/viewer/downloadfile/{filename}', [CommonDataController::class, 'downloadFileNImage'])->where('filename', '.*'); // Un-finished
 
     });
 
@@ -84,12 +114,12 @@ Route::put('/cp/completeProfile', [CpDetailsController::class, 'cpCompleteProfil
 Route::put('/cp/updateCpProfileInfo', [CpDetailsController::class, 'updateProfileInfo']); // Done to V2
 
 //Booking Operations
-Route::post('/cp/bookingMainList', [BookingMainController::class, 'cpBookingInfo']);
+Route::post('/cp/bookingMainList', [BookingMainController::class, 'cpBookingInfo']); // Done to V2
 Route::post('/cp/cpBookingRequest', [BookingMainController::class, 'cpBookingRequest']);
-Route::post('/cp/bookingDetails', [BookingMainController::class, 'cpBookingDetailsList']);
-Route::post('/cp/addBookingRequest', [BookingMainController::class, 'addBookingRequest']);
-Route::post('/cp/updateBookingMain', [BookingMainController::class, 'updateStatusBookingMain']);
-Route::post('/cp/updateBookingRequest', [BookingMainController::class, 'updateStatusBookingRequest']);
+Route::post('/cp/bookingDetails', [BookingMainController::class, 'cpBookingDetailsList']); // Done to V2
+Route::post('/cp/addBookingRequest', [BookingMainController::class, 'addBookingRequest']); // Done to V2
+Route::post('/cp/updateBookingMain', [BookingMainController::class, 'updateStatusBookingMain']); // Done to V2
+Route::post('/cp/updateBookingRequest', [BookingMainController::class, 'updateStatusBookingRequest']); // Done to V2
 
 //Job Operation
 Route::post('/cp/getJobList', [JobMainController::class, 'cpJobMainListDetails']);
@@ -101,17 +131,17 @@ Route::post('/cp/updateJobMainProgressCompleteStatus', [JobMainController::class
 Route::post('/cp/uploadJobResultFinalReport', [JobMainController::class, 'uploadJobResultFinalDocument']);
 
 //Service Operations
-Route::post('/cp/getCpServiceList', [CommonDataController::class, 'getServiceList']);
-Route::post('/cp/addServiceInfo', [ServiceController::class, 'addServiceDetails']);
-Route::post('/cp/getMyServiceDetailsList', [ServiceController::class, 'getMyServiceDetailsList']);
-Route::post('/cp/updateServiceDetails', [ServiceController::class, 'updateServiceDetails']);
-Route::post('/cp/deleteServiceDetails', [ServiceController::class, 'deleteServiceDetails']);
+Route::post('/cp/getCpServiceList', [CommonDataController::class, 'getServiceList']); // Done to V2
+Route::post('/cp/addServiceInfo', [ServiceController::class, 'addServiceDetails']); // Done to V2
+Route::post('/cp/getMyServiceDetailsList', [ServiceController::class, 'getMyServiceDetailsList']); // Done to V2
+Route::post('/cp/updateServiceDetails', [ServiceController::class, 'updateServiceDetails']); // Done to V2
+Route::post('/cp/deleteServiceDetails', [ServiceController::class, 'deleteServiceDetails']); // Done to V2
 
 //Certificate Operations
-Route::post('/cp/getMyCertificateDetailsList', [CertificateController::class, 'getMyCertificateDetailsList']);
-Route::post('/cp/addCertificateInfo', [CertificateController::class, 'addCertificateDetails']);
-Route::post('/cp/updateCertificateDetails', [CertificateController::class, 'updateCertificateDetails']);
-Route::post('/cp/deleteCertificateDetails', [CertificateController::class, 'deleteCertificateDetails']);
+Route::post('/cp/getMyCertificateDetailsList', [CertificateController::class, 'getMyCertificateDetailsList']); // Done to V2
+Route::post('/cp/addCertificateInfo', [CertificateController::class, 'addCertificateDetails']); // Done to V2
+Route::post('/cp/updateCertificateDetails', [CertificateController::class, 'updateCertificateDetails']); // Done to V2
+Route::post('/cp/deleteCertificateDetails', [CertificateController::class, 'deleteCertificateDetails']); // Done to V2
 
 //Subscription Operations
 Route::post('/cp/uploadSubscriptionPayment', [PaymentSubscribeController::class, 'uploadSubscriptionPaymentData']);
@@ -119,18 +149,18 @@ Route::post('/cp/checkUserSubscription', [PaymentSubscribeController::class, 'ch
 Route::post('/cp/checkIfUserCP', [PaymentSubscribeController::class, 'checkIfUserCP']);
 
 //Normal User Operations
-Route::post("/clientUser/getClientUserProfileDetails", [ClientUserDetailsController::class, 'clientUserProfileDetails']);
+Route::post("/clientUser/getClientUserProfileDetails", [ClientUserDetailsController::class, 'clientUserProfileDetails']); // Done to V2
 
 //PDF View
 // routes/web.php or routes/api.php
 
-Route::get('/pdfviewer/{filename}', [CommonDataController::class, 'pdfView'])->where('filename', '.*');
+Route::get('/pdfviewer/{filename}', [CommonDataController::class, 'pdfView'])->where('filename', '.*'); // Done to V2
 
 
 //Auth
-Route::post("/auth/register", [AuthController::class, 'register']);
-Route::post("/auth/login", [AuthController::class, 'login']);
-Route::post("/auth/logout", [AuthController::class, 'logout']);
+Route::post("/auth/register", [AuthController::class, 'register']); // Done to V2
+Route::post("/auth/login", [AuthController::class, 'login']); // Done to V2
+Route::post("/auth/logout", [AuthController::class, 'logout']); // Done to V2
 
 
 

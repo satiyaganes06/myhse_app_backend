@@ -1,4 +1,3 @@
-
 <?php
 
 namespace App\Models\Certificate;
@@ -29,5 +28,5 @@ class CpCertificate extends Model
     const CREATED_AT = 'cc_ts_created_at';
     const UPDATED_AT = 'cc_ts_updated_at';
 
-    
+
 }

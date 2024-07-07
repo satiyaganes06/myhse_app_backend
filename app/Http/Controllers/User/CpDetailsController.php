@@ -151,8 +151,21 @@ class CpDetailsController extends BaseController
             return $this->sendError(errorMEssage: 'Error : ' . $e->getMessage(), code: 500);
         }
     }
-    // John Doe: 63|ksDgiSwEaT21xsTBh4GGMsqRFLcvFgE0vLYAysQx76ed7af1
-    // Pan Doe: 62|S7NbS7Ef0Fd2yk17Yj7EuJl2MqDE7esUGG3R2hMie742015e
+
+    public function getClientUserProfileDetailByID($id, $clientID)
+    {
+        try {
+            if($this->isAuthorizedUser($id)){
+                $userProfileDetails = UserProfile::where('up_int_ref', $clientID)->first();
+                return $this->sendResponse(message: 'Get Client Profile Detail', result: $userProfileDetails);
+            }
+
+            return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
+        } catch (Exception $e) {
+
+            return $this->sendError(errorMEssage: 'Error : ' . $e->getMessage(), code: 500);
+        }
+    }
 
     public function getEmailStatusByID($id)
     {
@@ -219,7 +232,7 @@ class CpDetailsController extends BaseController
                 );
 
                 if($validator->fails()){
-                    return $this->sendError(errorMEssage: 'Validation Error', code: 400);
+                    return $this->sendError(errorMEssage: 'Invalid Input', code: 400);
                 }
 
                 DB::beginTransaction();
