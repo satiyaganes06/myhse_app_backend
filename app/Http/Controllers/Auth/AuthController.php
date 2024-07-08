@@ -138,66 +138,77 @@ class AuthController extends BaseController
 
     public function forgotPassword(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|email',
-        ]);
+        try{
+            $validator = Validator::make($request->all(), [
+                'email' => 'required|email',
+            ]);
 
-        if ($validator->fails()) {
-            return $this->sendError(errorMEssage: 'Error : ' . $validator->errors(), code: 400); // Bad request
+            if ($validator->fails()) {
+                return $this->sendError(errorMEssage: 'Error : ' . $validator->errors(), code: 400); // Bad request
+            }
+
+            $user = User::where('ul_var_emailaddress', $request->input('email'))->first();
+
+            if (!$user) {
+                return $this->sendError(errorMEssage: 'Email does not exist', code: 404);
+            }
+
+            PasswordResets::where('email', $request->input('email'))->delete();
+
+            $token = rand(10000, 99999);
+            PasswordResets::create([
+                'email' => $request->input('email'),
+                'token' => Hash::make($token),
+                'created_at' => now(),
+            ]);
+
+            //! Send email with the token
+            // You can use Laravel's built-in notification system or any other method to send the email
+            // For example:
+            // Notification::send($user, new ResetPasswordNotification($token));
+
+            return $this->sendResponse(message: 'Password reset link sent to your email.', token: $token);
+        }catch(\Throwable $th){
+            return $this->sendError(errorMEssage: 'Error : ' . $th->getMessage(), code: 500);
         }
-
-        $user = User::where('ul_var_emailaddress', $request->input('email'))->first();
-
-        if (!$user) {
-            return $this->sendError(errorMEssage: 'Email does not exist', code: 404);
-        }
-
-        $token = Str::random(60);
-        PasswordResets::create([
-            'email' => $request->input('email'),
-            'token' => Hash::make($token),
-            'created_at' => now(),
-        ]);
-
-        //! Send email with the token
-        // You can use Laravel's built-in notification system or any other method to send the email
-        // For example:
-        // Notification::send($user, new ResetPasswordNotification($token));
-
-        return $this->sendResponse(message: 'Password reset link sent to your email.');
     }
+
 
     public function resetPassword(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|email',
-            'token' => 'required|string',
-            'password' => 'required|string|min:6|confirmed',
-        ]);
+        try{
+            $validator = Validator::make($request->all(), [
+                'email' => 'required|email',
+                'token' => 'required|string',
+                'password' => 'required|string|min:6',
+            ]);
 
-        if ($validator->fails()) {
-            return $this->sendError(errorMEssage: 'Error : ' . $validator->errors(), code: 400); // Bad request
+            if ($validator->fails()) {
+                return $this->sendError(errorMEssage: 'Error : ' . $validator->errors(), code: 400); // Bad request
+            }
+
+            $passwordReset = PasswordResets::where('email', $request->input('email'))->first();
+
+            if (!$passwordReset || !Hash::check($request->input('token'), $passwordReset->token)) {
+                return $this->sendError(errorMEssage: 'Invalid token or email', code: 400);
+            }
+
+            $user = User::where('ul_var_emailaddress', $request->input('email'))->first();
+
+            if (!$user) {
+                return $this->sendError(errorMEssage: 'Email does not exist', code: 404);
+            }
+
+            $user->ul_var_password = Hash::make($request->input('password'));
+            $user->save();
+
+            // Delete the password reset token
+            PasswordResets::where('email', $request->input('email'))->delete();
+
+            return $this->sendResponse(message: 'Password has been reset successfully.');
+        }catch(\Throwable $th){
+            return $this->sendError(errorMEssage: 'Error : ' . $th->getMessage(), code: 500);
         }
-
-        $passwordReset = PasswordResets::where('email', $request->input('email'))->first();
-
-        if (!$passwordReset || !Hash::check($request->input('token'), $passwordReset->token)) {
-            return $this->sendError(errorMEssage: 'Invalid token or email', code: 400);
-        }
-
-        $user = User::where('ul_var_emailaddress', $request->input('email'))->first();
-
-        if (!$user) {
-            return $this->sendError(errorMEssage: 'Email does not exist', code: 404);
-        }
-
-        $user->ul_var_password = Hash::make($request->input('password'));
-        $user->save();
-
-        // Delete the password reset token
-        PasswordResets::where('email', $request->input('email'))->delete();
-
-        return $this->sendResponse(message: 'Password has been reset successfully.');
     }
 
     public function logout()
