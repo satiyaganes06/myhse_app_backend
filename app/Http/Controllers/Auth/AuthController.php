@@ -31,19 +31,19 @@ class AuthController extends BaseController
             'upLastName' => 'required|string|max:255',
             'upNric' => 'required|string|max:255',
             'upEmailContact' => 'required|string|max:255',
-            'upContactNo' => 'required|string|max:10',
             'ulPassword' => 'required|min:6',
             'ulConfirmPassword' => 'required|min:6|same:ulPassword',
+            //'upContactNo' => 'required|string|max:255',
         ]);
 
         if ($validator->fails()) {
-            return $this->sendError(errorMEssage: 'Error : ' . $validator->errors(), code: 400); //Bad request
+            return $this->sendError(errorMEssage: 'Error : ' . $validator->errors()->first(), code: 400); //Bad request
         }
 
         $user = User::where('ul_var_emailaddress', $request->input('upEmailContact'))->first();
 
         if ($user) {
-            return $this->sendError(errorMEssage: 'Email already exists', code: 500);
+            return $this->sendError(errorMEssage: 'Email already exists', code: 409);
         } else {
             try {
                 DB::beginTransaction();
@@ -53,7 +53,7 @@ class AuthController extends BaseController
                     'up_var_last_name' => $request->input('upLastName'),
                     'up_var_nric' => $request->input('upNric'),
                     'up_var_email_contact' => $request->input('upEmailContact'),
-                    'up_var_contact_no' => $request->input('upContactNo'),
+                   // 'up_var_contact_no' => $request->input('upContactNo'), //! FIXME: Add the default null in database (Prod)
                 ]);
                 $userProfile->save();
 
@@ -76,11 +76,11 @@ class AuthController extends BaseController
                 ]);
                 $roleLogin->save();
 
-                $token = $userLogin->createToken('developmentRegisterApiToken')->plainTextToken;
+               // $token = $userLogin->createToken('developmentRegisterApiToken')->plainTextToken;
 
                 DB::commit();
 
-                return $this->sendResponse(message: 'User registered successfully.', result: $token);
+                return $this->sendResponse(message: 'User registered successfully.');
             } catch (\Throwable $th) {
                 DB::rollBack();
                 return $this->sendError(errorMEssage: 'Error : ' . $th->getMessage(), code: 500);
@@ -103,14 +103,14 @@ class AuthController extends BaseController
             $user = User::where('ul_var_emailaddress', $request->input('ulEmail'))->first();
 
             if (!$user) {
-                return $this->sendError(errorMEssage: 'Email does not exist', code: 401);
+                return $this->sendError(errorMEssage: 'Email does not exist', code: 400);
             }
 
             $userRole = UserRole::where('ur_var_name', 'Competent Person')->value('ur_int_ref');
             $roleLogin = RoleLogin::where('rl_int_user_ref', $user->ul_int_profile_ref)->value('rl_int_role_ref');
 
             if ($userRole != $roleLogin) {
-                return $this->sendError(errorMEssage: 'Sorry, access denied. Only Competent Persons are allowed to log in using the mobile app.', code: 401);
+                return $this->sendError(errorMEssage: 'Sorry, access denied. Only Competent Persons are allowed to log in using the mobile app.', code: 400);
             }
 
             $credentials = [
@@ -121,11 +121,14 @@ class AuthController extends BaseController
             if (Auth::attempt($credentials)) {
                 $user = Auth::user();
                 $token = $user->createToken('developmentLoginApiToken')->plainTextToken;
-
-                return $this->sendResponse(message: 'Login successfully.', result: $token);
+                $userProfile = UserProfile::where('up_int_ref', $user->ul_int_profile_ref)->first();
+                return $this->sendResponse(message: 'Login successfully.', result: [
+                    'userLogin' => $user,
+                    'userProfile' => $userProfile,
+                ], token: $token);
             } else {
 
-                return $this->sendError(errorMEssage: 'Email or Password does not match', code: 401);
+                return $this->sendError(errorMEssage: 'Email or Password does not match', code: 400);
             }
         } catch (\Throwable $th) {
             return $this->sendError(errorMEssage: 'Error : ' . $th->getMessage(), code: 500);
@@ -167,7 +170,9 @@ class AuthController extends BaseController
             // For example:
             // Notification::send($user, new ResetPasswordNotification($token));
 
-            return $this->sendResponse(message: 'Password reset link sent to your email.', token: $token);
+            return $this->sendResponse(message: 'Password reset link sent to your email.', result: [
+                'opt' => $token //! FIXME: Remove sending opt to frontend after send the email successfully
+            ]);
         }catch(\Throwable $th){
             return $this->sendError(errorMEssage: 'Error : ' . $th->getMessage(), code: 500);
         }

@@ -5,7 +5,7 @@ namespace App\Http\Controllers\User;
 use App\Http\Controllers\Base\BaseController as BaseController;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
-use App\Models\User\UserLogin;
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Models\User\UserProfile;
 use Exception;
@@ -171,7 +171,7 @@ class CpDetailsController extends BaseController
     {
         try {
             if ($this->isAuthorizedUser($id)) {
-                $status = UserLogin::select('ul_ts_email_verified_at')->where('ul_int_profile_ref', $id)->first();
+                $status = User::select('ul_ts_email_verified_at')->where('ul_int_profile_ref', $id)->first();
                 return $this->sendResponse(message: 'Get Email Verification Status', result: $status);
             }
 
@@ -186,7 +186,7 @@ class CpDetailsController extends BaseController
     {
 
         try {
-            $status  = UserLogin::where('ul_int_profile_ref', $id)->update(array('ul_ts_email_verified_at' => now()));
+            $status  = User::where('ul_int_profile_ref', $id)->update(array('ul_ts_email_verified_at' => now()));
 
             return $this->sendResponse(message: 'Email Verified Successfully', result: $status);
         } catch (Exception $e) {
@@ -199,7 +199,7 @@ class CpDetailsController extends BaseController
     {
         try {
             if ($this->isAuthorizedUser($id)) {
-                $status = UserLogin::select('ul_int_first_time_login')->where('ul_int_profile_ref', $id)->first();
+                $status = User::select('ul_int_first_time_login')->where('ul_int_profile_ref', $id)->first();
 
                 return $this->sendResponse(message: 'Get CP first time status', result: $status);
             }
@@ -225,9 +225,11 @@ class CpDetailsController extends BaseController
                         'up_var_email_contact' => 'required|string|max:255',
                         'up_var_contact_no' => 'required|string|max:255',
                         'up_int_iscompany' => 'required|integer',
+                        'up_var_company_no'=>'sometimes|string|max:255',
                         'up_var_address' => 'required|string|max:255',
                         'up_int_zip_code' => 'required|integer',
-                        'up_var_state' => 'required|string|max:255'
+                        'up_var_state' => 'required|string|max:255',
+                        'up_var_avatar_path' => 'sometimes|mimes:jpeg,jpg,png|max:2048'
                     ]
                 );
 
@@ -235,13 +237,22 @@ class CpDetailsController extends BaseController
                     return $this->sendError(errorMEssage: 'Invalid Input', code: 400);
                 }
 
+                if($request->hasFile('up_var_avatar_path')){
+                    $picPath = $this->uploadFile($request->file('up_var_avatar_path')); //! FIXME: need to change the path to the correct one
+
+                    $request->merge(['up_var_avatar_path' => $picPath]);
+
+                }
+
                 DB::beginTransaction();
 
+                $data = $request->except(['_method']);
+
                 UserProfile::where('up_int_ref', $id)->update(
-                    $request->all()
+                    $data
                 );
 
-                UserLogin::where('ul_int_profile_ref', $id)->update(
+                User::where('ul_int_profile_ref', $id)->update(
                     array(
                         'ul_int_first_time_login' => 1,
                     )
