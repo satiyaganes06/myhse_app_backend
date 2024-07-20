@@ -21,7 +21,7 @@ Route::get('/', function () {
 
 Route::get(
     '/test',
-    [test::class, 'test']
+    [test::class, 'testttt']
 );
 // routes/web.php
 
