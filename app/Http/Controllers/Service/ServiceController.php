@@ -37,6 +37,11 @@ class ServiceController extends BaseController
     {
         try {
             $subServiceList = ServiceSub::all();
+
+            if ($subServiceList->isEmpty()) {
+                return $this->sendError(errorMEssage: 'No Sub Service Found', code: 404);
+            }
+
             return $this->sendResponse(message: 'Get Sub Service List', result: $subServiceList);
         } catch (\Exception $e) {
             return $this->sendError(errorMEssage: 'Error : ' . $e, code: 500);
@@ -48,10 +53,10 @@ class ServiceController extends BaseController
         try {
             if ($this->isAuthorizedUser($id)) {
                 $limit = $request->input('limit');
-                $services = CompetentPersonService::join('service_sub_list', 'competent_person_services.cps_int_service_ref', '=', 'service_sub_list.ssl_int_ref')
-                    ->join('service_main', 'service_sub_list.ssl_int_servicemain_ref', '=', 'service_main.sm_int_ref')
+
+                $services = CompetentPersonService::join('service_sub_list', 'competent_person_services.cps_int_service_ref', '=', 'service_sub_list.ssl_int_ref') //! FIXME: ServiceMain is not neccessary
+                    ->join('service_main', 'service_sub_list.ssl_int_servicemain_ref', '=', 'service_main.sm_int_ref') //! FIXME: ServiceMain is not neccessary
                     ->join('cp_certificate', 'competent_person_services.cps_certification_ref', '=', 'cp_certificate.cc_int_ref')
-                    ->join('cp_services_state', 'competent_person_services.cps_int_service_ref', '=', 'cp_services_state.css_int_services_ref')
                     ->where('cps_int_user_ref', $id)
                     ->select(
                         'competent_person_services.*',
@@ -61,13 +66,21 @@ class ServiceController extends BaseController
                         'service_main.sm_int_ref',
                         'service_main.sm_var_name',
                         'service_main.sm_var_img_path',
-                        'cp_certificate.cc_var_registration_no',
-                        'cp_services_state.css_int_states_ref'
-                    )->paginate($limit);
+                        'cp_certificate.cc_int_ref',
+                    )->orderBy('cps_ts_created_at', 'desc')->paginate($limit);
 
                 if ($services->isEmpty()) {
                     return $this->sendError(errorMEssage: 'No service found', code: 404);
                 }
+
+                //Fetch states for each service
+                foreach ($services as $service) {
+                    $states = CpServicesState::where('css_int_services_ref', $service->cps_int_ref)
+                        ->pluck('css_int_states_ref')
+                        ->toArray();
+                    $service->states = $states;
+                }
+
 
                 return $this->sendResponse(message: 'Get Service Details', result: $services);
             }
@@ -116,7 +129,22 @@ class ServiceController extends BaseController
 
             DB::commit();
 
-            return $this->sendResponse(message: 'Service Added Successfully', result: $service);
+            $getService = CompetentPersonService::join('service_sub_list', 'competent_person_services.cps_int_service_ref', '=', 'service_sub_list.ssl_int_ref') //! FIXME: ServiceMain is not neccessary
+                    ->join('service_main', 'service_sub_list.ssl_int_servicemain_ref', '=', 'service_main.sm_int_ref') //! FIXME: ServiceMain is not neccessary
+                    ->join('cp_certificate', 'competent_person_services.cps_certification_ref', '=', 'cp_certificate.cc_int_ref')
+                    ->where('cps_int_ref', $service->cps_int_ref)
+                    ->select(
+                        'competent_person_services.*',
+                        'service_sub_list.ssl_int_ref',
+                        'service_sub_list.ssl_var_subservice_name',
+                        'service_sub_list.ssl_var_img_path',
+                        'service_main.sm_int_ref',
+                        'service_main.sm_var_name',
+                        'service_main.sm_var_img_path',
+                        'cp_certificate.cc_int_ref',
+                    )->first();
+
+            return $this->sendResponse(message: 'Service Added Successfully', result: $getService);
         } catch (Exception $e) {
             DB::rollBack();
             return $this->sendError('Error : ' . $e, 500);
@@ -134,10 +162,11 @@ class ServiceController extends BaseController
                     'certificateID' => 'sometimes|integer',
                     'serviceDescription' => 'sometimes|string',
                     'startingPrice' => 'sometimes|string',
+                    'serviceState' => 'sometimes|string',
                 ]);
 
                 if ($validator->fails()) {
-                    return $this->sendError(errorMEssage: 'Invalid Input', code: 400);
+                    return $this->sendError(errorMEssage: 'Invalid Input' . $validator->errors(), code: 400);
                 }
 
                 $service = CompetentPersonService::find($request->input('cpsID'));

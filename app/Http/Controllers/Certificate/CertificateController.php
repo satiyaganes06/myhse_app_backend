@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Log;
 class CertificateController extends BaseController
 {
 
+
     public function getCertificatesDetailByID(Request $request, $id)
     {
         try {
@@ -33,7 +34,7 @@ class CertificateController extends BaseController
                     ->select(
                         'cp_certificate.*',
                         'competent_person_types.*',
-                    )->paginate($limit);
+                    )->orderBy('cc_ts_created_at', 'desc')->paginate($limit);
 
                 if ($certificates->isEmpty()) {
                     return $this->sendResponse(message: 'No certificate found.', code: 404);
@@ -56,12 +57,19 @@ class CertificateController extends BaseController
                 'userID' => 'required|integer',
                 'cptID' => 'required|integer',
                 'certRegistrationNo' => 'required|string|max:255',
-                'certExpiryDate' => 'required|date',
+                'certExpiryDate' => 'sometimes|date',
                 'certificateFile' => 'required|mimes:pdf|max:2048',
             ]);
 
             if ($validator->fails()) {
-                return $this->sendError(errorMEssage: 'Invalid Input', code: 400);
+                return $this->sendError(errorMEssage: $validator->errors(), code: 400);
+            }
+
+            $certificates = CpCertificate::where('cc_int_user_ref', $request->input('userID'))
+            ->where('cc_var_registration_no', $request->input('certRegistrationNo'))->first();
+
+            if($certificates){
+                return $this->sendError(errorMEssage: 'Certificate Already Exist', code: 400);
             }
 
             $fileURL = $this->uploadFile($request->file('certificateFile'));
@@ -74,13 +82,19 @@ class CertificateController extends BaseController
                 'cc_int_user_ref' => $request->input('userID'),
                 'cc_int_cpt_ref' => $request->input('cptID'),
                 'cc_var_registration_no' => $request->input('certRegistrationNo'),
-                'cc_date_expiry_date' => $request->input('certExpiryDate'),
+                'cc_date_expiry_date' => $request->input('certExpiryDate'), //! FIXME: Add the default null in database (Prod)
                 'cc_var_path_document' => $fileURL,
                 'cc_int_status' => 0
             ]);
 
             if($cpCetificate){
-                return $this->sendResponse(message: 'Save Certificate Successfully', result: $cpCetificate);
+                $cert = CpCertificate::join('competent_person_types', 'cp_certificate.cc_int_cpt_ref', '=', 'competent_person_types.cpt_int_ref')
+                    ->where('cc_int_ref', $cpCetificate->cc_int_ref)
+                    ->select(
+                        'cp_certificate.*',
+                        'competent_person_types.*',
+                    )->first();
+                return $this->sendResponse(message: 'Save Certificate Successfully', result: $cert);
             }else{
                 return $this->sendError(errorMEssage: 'Something went wrong', code: 500);
             }
@@ -99,12 +113,12 @@ class CertificateController extends BaseController
                     'ccID' => 'required|integer',
                     'cptID' => 'required|integer',
                     'certRegistrationNo' => 'required|string|max:255',
-                    'certExpiryDate' => 'required|date',
+                    'certExpiryDate' => 'sometimes|date',
                     'certificateFile' => 'sometimes|mimes:pdf|max:2048'
                 ]);
 
                 if ($validator->fails()) {
-                    return $this->sendError(errorMEssage: 'Invalid Input' , code: 400);
+                    return $this->sendError(errorMEssage: $validator->errors() , code: 400);
                 }
 
                 $certificate = CpCertificate::find($request->input('ccID'));

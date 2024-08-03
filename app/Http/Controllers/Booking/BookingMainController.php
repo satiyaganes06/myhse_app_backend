@@ -17,6 +17,7 @@ use DateTime;
 use Exception;
 use Nette\Schema\Expect;
 use Symfony\Component\Console\Input\Input;
+use DateTimeZone;
 
 class BookingMainController extends BaseController
 {
@@ -29,18 +30,19 @@ class BookingMainController extends BaseController
                 $limit = $request->input('limit');
 
                 $bookingDetails = BookingMain::join('competent_person_services', 'booking_main.bm_int_competent_person_service_id', '=', 'competent_person_services.cps_int_ref')
-                    ->join('service_main', 'competent_person_services.cps_int_service_ref', '=', 'service_main.sm_int_ref')
+                    ->join('service_sub_list', 'competent_person_services.cps_int_service_ref', '=', 'service_sub_list.ssl_int_ref') //! FIXME: service_main is not used
                     ->where('competent_person_services.cps_int_user_ref',  $id)
                     ->where('booking_main.bm_int_status', $request->input('status'))
                     ->select(
                         'booking_main.*',
                         'competent_person_services.*',
-                        'service_main.sm_int_ref',
-                        'service_main.sm_var_name',
-                        'service_main.sm_var_img_path',
-                        'service_main.sm_int_status',
-                        'service_main.sm_ts_created_at',
-                        'service_main.sm_ts_updated_at'
+                        'service_sub_list.*',
+                        // 'service_main.sm_int_ref',
+                        // 'service_main.sm_var_name',
+                        // 'service_main.sm_var_img_path',
+                        // 'service_main.sm_int_status',
+                        // 'service_main.sm_ts_created_at',
+                        // 'service_main.sm_ts_updated_at'
                     )->paginate($limit);
 
                 if ($bookingDetails->isEmpty()) {
@@ -63,7 +65,7 @@ class BookingMainController extends BaseController
 
                 $limit = $request->input('limit') ?? 10;
 
-                $bookingRequests = BookingRequest::where('br_int_bookingmain_ref', $brID)->paginate($limit);
+                $bookingRequests = BookingRequest::where('br_int_bookingmain_ref', $brID)->orderBy('br_ts_created_at', 'desc')->paginate($limit);
 
                 if ($bookingRequests->isEmpty()) {
                     return $this->sendError(errorMEssage: 'No negotiation found', code: 404);
@@ -85,10 +87,11 @@ class BookingMainController extends BaseController
 
             $validator = Validator::make($request->all(), [
                 'bookingMainID' => 'required|integer',
-                'requestedPrice' => 'required|numeric',
+                'requestedPrice' => 'sometimes|numeric',
                 'remark' => 'required|string',
-                'status' => 'required|integer',
-                'userType' => 'required|integer'
+                'status' => 'sometimes|integer',
+                'userType' => 'required|integer',
+                'brType' => 'required|integer',
             ]);
 
             if ($validator->fails()) {
@@ -100,7 +103,9 @@ class BookingMainController extends BaseController
                 'br_text_request' => $request->input('requestedPrice'),
                 'br_txt_remark_reason' => $request->input('remark'),
                 'br_int_status' => $request->input('status'),
-                'br_int_user_type' => $request->input('userType')
+                'br_int_user_type' => $request->input('userType'),
+                'br_int_type' => $request->input('brType'),
+                'br_ts_created_at' =>  now()
             ]);
 
             $bookingRequest->save();
@@ -222,7 +227,7 @@ class BookingMainController extends BaseController
 
                 DB::commit();
 
-                return $this->sendResponse(message: 'Booking Accepted Successfully');
+                return $this->sendResponse(message: 'Proposal accepted successfully', result: $jobMain);
 
             } else if ($request->input('status') == '2') {
 
@@ -232,7 +237,7 @@ class BookingMainController extends BaseController
                     )
                 );
 
-                return $this->sendResponse(message: 'Booking Rejected Successfully');
+                return $this->sendResponse(message: 'Proposal rejected successfully');
             } else {
 
                 return $this->sendError(errorMEssage: 'Invalid Status', code: 406);

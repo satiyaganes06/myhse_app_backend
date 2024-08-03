@@ -21,12 +21,13 @@ class BookingRequest extends Model
         'br_text_request',
         'br_txt_remark_reason',
         'br_int_status',
-        'br_int_user'
+        'br_int_user',
+        'br_int_type'
     ];
 
     const CREATED_AT = 'br_ts_created_at';
     const UPDATED_AT = 'br_ts_updated_at';
 
-   
+
 
 }
