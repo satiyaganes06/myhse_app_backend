@@ -6,8 +6,6 @@ use App\Http\Controllers\Base\BaseController as BaseController;
 use Illuminate\Http\Request;
 use App\Models\User\UserProfile;
 use App\Models\User;
-use App\Models\User\RoleLogin;
-use App\Models\User\UserRole;
 use App\Models\User\PasswordResets;
 use Laravel\Sanctum\PersonalAccessToken;
 use Exception;
@@ -22,11 +20,12 @@ use Illuminate\Support\Str;
 
 class AuthController extends BaseController
 {
-    // Version 2
+    // Version 3
 
     public function registration(Request $request)
     {
         $validator = validator::make($request->all(), [
+            'ulVarRole' => 'required|string|max:255',
             'upfirstName' => 'required|string|max:255',
             'upLastName' => 'required|string|max:255',
             'upNric' => 'required|string|max:255',
@@ -51,14 +50,13 @@ class AuthController extends BaseController
                 $userProfile = new UserProfile([
                     'up_var_first_name' => $request->input('upfirstName'),
                     'up_var_last_name' => $request->input('upLastName'),
-                    'up_var_nric' => $request->input('upNric'),
-                    'up_var_email_contact' => $request->input('upEmailContact'),
-                   // 'up_var_contact_no' => $request->input('upContactNo'), //! FIXME: Add the default null in database (Prod)
+                    'up_var_nric' => $request->input('upNric')
                 ]);
                 $userProfile->save();
 
                 //Insert into user_login
                 $userLogin = new User([
+                    'ul_var_role' => $request->input('ulVarRole'),
                     'ul_int_profile_ref' => $userProfile->up_int_ref,
                     'ul_var_emailaddress' => $request->input('upEmailContact'),
                     'ul_var_password' => Hash::make($request->input('ulPassword'), [
@@ -67,16 +65,6 @@ class AuthController extends BaseController
                     ]),
                 ]);
                 $userLogin->save();
-
-                $userRole = UserRole::where('ur_var_name', 'Competent Person')->value('ur_int_ref');
-
-                $roleLogin = new RoleLogin([
-                    'rl_int_user_ref' => $userProfile->up_int_ref,
-                    'rl_int_role_ref' => $userRole, // Assign desired role here
-                ]);
-                $roleLogin->save();
-
-               // $token = $userLogin->createToken('developmentRegisterApiToken')->plainTextToken;
 
                 DB::commit();
 
@@ -106,13 +94,6 @@ class AuthController extends BaseController
                 return $this->sendError(errorMEssage: 'Email does not exist', code: 400);
             }
 
-            $userRole = UserRole::where('ur_var_name', 'Competent Person')->value('ur_int_ref');
-            $roleLogin = RoleLogin::where('rl_int_user_ref', $user->ul_int_profile_ref)->value('rl_int_role_ref');
-
-            if ($userRole != $roleLogin) {
-                return $this->sendError(errorMEssage: 'Sorry, access denied. Only Competent Persons are allowed to log in using the mobile app.', code: 400);
-            }
-
             $credentials = [
                 'ul_var_emailaddress' => $request->input('ulEmail'),
                 'password' => $request->input('ulPassword')
@@ -135,13 +116,14 @@ class AuthController extends BaseController
         }
     }
 
-    public function getUserID(){
+    public function getUserID()
+    {
         return Auth::user()->ul_int_profile_ref;
     }
 
     public function forgotPassword(Request $request)
     {
-        try{
+        try {
             $validator = Validator::make($request->all(), [
                 'email' => 'required|email',
             ]);
@@ -173,7 +155,7 @@ class AuthController extends BaseController
             return $this->sendResponse(message: 'Password reset link sent to your email.', result: [
                 'opt' => $token //! FIXME: Remove sending opt to frontend after send the email successfully
             ]);
-        }catch(\Throwable $th){
+        } catch (\Throwable $th) {
             return $this->sendError(errorMEssage: 'Error : ' . $th->getMessage(), code: 500);
         }
     }
@@ -181,7 +163,7 @@ class AuthController extends BaseController
 
     public function resetPassword(Request $request)
     {
-        try{
+        try {
             $validator = Validator::make($request->all(), [
                 'email' => 'required|email',
                 'token' => 'required|string',
@@ -211,7 +193,7 @@ class AuthController extends BaseController
             PasswordResets::where('email', $request->input('email'))->delete();
 
             return $this->sendResponse(message: 'Password has been reset successfully.');
-        }catch(\Throwable $th){
+        } catch (\Throwable $th) {
             return $this->sendError(errorMEssage: 'Error : ' . $th->getMessage(), code: 500);
         }
     }

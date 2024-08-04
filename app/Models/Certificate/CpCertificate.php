@@ -18,7 +18,8 @@ class CpCertificate extends Model
 
     protected $fillable = [
         'cc_int_user_ref',
-        'cc_int_cpt_ref',
+        'cc_var_title',
+        'cc_var_description',
         'cc_var_registration_no',
         'cc_date_expiry_date',
         'cc_var_path_document',

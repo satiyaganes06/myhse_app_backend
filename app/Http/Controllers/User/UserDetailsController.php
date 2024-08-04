@@ -12,7 +12,7 @@ use Exception;
 use Illuminate\Support\Facades\DB;
 use App\Models\Common\CompetentPersonTypes;
 
-class CpDetailsController extends BaseController
+class UserDetailsController extends BaseController
 {
 
     //!! Version 1
@@ -136,13 +136,13 @@ class CpDetailsController extends BaseController
 
     //!! Version 2
 
-    public function getCpProfileDetailsByID($id)
+    public function getMyProfileDetailsByID($id)
     {
         try {
 
             if ($this->isAuthorizedUser($id)) {
                 $userProfile = UserProfile::where('up_int_ref', $id)->first();
-                return $this->sendResponse(message: 'Get CP Profile Informations', result: $userProfile);
+                return $this->sendResponse(message: 'Get My Profile Informations', result: $userProfile);
             }
 
             return $this->sendError('Unauthorized Request', 401);
@@ -152,7 +152,7 @@ class CpDetailsController extends BaseController
         }
     }
 
-    public function getClientUserProfileDetailByID($id, $clientID)
+    public function getUserProfileDetailByID($id, $clientID)
     {
         try {
             if($this->isAuthorizedUser($id)){
@@ -182,26 +182,32 @@ class CpDetailsController extends BaseController
         }
     }
 
-    public function updateEmailStatusByID(Request $request, $id)
+    public function updateEmailStatusByID($id)
     {
 
         try {
+
             $status  = User::where('ul_int_profile_ref', $id)->update(array('ul_ts_email_verified_at' => now()));
 
-            return $this->sendResponse(message: 'Email Verified Successfully', result: $status);
+            if ($status) {
+                return $this->sendResponse(message: 'Email Verified Successfully', result: $status);
+            }else{
+                return $this->sendError(errorMEssage: 'Email Verification Failed', code: 500);
+            }
+
         } catch (Exception $e) {
 
             return $this->sendError(errorMEssage: 'Error : ' . $e->getMessage(), code: 500);
         }
     }
 
-    public function getCpFirstTimeStatusByID($id)
+    public function getMyFirstTimeStatusByID($id)
     {
         try {
             if ($this->isAuthorizedUser($id)) {
                 $status = User::select('ul_int_first_time_login')->where('ul_int_profile_ref', $id)->first();
 
-                return $this->sendResponse(message: 'Get CP first time status', result: $status);
+                return $this->sendResponse(message: 'Get my first time status', result: $status);
             }
 
             return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
@@ -211,7 +217,7 @@ class CpDetailsController extends BaseController
         }
     }
 
-    public function updateCpProfileDetailsByID(Request $request, $id)
+    public function updateMyProfileDetailsByID(Request $request, $id)
     {
         try {
 
@@ -222,25 +228,25 @@ class CpDetailsController extends BaseController
                         'up_var_first_name' => 'required|string|max:255',
                         'up_var_last_name' => 'required|string|max:255',
                         'up_var_nric' => 'required|string|max:255',
-                        'up_var_email_contact' => 'required|string|max:255',
                         'up_var_contact_no' => 'required|string|max:255',
                         'up_int_iscompany' => 'required|integer',
                         'up_var_company_no'=>'sometimes|string|max:255',
                         'up_var_address' => 'required|string|max:255',
                         'up_int_zip_code' => 'required|integer',
                         'up_var_state' => 'required|string|max:255',
-                        'up_var_avatar_path' => 'sometimes|mimes:jpeg,jpg,png|max:2048'
+                        'up_txt_desc' => 'sometimes|string',
+                        'up_var_pic' => 'sometimes|max:2048'
                     ]
                 );
 
                 if($validator->fails()){
-                    return $this->sendError(errorMEssage: 'Invalid Input', code: 400);
+                    return $this->sendError(errorMEssage: 'Validator ' . $validator->errors()->first(), code: 400);
                 }
 
-                if($request->hasFile('up_var_avatar_path')){
-                    $picPath = $this->uploadFile($request->file('up_var_avatar_path')); //! FIXME: need to change the path to the correct one
+                if($request->hasFile('up_var_pic')){
+                    $picPath = $this->uploadMedia($request->file('up_var_pic'), 0); //! FIXME: need to change the path to the correct one
 
-                    $request->merge(['up_var_avatar_path' => $picPath]);
+                    $request->merge(['up_var_pic' => $picPath]);
 
                 }
 
@@ -275,6 +281,7 @@ class CpDetailsController extends BaseController
         }
     }
 
+    //! FIXME: Remove this method if not needed
     public function getCompententPersonTypeList(){
         try {
             $competentPersonTypeList = CompetentPersonTypes::all();

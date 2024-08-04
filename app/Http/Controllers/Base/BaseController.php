@@ -10,6 +10,7 @@ use Exception;
 
 class BaseController extends Controller
 {
+
     public function sendResponse($message, $token = '', $result = '', $code = 200)
     {
         $response = [
@@ -46,13 +47,15 @@ class BaseController extends Controller
         return Auth::user()->ul_int_profile_ref == $id;
     }
 
-    protected function uploadFile($file)
+    protected function uploadMedia($file, $folder)
     {
+        $folderName = ['UserProfileImage', 'PostImage', 'CertificateImage', 'ServiceImage', 'ServiceDocument', 'ServiceRequestImage', 'PaymentReceipt', 'JobResultFile'];
+
         try {
 
             $fileName = time() . '_' . $file->getClientOriginalName();
 
-            $path = $file->storeAs('uploads/pdf', $fileName);
+            $path = $file->storeAs('uploads/' . $folderName[$folder] , $fileName);
 
             //    // $path = $file->store('uploads/images/profile'); // 'pdfs' is the storage folder, you can change it as needed
             // $path = $file->store('uploads/images'); // 'pdfs' is the storage folder, you can change it as needed
@@ -77,12 +80,5 @@ class BaseController extends Controller
         $decData = urldecode($data);
         $decData = base64_decode($decData);
         return $decData;
-    }
-
-    protected function getCpProfileDetails($userLoginID)
-    {
-        $userLoginDetails = UserLogin::where('ul_int_ref', $userLoginID)->value('ul_int_profile_ref');
-
-        return $userLoginDetails;
     }
 }

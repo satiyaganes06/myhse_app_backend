@@ -29,12 +29,7 @@ class CertificateController extends BaseController
         try {
             if ($this->isAuthorizedUser($id)) {
                 $limit = $request->input('limit');
-                $certificates = CpCertificate::join('competent_person_types', 'cp_certificate.cc_int_cpt_ref', '=', 'competent_person_types.cpt_int_ref')
-                    ->where('cc_int_user_ref', $id)
-                    ->select(
-                        'cp_certificate.*',
-                        'competent_person_types.*',
-                    )->orderBy('cc_ts_created_at', 'desc')->paginate($limit);
+                $certificates = CpCertificate::where('cc_int_user_ref', $id)->orderBy('cc_ts_created_at', 'desc')->paginate($limit);
 
                 if ($certificates->isEmpty()) {
                     return $this->sendResponse(message: 'No certificate found.', code: 404);
@@ -55,10 +50,11 @@ class CertificateController extends BaseController
 
             $validator = validator::make($request->all(), [
                 'userID' => 'required|integer',
-                'cptID' => 'required|integer',
+                'title' => 'required|string|max:255',
+                'description' => 'required|string|max:255',
                 'certRegistrationNo' => 'required|string|max:255',
                 'certExpiryDate' => 'sometimes|date',
-                'certificateFile' => 'required|mimes:pdf|max:2048',
+                'certificateImage' => 'required|max:2048',
             ]);
 
             if ($validator->fails()) {
@@ -66,39 +62,34 @@ class CertificateController extends BaseController
             }
 
             $certificates = CpCertificate::where('cc_int_user_ref', $request->input('userID'))
-            ->where('cc_var_registration_no', $request->input('certRegistrationNo'))->first();
+                ->where('cc_var_registration_no', $request->input('certRegistrationNo'))->first();
 
-            if($certificates){
+            if ($certificates) {
                 return $this->sendError(errorMEssage: 'Certificate Already Exist', code: 400);
             }
 
-            $fileURL = $this->uploadFile($request->file('certificateFile'));
+            $fileURL = $this->uploadMedia($request->file('certificateImage'), 2);
 
             if (empty($fileURL)) {
-                return $this->sendError(errorMEssage: 'File Upload Error', code: 400);
+                return $this->sendError(errorMEssage: 'Image Upload Error', code: 400);
             }
 
             $cpCetificate = CpCertificate::create([
                 'cc_int_user_ref' => $request->input('userID'),
-                'cc_int_cpt_ref' => $request->input('cptID'),
+                'cc_var_title' => $request->input('title'),
+                'cc_var_description' => $request->input('description'),
                 'cc_var_registration_no' => $request->input('certRegistrationNo'),
-                'cc_date_expiry_date' => $request->input('certExpiryDate'), //! FIXME: Add the default null in database (Prod)
+                'cc_date_expiry_date' => $request->input('certExpiryDate'),
                 'cc_var_path_document' => $fileURL,
                 'cc_int_status' => 0
             ]);
 
-            if($cpCetificate){
-                $cert = CpCertificate::join('competent_person_types', 'cp_certificate.cc_int_cpt_ref', '=', 'competent_person_types.cpt_int_ref')
-                    ->where('cc_int_ref', $cpCetificate->cc_int_ref)
-                    ->select(
-                        'cp_certificate.*',
-                        'competent_person_types.*',
-                    )->first();
+            if ($cpCetificate) {
+                $cert = CpCertificate::where('cc_int_ref', $cpCetificate->cc_int_ref)->first();
                 return $this->sendResponse(message: 'Save Certificate Successfully', result: $cert);
-            }else{
+            } else {
                 return $this->sendError(errorMEssage: 'Something went wrong', code: 500);
             }
-
         } catch (Exception $e) {
 
             return $this->sendError(errorMEssage: 'Error : ' . $e->getMessage(), code: 500);
@@ -108,54 +99,53 @@ class CertificateController extends BaseController
     public function updateCertificateDetail(Request $request, $id)
     {
         try {
-            if($this->isAuthorizedUser($id)){
+            if ($this->isAuthorizedUser($id)) {
                 $validator = Validator::make($request->all(), [
                     'ccID' => 'required|integer',
-                    'cptID' => 'required|integer',
+                    'title' => 'required|string|max:255',
+                    'description' => 'required|string|max:255',
                     'certRegistrationNo' => 'required|string|max:255',
                     'certExpiryDate' => 'sometimes|date',
-                    'certificateFile' => 'sometimes|mimes:pdf|max:2048'
+                    'certificateImage' => 'sometimes|max:2048'
                 ]);
 
                 if ($validator->fails()) {
-                    return $this->sendError(errorMEssage: $validator->errors() , code: 400);
+                    return $this->sendError(errorMEssage: $validator->errors(), code: 400);
                 }
 
                 $certificate = CpCertificate::find($request->input('ccID'));
 
-                if($certificate->cc_int_user_ref != $id){
+                if ($certificate->cc_int_user_ref != $id) {
                     return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
                 }
 
                 $updateData = [
-                    'cc_int_cpt_ref' => $request->input('cptID'),
+                    'cc_var_title' => $request->input('title'),
+                    'cc_var_description' => $request->input('description'),
                     'cc_var_registration_no' => $request->input('certRegistrationNo'),
-                    'cc_date_expiry_date' => $request->input('certExpiryDate'),
                     'cc_int_status' => 0
                 ];
 
-                if ($request->hasFile('certificateFile')) {
-                    $fileURL = $this->uploadFile($request->file('certificateFile'));
+                if($request->has('certExpiryDate')){
+                    $updateData['cc_date_expiry_date'] = $request->input('certExpiryDate');
+                }
+
+                if ($request->hasFile('certificateImage')) {
+                    $fileURL = $this->uploadMedia($request->file('certificateImage'), 2);
 
                     if (empty($fileURL)) {
-                        return $this->sendError(errorMEssage: 'File Upload Error', code: 400);
+                        return $this->sendError(errorMEssage: 'Image Upload Error', code: 400);
                     }
                     $updateData['cc_var_path_document'] = $fileURL;
                 }
 
                 CpCertificate::where('cc_int_ref', $request->input('ccID'))->update($updateData);
-                $updateCertificate = CpCertificate::join('competent_person_types', 'cp_certificate.cc_int_cpt_ref', '=', 'competent_person_types.cpt_int_ref')
-                ->where('cc_int_ref', $request->input('ccID'))
-                ->select(
-                    'cp_certificate.*',
-                    'competent_person_types.*',
-                )->first();
+                $updateCertificate = CpCertificate::where('cc_int_ref', $request->input('ccID'))->first();
 
                 return $this->sendResponse(message: 'Updated Successfully', result: $updateCertificate);
             }
 
             return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
-
         } catch (Exception $e) {
             return $this->sendError(errorMEssage: 'Error : ' . $e->getMessage(), code: 500);
         }
@@ -164,11 +154,11 @@ class CertificateController extends BaseController
     public function deleteCertificateDetailByID($id, $ccID)
     {
         try {
-            if($this->isAuthorizedUser($id)){
+            if ($this->isAuthorizedUser($id)) {
                 $deleteCertificate = CpCertificate::find($ccID);
 
-                if($deleteCertificate){
-                    if($deleteCertificate['cc_int_user_ref'] == $id){
+                if ($deleteCertificate) {
+                    if ($deleteCertificate['cc_int_user_ref'] == $id) {
                         $deleteCertificate->delete();
                         return $this->sendResponse(message: 'Certificate Deleted Successfully');
                     }
@@ -177,11 +167,9 @@ class CertificateController extends BaseController
                 }
 
                 return $this->sendError(errorMEssage: 'Certificate Not Found', code: 404);
-
             }
 
             return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
-
         } catch (Exception $e) {
             return $this->sendError(errorMEssage: 'Error : ' . $e, code: 500);
         }

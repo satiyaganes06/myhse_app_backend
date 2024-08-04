@@ -9,23 +9,22 @@ use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
 use App\Models\Booking\BookingMain;
 
-class ServiceSub extends Model
+class ServiceMainRef extends Model
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    protected $table = 'service_sub_list';
+    protected $table = 'service_main_ref';
 
-    protected $primaryKey = 'ssl_int_ref';
+    protected $primaryKey = 'smr_int_ref';
 
     protected $fillable = [
-        'ssl_int_servicemain_ref',
-        'ssl_var_subservice_name',
-        'ssl_var_img_path',
-        'ssl_int_status'
+        'smr_var_service_name',
+        'smr_var_img_path',
+        'smr_int_status'
     ];
 
-    const CREATED_AT = 'ssl_ts_created_at';
-    const UPDATED_AT = 'sll_ts_updated_at';
+    const CREATED_AT = 'smr_ts_created_at';
+    const UPDATED_AT = 'smr_ts_updated_at';
 
 
 }
