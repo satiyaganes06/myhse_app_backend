@@ -9,20 +9,22 @@ use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
 use App\Models\Booking\BookingMain;
 
-class CompetentPersonService extends Model
+class CpService extends Model
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    protected $table = 'competent_person_services';
+    protected $table = 'cp_service';
 
     protected $primaryKey = 'cps_int_ref';
 
     protected $fillable = [
         'cps_int_user_ref',
         'cps_int_service_ref',
-        'cps_certification_ref',
+        'cps_var_image',
         'cps_txt_description',
         'cps_var_starting_price',
+        'cps_estimate_delivery_time',
+        'cps_fl_average_rating',
         'cps_int_status'
     ];
 

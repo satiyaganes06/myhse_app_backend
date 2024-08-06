@@ -14,15 +14,18 @@ use Illuminate\Support\Facades\Validator;
 class PostController extends BaseController
 {
 
-    public function getAllPostDetails($id)
+    public function getAllPostDetails(Request $request, $id)
     {
         try {
 
             if ($this->isAuthorizedUser($id)) {
+                $limit = $request->input('limit') ?? 10;
+
                 $posteInfos = CpPost::join('user_profile', 'cp_post.cpp_int_user_ref', '=', 'user_profile.up_int_ref')
-                    ->where('ep_int_status', 1)
+                    ->where('cpp_int_status', 1)
                     ->where('cpp_int_user_ref', '!=', $id)
-                    ->get();
+                    ->paginate($limit);
+
                 return $this->sendResponse(message: 'Get All Post Details', result: $posteInfos);
             }
 
@@ -32,12 +35,19 @@ class PostController extends BaseController
         }
     }
 
-    public function getCpPostDetails($id)
+    public function getCpPostDetails(Request $request, $id)
     {
         try {
             if ($this->isAuthorizedUser($id)) {
-                $posteInfos = CpPost::join('service_main_ref', 'cp_post.cpp_int_service_category', '=', 'service_main_ref.smr_int_ref')
-                    ->where('cpp_int_user_ref', $id)->get();
+                $limit = $request->input('limit') ?? 10;
+
+                $posteInfos = CpPost::join('service_main_ref', 'cp_post.cpp_int_service_main_ref', '=', 'service_main_ref.smr_int_ref')
+                    ->where('cpp_int_user_ref', $id)->paginate($limit);
+
+                if ($posteInfos->isEmpty()) {
+                    return $this->sendResponse(message: 'No posts found.', code: 404);
+                }
+
                 return $this->sendResponse(message: 'Get My Post Details', result: $posteInfos);
             }
 
@@ -54,11 +64,11 @@ class PostController extends BaseController
                 'userID' => 'required|integer',
                 'description' => 'required|string|max:255',
                 'serviceCategory' => 'required|integer',
-                'postImage' => 'required|max:10000', // 10mb
+                'postImage' => 'required|max:10000' // 10mb
             ]);
 
             if ($validator->fails()) {
-                return $this->sendError(errorMEssage: 'Invalid input', code: 400);
+                return $this->sendError(errorMEssage: 'Invalid input' . $validator->errors()->first(), code: 400);
             }
 
             $fileURL = $this->uploadMedia($request->file('postImage'), 1);
@@ -72,11 +82,11 @@ class PostController extends BaseController
                 'cpp_txt_desc' => $request->input('description'),
                 'cpp_var_image' => $fileURL,
                 'cpp_int_service_main_ref' => $request->input('serviceCategory'),
-                'cc_int_status' => 0
+                'cpp_int_status' => 0
             ]);
 
             if ($cpPost) {
-                $cert = CpPost::where('cpp_int_ref ', $cpPost->cpp_int_ref)->first();
+                $cert = CpPost::join('service_main_ref', 'cp_post.cpp_int_service_main_ref', '=', 'service_main_ref.smr_int_ref')->where('cpp_int_ref', $cpPost->cpp_int_ref)->first();
                 return $this->sendResponse(message: 'Save Post Successfully', result: $cert);
             } else {
                 return $this->sendError(errorMEssage: 'Something went wrong', code: 500);
@@ -121,8 +131,8 @@ class PostController extends BaseController
                 $updateData['cpp_var_image'] = $fileURL;
             }
 
-            CpPost::where('cpp_int_ref ', $request->input('postID'))->update($updateData);
-            $updatePost = CpPost::where('cpp_int_ref', $request->input('postID'))->first();
+            CpPost::where('cpp_int_ref', $request->input('postID'))->update($updateData);
+            $updatePost = CpPost::join('service_main_ref', 'cp_post.cpp_int_service_main_ref', '=', 'service_main_ref.smr_int_ref')->where('cpp_int_ref', $request->input('postID'))->first();
 
             return $this->sendResponse(message: 'Updated Successfully', result: $updatePost);
         } catch (\Throwable $th) {

@@ -28,7 +28,7 @@ class CertificateController extends BaseController
     {
         try {
             if ($this->isAuthorizedUser($id)) {
-                $limit = $request->input('limit');
+                $limit = $request->input('limit'); // limit must
                 $certificates = CpCertificate::where('cc_int_user_ref', $id)->orderBy('cc_ts_created_at', 'desc')->paginate($limit);
 
                 if ($certificates->isEmpty()) {
@@ -47,7 +47,7 @@ class CertificateController extends BaseController
     public function addCertificateDetail(Request $request)
     {
         try {
-
+            // Start Template
             $validator = validator::make($request->all(), [
                 'userID' => 'required|integer',
                 'title' => 'required|string|max:255',
@@ -60,6 +60,8 @@ class CertificateController extends BaseController
             if ($validator->fails()) {
                 return $this->sendError(errorMEssage: $validator->errors(), code: 400);
             }
+
+            // End Template
 
             $certificates = CpCertificate::where('cc_int_user_ref', $request->input('userID'))
                 ->where('cc_var_registration_no', $request->input('certRegistrationNo'))->first();
@@ -84,12 +86,15 @@ class CertificateController extends BaseController
                 'cc_int_status' => 0
             ]);
 
+            // Start Template
             if ($cpCetificate) {
                 $cert = CpCertificate::where('cc_int_ref', $cpCetificate->cc_int_ref)->first();
                 return $this->sendResponse(message: 'Save Certificate Successfully', result: $cert);
             } else {
                 return $this->sendError(errorMEssage: 'Something went wrong', code: 500);
             }
+
+            // End Template
         } catch (Exception $e) {
 
             return $this->sendError(errorMEssage: 'Error : ' . $e->getMessage(), code: 500);

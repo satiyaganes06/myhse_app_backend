@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Booking\BookingMain;
 use App\Models\Booking\BookingRequest;
 use App\Models\Services\CompetentPersonService;
+use App\Models\Services\CpService;
 use App\Models\Services\CpServicesState;
 use Illuminate\Support\Facades\Validator;
 use App\Models\UserLogin;
@@ -15,6 +16,7 @@ use Illuminate\Http\Request;
 use App\Models\UserProfile;
 use App\Models\Services\ServiceMain;
 use App\Models\Services\ServiceSub;
+use App\Models\Services\ServiceMainRef;
 
 use Exception;
 use Nette\Schema\Expect;
@@ -26,23 +28,12 @@ class ServiceController extends BaseController
     public function getServiceMainList()
     {
         try {
-            $serviceMainList = ServiceMain::all();
-            return $this->sendResponse(message: 'Get Service Main List', result: $serviceMainList);
-        } catch (\Exception $e) {
-            return $this->sendError(errorMEssage: 'Error : ' . $e, code: 500);
-        }
-    }
+            $serviceMainList = ServiceMainRef::all();
 
-    public function getSubServiceList()
-    {
-        try {
-            $subServiceList = ServiceSub::all();
-
-            if ($subServiceList->isEmpty()) {
-                return $this->sendError(errorMEssage: 'No Sub Service Found', code: 404);
+            if ($serviceMainList->isEmpty()) {
+                return $this->sendError(errorMEssage: 'No service category found', code: 404);
             }
-
-            return $this->sendResponse(message: 'Get Sub Service List', result: $subServiceList);
+            return $this->sendResponse(message: 'Get Service Main List', result: $serviceMainList);
         } catch (\Exception $e) {
             return $this->sendError(errorMEssage: 'Error : ' . $e, code: 500);
         }
@@ -54,33 +45,20 @@ class ServiceController extends BaseController
             if ($this->isAuthorizedUser($id)) {
                 $limit = $request->input('limit');
 
-                $services = CompetentPersonService::join('service_sub_list', 'competent_person_services.cps_int_service_ref', '=', 'service_sub_list.ssl_int_ref') //! FIXME: ServiceMain is not neccessary
-                    ->join('service_main', 'service_sub_list.ssl_int_servicemain_ref', '=', 'service_main.sm_int_ref') //! FIXME: ServiceMain is not neccessary
-                    ->join('cp_certificate', 'competent_person_services.cps_certification_ref', '=', 'cp_certificate.cc_int_ref')
-                    ->where('cps_int_user_ref', $id)
-                    ->select(
-                        'competent_person_services.*',
-                        'service_sub_list.ssl_int_ref',
-                        'service_sub_list.ssl_var_subservice_name',
-                        'service_sub_list.ssl_var_img_path',
-                        'service_main.sm_int_ref',
-                        'service_main.sm_var_name',
-                        'service_main.sm_var_img_path',
-                        'cp_certificate.cc_int_ref',
-                    )->orderBy('cps_ts_created_at', 'desc')->paginate($limit);
+                $services = CpService::join('service_main_ref', 'cp_service.cps_int_service_ref', '=', 'service_main_ref.smr_int_ref')
+                    ->where('cps_int_user_ref', $id)->orderBy('cps_ts_created_at', 'desc')->paginate($limit);
 
                 if ($services->isEmpty()) {
                     return $this->sendError(errorMEssage: 'No service found', code: 404);
                 }
 
-                //Fetch states for each service
-                foreach ($services as $service) {
-                    $states = CpServicesState::where('css_int_services_ref', $service->cps_int_ref)
-                        ->pluck('css_int_states_ref')
-                        ->toArray();
-                    $service->states = $states;
-                }
-
+                //! //Fetch states for each service
+                // foreach ($services as $service) {
+                //     $states = CpServicesState::where('css_int_services_ref', $service->cps_int_ref)
+                //         ->pluck('css_int_states_ref')
+                //         ->toArray();
+                //     $service->states = $states;
+                // }
 
                 return $this->sendResponse(message: 'Get Service Details', result: $services);
             }
@@ -97,56 +75,56 @@ class ServiceController extends BaseController
         try {
             $validator = Validator::make($request->all(), [
                 'userID' => 'required|integer',
-                'subServiceID' => 'required|integer',
-                'certificateID' => 'required|integer',
+                'serviceMainRefID' => 'required|integer',
+                'serviceTitle' => 'required|integer',
                 'serviceDescription' => 'required|string',
                 'startingPrice' => 'required|string',
+                'estimateDeliveryTime' => 'required|integer',
+                'serviceImage' => 'required|max:10000'
             ]);
 
             if ($validator->fails()) {
                 return $this->sendError(errorMEssage: 'Invalid Input' . $validator->errors(), code: 400);
             }
 
-            DB::beginTransaction();
+            $fileURL = $this->uploadMedia($request->file('serviceImage'), 3);
 
-            $service = new CompetentPersonService();
+            if (empty($fileURL)) {
+                return $this->sendError(errorMEssage: 'Image Upload Error', code: 400);
+            }
+
+            // DB::beginTransaction();
+
+            $service = new CpService();
             $service->cps_int_user_ref = $request->input('userID');
-            $service->cps_int_service_ref = $request->input('subServiceID');
-            $service->cps_certification_ref = $request->input('certificateID');
+            $service->cps_int_service_ref = $request->input('serviceMainRefID');
+            $service->cps_var_image = $fileURL;
+            $service->cps_var_title = $request->input('serviceTitle');
             $service->cps_txt_description = $request->input('serviceDescription');
             $service->cps_var_starting_price = $request->input('startingPrice');
-            $service->cps_int_status = 0; //! FIXME: Check status Column in database (Prod)
+            $service->cps_estimate_delivery_time = $request->input('estimateDeliveryTime');
+            $service->cps_fl_average_rating = 0;
+            $service->cps_int_status = 0;
             $service->save();
 
             // Store the state one by one
-            $states = json_decode($request->input('serviceState'), true);
-            foreach ($states as $state) {
-                $stateTable = new CpServicesState();
-                $stateTable->css_int_services_ref = $service->cps_int_ref;
-                $stateTable->css_int_states_ref = $state;
-                $stateTable->save();
-            }
+            // $states = json_decode($request->input('serviceState'), true);
+            // foreach ($states as $state) {
+            //     $stateTable = new CpServicesState();
+            //     $stateTable->css_int_services_ref = $service->cps_int_ref;
+            //     $stateTable->css_int_states_ref = $state;
+            //     $stateTable->save();
+            // }
 
-            DB::commit();
+            // DB::commit();
 
-            $getService = CompetentPersonService::join('service_sub_list', 'competent_person_services.cps_int_service_ref', '=', 'service_sub_list.ssl_int_ref') //! FIXME: ServiceMain is not neccessary
-                    ->join('service_main', 'service_sub_list.ssl_int_servicemain_ref', '=', 'service_main.sm_int_ref') //! FIXME: ServiceMain is not neccessary
-                    ->join('cp_certificate', 'competent_person_services.cps_certification_ref', '=', 'cp_certificate.cc_int_ref')
-                    ->where('cps_int_ref', $service->cps_int_ref)
-                    ->select(
-                        'competent_person_services.*',
-                        'service_sub_list.ssl_int_ref',
-                        'service_sub_list.ssl_var_subservice_name',
-                        'service_sub_list.ssl_var_img_path',
-                        'service_main.sm_int_ref',
-                        'service_main.sm_var_name',
-                        'service_main.sm_var_img_path',
-                        'cp_certificate.cc_int_ref',
-                    )->first();
 
-            return $this->sendResponse(message: 'Service Added Successfully', result: $getService);
+            $getService = CpService::join('service_main_ref', 'cp_service.cps_int_service_ref', '=', 'service_main_ref.smr_int_ref')
+                ->where('cps_int_ref', $service->cps_int_ref)->first();
+
+            return $this->sendResponse(message: 'Saved Service Successfully', result: $getService);
         } catch (Exception $e) {
-            DB::rollBack();
+            // DB::rollBack();
             return $this->sendError('Error : ' . $e, 500);
         }
     }
@@ -158,102 +136,98 @@ class ServiceController extends BaseController
             if ($this->isAuthorizedUser($id)) {
                 $validator = Validator::make($request->all(), [
                     'cpsID' => 'required|integer',
-                    'subServiceID' => 'sometimes|integer',
-                    'certificateID' => 'sometimes|integer',
-                    'serviceDescription' => 'sometimes|string',
-                    'startingPrice' => 'sometimes|string',
-                    'serviceState' => 'sometimes|string',
+                    'serviceMainRefID' => 'required|integer',
+                    'serviceTitle' => 'required|integer',
+                    'serviceDescription' => 'required|string',
+                    'startingPrice' => 'required|string',
+                    'estimateDeliveryTime' => 'required|integer',
+                    'serviceImage' => 'sometimes|max:10000'
                 ]);
 
                 if ($validator->fails()) {
                     return $this->sendError(errorMEssage: 'Invalid Input' . $validator->errors(), code: 400);
                 }
 
-                $service = CompetentPersonService::find($request->input('cpsID'));
+                $service = CpService::find($request->input('cpsID'));
 
                 if ($service->cps_int_user_ref != $id) {
                     return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
                 }
 
-                $updateData = [];
+                $updateData = [
+                    'cps_int_service_ref' => $request->input('serviceMainRefID'),
+                    'cps_var_title' => $request->input('serviceTitle'),
+                    'cps_txt_description' => $request->input('serviceDescription'),
+                    'cps_var_starting_price' => $request->input('startingPrice'),
+                    'cps_estimate_delivery_time' => $request->input('estimateDeliveryTime'),
+                    'cps_int_status' => 0
+                ];
 
-                if ($request->input('subServiceID')) {
-                    $updateData['cps_int_service_ref'] = $request->input('subServiceID');
+                if ($request->hasFile('serviceImage')) {
+                    $fileURL = $this->uploadMedia($request->file('serviceImage'), 3);
+
+                    if (empty($fileURL)) {
+                        return $this->sendError(errorMEssage: 'Image Upload Error', code: 400);
+                    }
+                    $updateData['cps_var_image'] = $fileURL;
                 }
 
-                if ($request->input('certificateID')) {
-                    $updateData['cps_certification_ref'] = $request->input('certificateID');
-                }
+                $updateService = CpService::where('cps_int_ref', $request->input('cpsID'))->update($updateData);
 
-                if ($request->input('serviceDescription')) {
-                    $updateData['cps_txt_description'] = $request->input('serviceDescription');
-                }
 
-                if ($request->input('startingPrice')) {
-                    $updateData['cps_var_starting_price'] = $request->input('startingPrice');
-                }
+                // DB::beginTransaction();
 
-                DB::beginTransaction();
+                // $updateService = CompetentPersonService::where('cps_int_ref', $request->input('cpsID'))->update($updateData);
+                // $existingStates = CpServicesState::where('css_int_services_ref', $service->cps_int_ref)
+                //     ->pluck('css_int_states_ref')
+                //     ->toArray();
 
-                $updateService = CompetentPersonService::where('cps_int_ref', $request->input('cpsID'))->update($updateData);
-                $existingStates = CpServicesState::where('css_int_services_ref', $service->cps_int_ref)
-                    ->pluck('css_int_states_ref')
-                    ->toArray();
+                // $newStates = json_decode($request->input('serviceState'), true);
 
-                $newStates = json_decode($request->input('serviceState'), true);
+                // // Determine states to add
+                // $statesToAdd = array_diff($newStates, $existingStates);
 
-                // Determine states to add
-                $statesToAdd = array_diff($newStates, $existingStates);
+                // // Determine states to delete
+                // $statesToDelete = array_diff($existingStates, $newStates);
 
-                // Determine states to delete
-                $statesToDelete = array_diff($existingStates, $newStates);
+                // // Add new states
+                // foreach ($statesToAdd as $state) {
+                //     $stateTable = new CpServicesState();
+                //     $stateTable->css_int_services_ref = $service->cps_int_ref;
+                //     $stateTable->css_int_states_ref = $state;
+                //     $stateTable->save();
+                // }
 
-                // Add new states
-                foreach ($statesToAdd as $state) {
-                    $stateTable = new CpServicesState();
-                    $stateTable->css_int_services_ref = $service->cps_int_ref;
-                    $stateTable->css_int_states_ref = $state;
-                    $stateTable->save();
-                }
+                // // Delete removed states
+                // CpServicesState::where('css_int_services_ref', $service->cps_int_ref)
+                //     ->whereIn('css_int_states_ref', $statesToDelete)
+                //     ->delete();
 
-                // Delete removed states
-                CpServicesState::where('css_int_services_ref', $service->cps_int_ref)
-                    ->whereIn('css_int_states_ref', $statesToDelete)
-                    ->delete();
-
-                DB::commit();
+                // DB::commit();
 
                 if ($updateService) {
-                    $service = CompetentPersonService::join('service_sub_list', 'competent_person_services.cps_int_service_ref', '=', 'service_sub_list.ssl_int_ref')
-                        ->join('service_main', 'service_sub_list.ssl_int_servicemain_ref', '=', 'service_main.sm_int_ref')
-                        ->join('cp_certificate', 'competent_person_services.cps_certification_ref', '=', 'cp_certificate.cc_int_ref')
-                        ->where('cps_int_ref', $request->input('cpsID'))
-                        ->select(
-                            'competent_person_services.*',
-                            'service_sub_list.*',
-                            'service_main.*',
-                            'cp_certificate.*',
-                        )->first();
+                    $service = CpService::join('service_main_ref', 'cp_service.cps_int_service_ref', '=', 'service_main_ref.smr_int_ref')
+                    ->where('cps_int_ref', $request->input('cpsID'))->first();
                     return $this->sendResponse(message: 'Updated Successfully', result: $service);
                 } else {
-                    DB::rollBack();
+                    //DB::rollBack();
                     return $this->sendError(errorMEssage: 'Something went wrong', code: 500);
                 }
             }
 
             return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
         } catch (Exception $e) {
-            DB::rollBack();
+           // DB::rollBack();
             return $this->sendError(errorMEssage: 'Error : ' . $e->getMessage(), code: 500);
         }
     }
 
-    //! FIXME: Add Foreign Key for cp_services_state table in database
+    //! FIXME: Add Foreign Key for links table in database
     public function deleteServiceDetails($id, $cpsID)
     {
         try {
             if ($this->isAuthorizedUser($id)) {
-                $deleteCertificate = CompetentPersonService::find($cpsID);
+                $deleteCertificate = CpService::find($cpsID);
 
                 if ($deleteCertificate) {
 

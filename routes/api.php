@@ -41,11 +41,7 @@ Route::group(['prefix' => 'v2/auth'], function(){
 
 Route::middleware('auth:sanctum')->group(function () {
 
-    Route::group(['prefix' => 'v2/myhse'], function(){
-
-        //Test Routes
-        Route::get("/test/getData", [test::class, 'testttt']);
-
+    Route::group(['prefix' => 'v2/common'], function(){
         // Auth
         Route::get('/auth/logout', [AuthController::class, 'logout']);
         Route::get('/auth/getUserID', [AuthController::class, 'getUserID']);
@@ -57,6 +53,22 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get("/manage-user/getEmailStatusByID/{id}", [UserDetailsController::class, 'getEmailStatusByID']);
         Route::patch("/manage-user/updateEmailStatusByID/{id}", [UserDetailsController::class, 'updateEmailStatusByID']); //! Move out of the sanctum
         Route::get("/manage-user/getMyFirstTimeStatusByID/{id}", [UserDetailsController::class, 'getMyFirstTimeStatusByID']);
+
+        // State
+        Route::get("/state/getStateList", [StateController::class, 'getStateList']);
+    });
+
+    Route::group(['prefix' => 'v2/client'], function(){
+        Route::get("/post/getAllPostDetails/{id}", [PostController::class, 'getAllPostDetails']);
+    });
+
+    Route::group(['prefix' => 'v2/competent-person'], function(){
+
+        //Test Routes
+        Route::get("/test/getData", [test::class, 'testttt']);
+
+
+        // Manage User
         Route::get("/manage-user/getCompetentPersonTypeList", [UserDetailsController::class, 'getCompententPersonTypeList']);
 
         // Certificate
@@ -67,7 +79,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Post
         Route::get("/post/getCpPostDetailsByID/{id}", [PostController::class, 'getCpPostDetails']);
-        Route::get("/post/getAllPostDetails/{id}", [PostController::class, 'getAllPostDetails']);
         Route::post("/post/addPostDetail", [PostController::class, 'addPostDetail']);
         Route::patch("/post/updatePostDetail/{id}", [PostController::class, 'updatePostDetail']);
         Route::delete("/post/deletePostDetailByID/{id}/{postID}", [PostController::class, 'deletePostDetail']);
@@ -81,8 +92,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::patch('/service/updateServiceDetail/{id}', [ServiceController::class, 'updateServiceDetail']);
         Route::delete('/service/deleteServiceDetails/{id}/{cpsID}', [ServiceController::class, 'deleteServiceDetails']);
 
-        // State
-        Route::get("/state/getStateList", [StateController::class, 'getStateList']);
+
 
         // Booking
         Route::get('/booking/getBookingsDetailByID/{id}', [BookingMainController::class, 'getBookingsDetailByID']);
