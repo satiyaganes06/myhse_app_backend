@@ -20,33 +20,49 @@ use Exception;
 use Nette\Schema\Expect;
 use Symfony\Component\Console\Input\Input;
 
-class JobMainController extends BaseController
+class JobPaymentController extends BaseController
 {
-    public function getJobMainDetailsByID(Request $request, $id)
+
+    public function getJobInitialPaymentStatusByID($id, $brID, $jmID)
     {
         try {
             if ($this->isAuthorizedUser($id)) {
 
-                $limit = $request->input('limit');
+                $bookingReq = BookingRequest::select('br_double_price')->find($brID);
 
-                $jobMain = JobMain::join('booking_request', 'job_main.jm_br_ref', '=', 'booking_request.br_int_ref')
-                    ->join('cp_service', 'booking_request.br_int_cps_ref', '=', 'cp_service.cps_int_ref')
-                    ->join('service_main_ref', 'cp_service.cps_int_service_ref', '=', 'service_main_ref.smr_int_ref')
-                    ->join('user_profile', 'cp_service.cps_int_user_ref', '=', 'user_profile.up_int_ref')
-                    ->where('cp_service.cps_int_user_ref',  $id)
-                    ->where('job_main.jm_int_status', $request->input('status'))
-                    ->select(
-                        'booking_request.*',
-                        'cp_service.*',
-                        'service_main_ref.*',
-                        'user_profile.*'
-                    )->paginate($limit);
+                $firstPayment = $bookingReq->br_double_price * 0.1;
 
-                if ($jobMain->isEmpty()) {
-                    return $this->sendError(errorMEssage: 'No order found', code: 404);
+                $jobPayment = JobPayment::where('jp_jm_ref', $jmID)->get();
+
+                if (!$jobPayment) {
+                    return $this->sendError(errorMEssage: 'Payment not found', code: 404);
                 }
 
-                return $this->sendResponse(message: 'Get Orders Details', result: $jobMain);
+                $totalAmount = 0; // Initialize total amount
+
+                foreach ($jobPayment as $payment) {
+                    if ($payment->jp_int_status == 1) {
+                        $totalAmount += $payment->jp_double_account_transfer_amount; // Sum amounts
+                    }
+                    // If jp_int_status is 2, we skip to the next payment
+                }
+
+
+                // Check if total amount equals first payment
+                if ($totalAmount == $firstPayment) {
+                    $reason = null;
+                    $paymentStatus = 'true'; // Return true if amounts match
+                }else{
+                    $reason = JobPayment::where('jp_jm_ref', $jmID)->where('jp_int_status', 2)->orderBy('jp_ts_created_at', 'desc')->first()->jp_var_reject_reason ?? null;
+                    $paymentStatus = 'false'; // Return false if amounts do not match
+                }
+
+
+
+                return $this->sendResponse(message: 'Get Orders Details', result: [
+                    'paymentStatus' => $paymentStatus,
+                    'reason' => $reason
+                ]);
             }
 
             return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
@@ -54,27 +70,6 @@ class JobMainController extends BaseController
             return $this->sendError(errorMEssage: 'Error : ' . $e->getMessage(), code: 500);
         }
     }
-
-    public function getJobMainDetailByID($id, $brID)
-    {
-        try {
-            if ($this->isAuthorizedUser($id)) {
-
-                $jobMain = JobMain::where('jm_br_ref', $brID)->first();
-
-                if ($jobMain) {
-                    return $this->sendResponse(message: 'Get Orders Details', result: $jobMain);
-                }
-                return $this->sendError(errorMEssage: 'No data found', code: 404);
-            }
-
-            return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
-        } catch (Exception $e) {
-            return $this->sendError(errorMEssage: 'Error : ' . $e->getMessage(), code: 500);
-        }
-    }
-
-
 }
 
 // public function cpJobMainListDetails(Request $request)

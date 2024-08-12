@@ -63,7 +63,7 @@ class BaseController extends Controller
 
             return $path;
         } catch (Exception $e) {
-            return $path;
+            return $e;
         }
     }
 

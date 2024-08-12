@@ -10,6 +10,7 @@ use App\Http\Controllers\Job\JobMainController;
 use App\Http\Controllers\Booking\BookingMainController;
 use App\Http\Controllers\Base\BaseController;
 use App\Http\Controllers\Certificate\CertificateController;
+use App\Http\Controllers\Job\JobPaymentController;
 use App\Http\Controllers\PaymentSubscribeController;
 use App\Http\Controllers\Post\PostController;
 use App\Http\Controllers\State\StateController;
@@ -56,6 +57,14 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // State
         Route::get("/state/getStateList", [StateController::class, 'getStateList']);
+
+        // Service
+        Route::get("/service/getRelatedCertificate/{id}/{serviceID}", [ServiceController::class, 'getRelatedCertificate']);
+        Route::get("/service/getRelatedPost/{id}/{serviceId}", [ServiceController::class, 'getRelatedPost']);
+
+        // Job
+        Route::get('/job/getJobInitialPaymentStatusByID/{id}/{brID}/{jmID}', [JobPaymentController::class, 'getJobInitialPaymentStatusByID']);
+
     });
 
     Route::group(['prefix' => 'v2/client'], function(){
@@ -93,13 +102,16 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/service/deleteServiceDetails/{id}/{cpsID}', [ServiceController::class, 'deleteServiceDetails']);
 
 
-
         // Booking
-        Route::get('/booking/getBookingsDetailByID/{id}', [BookingMainController::class, 'getBookingsDetailByID']);
-        Route::get('/booking/getBookingRequestDetailByID/{id}/{brID}', [BookingMainController::class, 'getBookingRequestDetailByID']);
-        Route::post('/booking/addBookingRequestDetail', [BookingMainController::class, 'addBookingRequestDetail']);
-        Route::patch('/booking/updateBookingRequestStatusByID/{id}', [BookingMainController::class, 'updateBookingRequestStatusByID']);
-        Route::patch('/booking/updateBookingMainStatusByID/{id}', [BookingMainController::class, 'updateBookingMainStatusByID']); // Un-finished
+        Route::get('/booking/getBookingsRequestDetailByID/{id}', [BookingMainController::class, 'getBookingsRequestDetailByID']);
+        Route::get('/booking/getBookingRequestNegotiationDetailByID/{id}/{brID}', [BookingMainController::class, 'getBookingRequestNegotiationDetailByID']);
+        Route::post('/booking/addBookingRequestNegotiationDetail', [BookingMainController::class, 'addBookingRequestNegotiationDetail']);
+        Route::patch('/booking/updateBookingRequestNegotiationStatusByID/{id}', [BookingMainController::class, 'updateBookingRequestNegotiationStatusByID']);
+        Route::patch('/booking/updateBookingMainNegotiationStatusByID/{id}', [BookingMainController::class, 'updateBookingMainNegotiationStatusByID']); // Un-finished
+
+        // Job
+        Route::get('/job/getJobMainDetailsByID/{id}', [JobMainController::class, 'getJobMainDetailsByID']);
+        Route::get('/job/getJobMainDetailByID/{id}/{brID}', [JobMainController::class, 'getJobMainDetailByID']);
 
         //Image and File Viewer
         Route::get('/viewer/pdfviewer/{filename}', [CommonDataController::class, 'fileView'])->where('filename', '.*'); // Un-finished

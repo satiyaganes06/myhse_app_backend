@@ -3,24 +3,14 @@
 namespace App\Http\Controllers\Service;
 
 use App\Http\Controllers\Base\BaseController as BaseController;
-use App\Http\Controllers\Controller;
-use App\Models\Booking\BookingMain;
-use App\Models\Booking\BookingRequest;
-use App\Models\Services\CompetentPersonService;
+use App\Models\Certificate\CpCertLink;
+use App\Models\Post\CpPostLink;
 use App\Models\Services\CpService;
-use App\Models\Services\CpServicesState;
 use Illuminate\Support\Facades\Validator;
-use App\Models\UserLogin;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
-use App\Models\UserProfile;
-use App\Models\Services\ServiceMain;
-use App\Models\Services\ServiceSub;
 use App\Models\Services\ServiceMainRef;
 
 use Exception;
-use Nette\Schema\Expect;
-use Symfony\Component\Console\Input\Input;
 
 class ServiceController extends BaseController
 {
@@ -37,6 +27,53 @@ class ServiceController extends BaseController
         } catch (\Exception $e) {
             return $this->sendError(errorMEssage: 'Error : ' . $e, code: 500);
         }
+    }
+
+    public function getRelatedCertificate($id, $serviceID)
+    {
+        try {
+            if($this->isAuthorizedUser($id)){
+                $certificate = CpCertLink::join('cp_certificate', 'cp_cert_link.cpcl_int_cc_ref', '=', 'cp_certificate.cc_int_ref')
+                ->where('cpcl_int_cps_ref', $serviceID)
+                ->select('cp_certificate.*')
+                ->get();
+
+                if ($certificate->isEmpty()) {
+                    return $this->sendError(errorMEssage: 'No certificate found', code: 404);
+                }
+
+                return $this->sendResponse(message: 'Get Certificate List', result: $certificate);
+            }
+
+            return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
+
+        } catch (\Exception $e) {
+            return $this->sendError(errorMEssage: 'Error : ' . $e, code: 500);
+        }
+    }
+
+
+    public function getRelatedPost($id, $serviceID)
+    {
+        try {
+            if($this->isAuthorizedUser($id)){
+                $certificate = CpPostLink::join('cp_post', 'cp_post_link.cppl_int_cpp_ref', '=', 'cp_post.cpp_int_ref')
+                ->where('cppl_int_cps_ref', $serviceID)
+                ->select('cp_post.*')
+                ->get();
+
+                if ($certificate->isEmpty()) {
+                    return $this->sendError(errorMEssage: 'No post found', code: 404);
+                }
+
+                return $this->sendResponse(message: 'Get Post List', result: $certificate);
+            }
+
+            return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
+        } catch (\Exception $e) {
+            return $this->sendError(errorMEssage: 'Error : ' . $e, code: 500);
+        }
+
     }
 
     public function getServicesDetailByID(Request $request, $id)

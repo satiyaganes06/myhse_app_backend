@@ -26,6 +26,10 @@ class PostController extends BaseController
                     ->where('cpp_int_user_ref', '!=', $id)
                     ->paginate($limit);
 
+                if ($posteInfos->isEmpty()) {
+                    return $this->sendResponse(message: 'No posts found.', code: 404);
+                }
+
                 return $this->sendResponse(message: 'Get All Post Details', result: $posteInfos);
             }
 
@@ -39,7 +43,7 @@ class PostController extends BaseController
     {
         try {
             if ($this->isAuthorizedUser($id)) {
-                $limit = $request->input('limit') ?? 10;
+                $limit = $request->input('limit');
 
                 $posteInfos = CpPost::join('service_main_ref', 'cp_post.cpp_int_service_main_ref', '=', 'service_main_ref.smr_int_ref')
                     ->where('cpp_int_user_ref', $id)->paginate($limit);
