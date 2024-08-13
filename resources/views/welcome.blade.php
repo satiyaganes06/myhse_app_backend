@@ -1,22 +1,40 @@
+
+<!-- resources/views/welcome.blade.php -->
 <!DOCTYPE html>
-<html style="height:100%">
-  <head>
-    <meta name="viewport"
-      content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <title> 403 Forbidden
-    </title></head>
-  <body
-    style="color: #444; margin:0;font: normal 14px/20px Arial, Helvetica, sans-serif; height:100%; background-color: #fff;">
-    <div style="height:auto; min-height:100%; "> <div
-        style="text-align: center; width:800px; margin-left: -400px; position:absolute; top: 30%; left:50%;">
-        <h1
-          style="margin:0; font-size:150px; line-height:150px; font-weight:bold;">403</h1>
-        <h2 style="margin-top:20px;font-size: 30px;">Forbidden
-        </h2>
-        <p>Access to this resource on the server is denied!!!!!</p>
-      </div></div><div
-      style="color:#f0f0f0; font-size:12px;margin:auto;padding:0px 30px 0px 30px;position:relative;clear:both;height:100px;margin-top:-101px;background-color:#474747;border-top: 1px solid rgba(0,0,0,0.15);box-shadow: 0 1px 0 rgba(255, 255, 255, 0.3) inset;">
-      <br>Proudly powered by <a style="color:#fff;"
-        href="http://www.litespeedtech.com/error-page">LiteSpeed Web Server</a><p>Please
-        be advised that LiteSpeed Technologies Inc. is not a web hosting company
-        and, as such, has no control over content found on this site.</p></div></body></html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to myHse</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Link to your CSS file -->
+</head>
+<body>
+    <header>
+        <h1>Welcome to myHse</h1>
+        <nav>
+            <ul>
+                <li><a href="#about">About</a></li>
+                <li><a href="#services">Services</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section id="about">
+            <h2>About Us</h2>
+            <p>Your content goes here.</p>
+        </section>
+        <section id="services">
+            <h2>Our Services</h2>
+            <p>Your content goes here.</p>
+        </section>
+        <section id="contact">
+            <h2>Contact Us</h2>
+            <p>Your content goes here.</p>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2023 myHse. All rights reserved.</p>
+    </footer>
+</body>
+</html>
