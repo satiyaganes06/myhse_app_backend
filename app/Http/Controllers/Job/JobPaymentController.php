@@ -32,7 +32,7 @@ class JobPaymentController extends BaseController
 
                 $firstPayment = $bookingReq->br_double_price * 0.1;
 
-                $jobPayment = JobPayment::where('jp_jm_ref', $jmID)->get();
+                $jobPayment = JobPayment::where('jp_jm_ref', $jmID)->where('jp_int_type', 0)->get();
 
                 if (!$jobPayment) {
                     return $this->sendError(errorMEssage: 'Payment not found', code: 404);
@@ -52,14 +52,62 @@ class JobPaymentController extends BaseController
                 if ($totalAmount == $firstPayment) {
                     $reason = null;
                     $paymentStatus = 'true'; // Return true if amounts match
-                }else{
-                    $reason = JobPayment::where('jp_jm_ref', $jmID)->where('jp_int_status', 2)->orderBy('jp_ts_created_at', 'desc')->first()->jp_var_reject_reason ?? null;
+                } else {
+                    $reason = JobPayment::where('jp_jm_ref', $jmID)->where('jp_int_type', 0)->where('jp_int_status', 2)->orderBy('jp_ts_created_at', 'desc')->first()->jp_var_reject_reason ?? null;
                     $paymentStatus = 'false'; // Return false if amounts do not match
                 }
 
 
 
-                return $this->sendResponse(message: 'Get Orders Details', result: [
+                return $this->sendResponse(message: 'Initial Payment Details', result: [
+                    'paymentStatus' => $paymentStatus,
+                    'reason' => $reason
+                ]);
+            }
+
+            return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
+        } catch (Exception $e) {
+            return $this->sendError(errorMEssage: 'Error : ' . $e->getMessage(), code: 500);
+        }
+    }
+
+    public function getJobFinalPaymentStatusByID($id, $brID, $jmID)
+    {
+        try {
+            if ($this->isAuthorizedUser($id)) {
+
+                $bookingReq = BookingRequest::select('br_double_price')->find($brID);
+
+                $finalPayment = $bookingReq->br_double_price * 0.9;
+
+                $jobPayment = JobPayment::where('jp_jm_ref', $jmID)->where('jp_int_type', 1)->get();
+
+                if (!$jobPayment) {
+                    return $this->sendError(errorMEssage: 'Payment not found', code: 404);
+                }
+
+                $totalAmount = 0; // Initialize total amount
+
+                foreach ($jobPayment as $payment) {
+                    if ($payment->jp_int_status == 1) {
+                        $totalAmount += $payment->jp_double_account_transfer_amount; // Sum amounts
+                    }
+                    // If jp_int_status is 2, we skip to the next payment
+                }
+
+
+                // Check if total amount equals first payment
+                if ($totalAmount == $finalPayment) {
+                    $reason = null;
+                    $paymentStatus = 'true'; // Return true if amounts match
+                } else {
+                    $reason = JobPayment::where('jp_jm_ref', $jmID)->where('jp_int_type', 1)->where('jp_int_status', 2)->orderBy('jp_ts_created_at', 'desc')->first()->jp_var_reject_reason ?? null;
+                    $paymentStatus = 'false'; // Return false if amounts do not match
+                }
+
+
+
+                return $this->sendResponse(message: 'Get Final Payment Details', result: [
                     'paymentStatus' => $paymentStatus,
                     'reason' => $reason
                 ]);

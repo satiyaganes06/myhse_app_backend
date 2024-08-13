@@ -11,6 +11,8 @@ use App\Http\Controllers\Booking\BookingMainController;
 use App\Http\Controllers\Base\BaseController;
 use App\Http\Controllers\Certificate\CertificateController;
 use App\Http\Controllers\Job\JobPaymentController;
+use App\Http\Controllers\Job\JobResultController;
+use App\Http\Controllers\Job\JobUserRatingController;
 use App\Http\Controllers\PaymentSubscribeController;
 use App\Http\Controllers\Post\PostController;
 use App\Http\Controllers\State\StateController;
@@ -64,6 +66,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Job
         Route::get('/job/getJobInitialPaymentStatusByID/{id}/{brID}/{jmID}', [JobPaymentController::class, 'getJobInitialPaymentStatusByID']);
+        Route::get('/job/getJobFinalPaymentStatusByID/{id}/{brID}/{jmID}', [JobPaymentController::class, 'getJobFinalPaymentStatusByID']);
+        Route::get('/job/getJobResultByID/{id}/{jmID}', [JobResultController::class, 'getJobResultByID']);
+        Route::get('/job/getJobResultCommentsByID/{id}/{jrID}', [JobResultController::class, 'getJobResultCommentsByID']);
+        Route::post('/job/addJobResultComment', [JobResultController::class, 'addJobResultComment']);
+        Route::get('/job/getJobUserRatingByID/{id}/{jmID}', [JobUserRatingController::class, 'getJobUserRatingByID']);
 
     });
 
@@ -112,6 +119,9 @@ Route::middleware('auth:sanctum')->group(function () {
         // Job
         Route::get('/job/getJobMainDetailsByID/{id}', [JobMainController::class, 'getJobMainDetailsByID']);
         Route::get('/job/getJobMainDetailByID/{id}/{brID}', [JobMainController::class, 'getJobMainDetailByID']);
+        Route::patch('/job/updateJobMainResultStatus/{id}', [JobMainController::class, 'updateJobMainResultStatus']);
+        Route::post('/job/addJobResult', [JobResultController::class, 'addJobResult']);
+
 
         //Image and File Viewer
         Route::get('/viewer/pdfviewer/{filename}', [CommonDataController::class, 'fileView'])->where('filename', '.*'); // Un-finished
