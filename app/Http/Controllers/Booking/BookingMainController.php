@@ -87,7 +87,7 @@ class BookingMainController extends BaseController
             $validator = Validator::make($request->all(), [
                 'bookingRequestID' => 'required|integer',
                 'requestedPrice' => 'sometimes|numeric',
-                'deadline' => 'required|string',
+                'deadline' => 'sometimes|string',
                 'remark' => 'required|string',
                 'userType' => 'required|integer',
                 'brnType' => 'required|integer',
