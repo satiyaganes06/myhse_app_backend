@@ -12,10 +12,6 @@ use Illuminate\Http\Request;
 
 class CommonDataController extends BaseController
 {
-    public function imageView($filename)
-    {
-
-    }
 
     public function fileView($filename)
     {
