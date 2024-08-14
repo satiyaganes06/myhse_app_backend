@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Exception;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Validator;
 
 class BaseController extends Controller
 {
@@ -68,10 +69,35 @@ class BaseController extends Controller
         }
     }
 
+    protected function uploadMediaWithPost(Request $request)
+    {
+
+        try {
+            $validator = validator::make($request->all(), [
+                'file' => 'required', // Adjust the file size limit as needed
+                'folder' => 'required|integer'
+            ]);
+
+            if ($validator->fails()) {
+                return $this->sendError(errorMEssage: $validator->errors(), code: 400);
+            }
+
+            $fileURL = $this->uploadMedia($request->file('file'), $request->input('folder'));
+
+            if (empty($fileURL)) {
+                return $this->sendError(errorMEssage: 'Image Upload Error', code: 400);
+            }
+
+            return $this->sendResponse(message: 'Image Uploaded Successfully', result: $fileURL);
+        } catch (Exception $e) {
+            return $this->sendError(errorMEssage: 'Error : ' . $e->getMessage(), code: 500);
+        }
+    }
+
     public function imageViewer($filepath)
     {
         //    dd($this->decode_data($filepath));
-        $path = storage_path($this->decode_data($filepath));
+        $path = storage_path('app/'. $this->decode_data($filepath));
         $contents = file_get_contents($path);
         $mime = mime_content_type($path);
 
