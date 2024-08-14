@@ -49,6 +49,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/auth/logout', [AuthController::class, 'logout']);
         Route::get('/auth/getUserID', [AuthController::class, 'getUserID']);
 
+        // Upload Media
+        Route::post('/uploadMediaWithPost', [BaseController::class, 'uploadMediaWithPost']);
+
+        // View Image
+        Route::get('/imageViewer/{filepath}',[BaseController::class, 'imageViewer'])->name('image.show');
+
         // Manage User
         Route::get("/manage-user/getMyProfileDetailsByID/{id}", [UserDetailsController::class, 'getMyProfileDetailsByID']);
         Route::get("/manage-user/getUserProfileDetailByID/{id}/{clientID}", [UserDetailsController::class, 'getUserProfileDetailByID']);
@@ -68,6 +74,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/job/getJobInitialPaymentStatusByID/{id}/{brID}/{jmID}', [JobPaymentController::class, 'getJobInitialPaymentStatusByID']);
         Route::get('/job/getJobFinalPaymentStatusByID/{id}/{brID}/{jmID}', [JobPaymentController::class, 'getJobFinalPaymentStatusByID']);
         Route::get('/job/getJobResultByID/{id}/{jmID}', [JobResultController::class, 'getJobResultByID']);
+        Route::get('/job/getFinalJobResultByID/{id}/{jmID}', [JobResultController::class, 'getFinalJobResultByID']);
         Route::get('/job/getJobResultCommentsByID/{id}/{jrID}', [JobResultController::class, 'getJobResultCommentsByID']);
         Route::post('/job/addJobResultComment', [JobResultController::class, 'addJobResultComment']);
         Route::get('/job/getJobUserRatingByID/{id}/{jmID}', [JobUserRatingController::class, 'getJobUserRatingByID']);
