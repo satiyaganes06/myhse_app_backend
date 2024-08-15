@@ -30,7 +30,7 @@ class JobResultController extends BaseController
         try {
             if ($this->isAuthorizedUser($id)) {
 
-                $jobResults = JobResult::where('jr_jm_ref', $jmID)->orderBy('jr_ts_created_at', 'desc')->get();
+                $jobResults = JobResult::where('jr_jm_ref', $jmID)->where('jr_int_type_item', 0)->orderBy('jr_ts_created_at', 'desc')->get();
 
                 if ($jobResults->isEmpty()) {
                     return $this->sendError(errorMEssage: 'No result found', code: 404);
@@ -64,6 +64,7 @@ class JobResultController extends BaseController
                 'description' => 'required|string|max:255',
                 'type' => 'required|integer',
                 'progressMedia' => 'sometimes|max:10000',
+             //   'deliveryMedias.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
             ]);
 
             if ($validator->fails()) {
@@ -93,6 +94,31 @@ class JobResultController extends BaseController
                     'jrf_jr_ref' => $jobResult->jr_int_ref,
                     'jrf_files_path' => $fileURL
                 ]);
+            }
+
+            // if ($request->hasFile('deliveryMedias')) {
+            //     // foreach ($request->file('deliveryMedias') as $file) {
+            //     //     $jobProgress->deliveryMedias()->create([
+            //     //         'file_path' => $file->store('delivery_media'),
+            //     //     ]);
+            //     // }
+            //     foreach ($request->file('deliveryMedias') as $file) {
+            //                 $jobResultFile = new JobResultFile();
+            //                 $jobResultFile->jrf_jr_ref = $jobResult->jr_int_ref;
+            //                 $jobResultFile->jrf_files_path = $file;
+            //                 $jobResultFile->save();
+            //             }
+            // }
+
+            if ($request->input('deliveryMedias') != null) {
+
+                $files = json_decode($request->input('deliveryMedias'));
+                foreach ($files as $file) {
+                    $jobResultFile = new JobResultFile();
+                    $jobResultFile->jrf_jr_ref = $jobResult->jr_int_ref;
+                    $jobResultFile->jrf_files_path = $file;
+                    $jobResultFile->save();
+                }
             }
 
             DB::commit();
@@ -161,6 +187,36 @@ class JobResultController extends BaseController
             } else {
                 return $this->sendError(errorMEssage: 'Something went wrong', code: 500);
             }
+        } catch (Exception $e) {
+            return $this->sendError(errorMEssage: 'Error : ' . $e->getMessage(), code: 500);
+        }
+    }
+
+    public function getFinalJobResultByID($id, $jmID)
+    {
+        try {
+            if ($this->isAuthorizedUser($id)) {
+
+                $jobResults = JobResult::where('jr_jm_ref', $jmID)->where('jr_int_type_item', 1)->orderBy('jr_ts_created_at', 'desc')->get();
+
+                if ($jobResults->isEmpty()) {
+                    return $this->sendError(errorMEssage: 'No result found', code: 404);
+                }
+
+                $files = JobResultFile::whereIn('jrf_jr_ref', $jobResults->pluck('jr_int_ref'))->get();
+
+                // Group images by booking request
+                $groupedImages = $files->groupBy('jrf_jr_ref');
+
+                // Add images to booking requests
+                foreach ($jobResults as $jobResult) {
+                    $jobResult->mediaURL = $groupedImages[$jobResult->jr_int_ref] ?? [];
+                }
+
+                return $this->sendResponse(message: 'Get Result Details', result: $jobResults[0]);
+            }
+
+            return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
         } catch (Exception $e) {
             return $this->sendError(errorMEssage: 'Error : ' . $e->getMessage(), code: 500);
         }

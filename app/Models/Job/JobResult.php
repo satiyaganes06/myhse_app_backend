@@ -16,7 +16,7 @@ class JobResult extends Model
     protected $fillable = [
         'jr_jm_ref',
         'jr_txt_description',
-        'jr_int_delivery_item',
+        'jr_int_type_item',
         'jr_double_progress_percent',
         'jr_int_status'
     ];
