@@ -246,14 +246,13 @@ class UserDetailsController extends BaseController
                 $updatedData = $request->except(['_method']);
 
                 if($request->hasFile('up_var_pic')){
-                    $picPath = $this->uploadMedia($request->file('up_var_pic'), 0); //! FIXME: need to change the path to the correct one
+                    $picPath = $this->uploadMedia($request->file('up_var_pic'), 0);
 
                     if(empty($picPath)){
                         return $this->sendError(errorMEssage: 'Image Upload Error', code: 400);
                     }
 
                     $updatedData['up_var_pic'] = $picPath;
-                    dd($updatedData);
                 }
 
                 DB::beginTransaction();
