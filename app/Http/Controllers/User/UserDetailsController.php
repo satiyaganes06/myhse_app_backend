@@ -243,15 +243,17 @@ class UserDetailsController extends BaseController
                     return $this->sendError(errorMEssage: 'Validator ' . $validator->errors()->first(), code: 400);
                 }
 
+                $updatedData = $request->except(['_method']);
+
                 if($request->hasFile('up_var_pic')){
                     $picPath = $this->uploadMedia($request->file('up_var_pic'), 0); //! FIXME: need to change the path to the correct one
 
                     if(empty($picPath)){
                         return $this->sendError(errorMEssage: 'Image Upload Error', code: 400);
                     }
-                    $request->merge(['up_var_pic' => $picPath]);
-                    dd($picPath);
 
+                    $updatedData['up_var_pic'] = $picPath;
+                    dd($updatedData);
                 }
 
                 DB::beginTransaction();
