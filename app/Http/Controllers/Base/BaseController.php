@@ -57,7 +57,7 @@ class BaseController extends Controller
 
             $fileName = time() . '_' . $file->getClientOriginalName();
 
-            $path = $file->storeAs('uploads/' . $folderName[$folder] , $fileName);
+            $path = $file->storeAs('app/uploads/' . $folderName[$folder] , $fileName);
 
             //    // $path = $file->store('uploads/images/profile'); // 'pdfs' is the storage folder, you can change it as needed
             // $path = $file->store('uploads/images'); // 'pdfs' is the storage folder, you can change it as needed
@@ -97,7 +97,7 @@ class BaseController extends Controller
     public function imageViewer($filepath)
     {
         //    dd($this->decode_data($filepath));
-        $path = storage_path('app/'. $this->decode_data($filepath));
+        $path = storage_path($this->decode_data($filepath));
         $contents = file_get_contents($path);
         $mime = mime_content_type($path);
 
