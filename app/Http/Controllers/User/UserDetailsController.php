@@ -244,11 +244,10 @@ class UserDetailsController extends BaseController
                 }
 
                 if($request->hasFile('up_var_pic')){
-                    dd($request->hasFile('up_var_pic'));
                     $picPath = $this->uploadMedia($request->file('up_var_pic'), 0); //! FIXME: need to change the path to the correct one
 
                     $request->merge(['up_var_pic' => $picPath]);
-
+                    dd($picPath);
 
                 }
 
