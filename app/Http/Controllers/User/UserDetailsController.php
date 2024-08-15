@@ -249,7 +249,7 @@ class UserDetailsController extends BaseController
                     if(empty($picPath)){
                         return $this->sendError(errorMEssage: 'Image Upload Error', code: 400);
                     }
-                    $request->input('up_var_pic', $picPath);
+                    $request->add(['up_var_pic' => $picPath]);
                     dd($request->all());
 
                 }
