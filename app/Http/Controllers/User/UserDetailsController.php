@@ -257,10 +257,8 @@ class UserDetailsController extends BaseController
 
                 DB::beginTransaction();
 
-                $data = $request->except(['_method']);
-
                 UserProfile::where('up_int_ref', $id)->update(
-                    $data
+                    $updatedData
                 );
 
                 User::where('ul_int_profile_ref', $id)->update(
