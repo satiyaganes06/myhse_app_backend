@@ -81,6 +81,8 @@ class PostController extends BaseController
                 return $this->sendError(errorMEssage: 'Image Upload Error', code: 400);
             }
 
+            dd($fileURL);
+
             $cpPost = CpPost::create([
                 'cpp_int_user_ref' => $request->input('userID'),
                 'cpp_txt_desc' => $request->input('description'),
