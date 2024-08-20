@@ -9,8 +9,8 @@ use App\Models\Services\CpService;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use App\Models\Services\ServiceMainRef;
-
 use Exception;
+use Illuminate\Support\Facades\DB;
 
 class ServiceController extends BaseController
 {
@@ -130,7 +130,7 @@ class ServiceController extends BaseController
                 return $this->sendError(errorMEssage: 'Image Upload Error', code: 400);
             }
 
-            // DB::beginTransaction();
+             DB::beginTransaction();
 
             $service = new CpService();
             $service->cps_int_user_ref = $request->input('userID');
@@ -144,6 +144,24 @@ class ServiceController extends BaseController
             $service->cps_int_status = 0;
             $service->save();
 
+            // Store the certificate one by one
+            $certificates = json_decode($request->input('serviceCertificates'), true);
+            foreach ($certificates as $certificate) {
+                $certLink = new CpCertLink();
+                $certLink->cpcl_int_cps_ref = $service->cps_int_ref;
+                $certLink->cpcl_int_cc_ref = $certificate;
+                $certLink->save();
+            }
+
+            // Store the post one by one
+            $posts = json_decode($request->input('servicePosts'), true);
+            foreach ($posts as $post) {
+                $postLink = new CpPostLink();
+                $postLink->cppl_int_cps_ref = $service->cps_int_ref;
+                $postLink->cppl_int_cpp_ref = $post;
+                $postLink->save();
+            }
+
             // Store the state one by one
             // $states = json_decode($request->input('serviceState'), true);
             // foreach ($states as $state) {
@@ -153,11 +171,13 @@ class ServiceController extends BaseController
             //     $stateTable->save();
             // }
 
-            // DB::commit();
+            DB::commit();
 
 
-            $getService = CpService::join('service_main_ref', 'cp_service.cps_int_service_ref', '=', 'service_main_ref.smr_int_ref')
-                ->where('cps_int_ref', $service->cps_int_ref)->first();
+            $getService = CpService::with(['certificates', 'posts'])
+                ->find($service->cps_int_ref);
+
+
 
             return $this->sendResponse(message: 'Saved Service Successfully', result: $getService);
         } catch (Exception $e) {

@@ -7,7 +7,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
-use App\Models\Booking\BookingMain;
+use App\Models\Booking\BookingRequest;
+use App\Models\Certificate\CpCertLink;
+use App\Models\Post\CpPostLink;
 
 class CpService extends Model
 {
@@ -31,9 +33,19 @@ class CpService extends Model
     const CREATED_AT = 'cps_ts_created_at';
     const UPDATED_AT = 'cps_ts_updated_at';
 
+    public function certificates()
+    {
+        return $this->hasMany(CpCertLink::class, 'cpcl_int_cps_ref', 'cps_int_ref');
+    }
+
+    public function posts()
+    {
+        return $this->hasMany(CpPostLink::class, 'cppl_int_cps_ref', 'cps_int_ref');
+    }
+
     public function bookings()
     {
-        return $this->hasMany(BookingMain::class, 'bm_int_competent_person_service_id', 'cps_int_ref');
+        return $this->hasMany(BookingRequest::class, 'bm_int_competent_person_service_id', 'cps_int_ref');
     }
 
     // public function serviceState()
