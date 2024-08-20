@@ -83,7 +83,7 @@ class CertificateController extends BaseController
                 'cc_var_registration_no' => $request->input('certRegistrationNo'),
                 'cc_date_expiry_date' => $request->input('certExpiryDate'),
                 'cc_var_path_document' => $fileURL,
-                'cc_int_status' => 0
+                'cc_int_status' => 1
             ]);
 
             // Start Template
