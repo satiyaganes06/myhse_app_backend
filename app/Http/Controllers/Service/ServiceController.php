@@ -82,10 +82,12 @@ class ServiceController extends BaseController
             if ($this->isAuthorizedUser($id)) {
                 $limit = $request->input('limit');
 
-                $services = CpService::join('service_main_ref', 'cp_service.cps_int_service_ref', '=', 'service_main_ref.smr_int_ref')
-                    ->where('cps_int_user_ref', $id)->orderBy('cps_ts_created_at', 'desc')->paginate($limit);
+                $getService = CpService::with(['certificates', 'posts'])
+                ->get();
+                // $services = CpService::join('service_main_ref', 'cp_service.cps_int_service_ref', '=', 'service_main_ref.smr_int_ref')
+                //     ->where('cps_int_user_ref', $id)->orderBy('cps_ts_created_at', 'desc')->paginate($limit);
 
-                if ($services->isEmpty()) {
+                if ($getService->isEmpty()) {
                     return $this->sendError(errorMEssage: 'No service found', code: 404);
                 }
 
@@ -97,7 +99,7 @@ class ServiceController extends BaseController
                 //     $service->states = $states;
                 // }
 
-                return $this->sendResponse(message: 'Get Service Details', result: $services);
+                return $this->sendResponse(message: 'Get Service Details', result: $getService);
             }
 
             return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);

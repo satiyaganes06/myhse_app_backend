@@ -33,15 +33,17 @@ class CpService extends Model
     const CREATED_AT = 'cps_ts_created_at';
     const UPDATED_AT = 'cps_ts_updated_at';
 
+
     public function certificates()
     {
-        return $this->hasMany(CpCertLink::class, 'cpcl_int_cps_ref', 'cps_int_ref');
+        return $this->hasMany(CpCertLink::class, 'cert_link_service_id', 'cps_int_ref');
     }
 
     public function posts()
     {
-        return $this->hasMany(CpPostLink::class, 'cppl_int_cps_ref', 'cps_int_ref');
+        return $this->hasMany(CpPostLink::class, 'post_link_service_id', 'cps_int_ref');
     }
+
 
     public function bookings()
     {
