@@ -83,7 +83,9 @@ class ServiceController extends BaseController
                 $limit = $request->input('limit');
 
                 $getService = CpService::with(['certificates', 'posts'])
-                ->get();
+                    ->where('cps_int_user_ref', $id)
+                    ->orderBy('cps_ts_created_at', 'desc')
+                    ->paginate($limit);
                 // $services = CpService::join('service_main_ref', 'cp_service.cps_int_service_ref', '=', 'service_main_ref.smr_int_ref')
                 //     ->where('cps_int_user_ref', $id)->orderBy('cps_ts_created_at', 'desc')->paginate($limit);
 

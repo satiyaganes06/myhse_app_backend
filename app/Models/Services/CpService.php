@@ -36,12 +36,28 @@ class CpService extends Model
 
     public function certificates()
     {
-        return $this->hasMany(CpCertLink::class, 'cert_link_service_id', 'cps_int_ref');
+        return $this->hasManyThrough(
+            CpCertLink::class,
+            CpService::class,
+            'cps_int_ref', // Foreign key on CpCertLink
+            'cpcl_int_cps_ref', // Foreign key on CpService
+            'cps_int_ref', // Local key on CpService
+            'cpcl_int_cc_ref' // Local key on CpCertLink
+        )->join('cp_certificate', 'cp_cert_link.cpcl_int_cc_ref', '=', 'cp_certificate.cc_int_ref')
+         ->select('cp_certificate.*');
     }
 
     public function posts()
     {
-        return $this->hasMany(CpPostLink::class, 'post_link_service_id', 'cps_int_ref');
+        return $this->hasManyThrough(
+            CpPostLink::class,
+            CpService::class,
+            'cps_int_ref', // Foreign key on CpPostLink
+            'cppl_int_cps_ref', // Foreign key on CpService
+            'cps_int_ref', // Local key on CpService
+            'cppl_int_cpp_ref' // Local key on CpPostLink
+        )->join('cp_post', 'cp_post_link.cppl_int_cpp_ref', '=', 'cp_post.cpp_int_ref')
+         ->select('cp_post.*');
     }
 
 
