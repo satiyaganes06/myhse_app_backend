@@ -46,7 +46,7 @@ class PostController extends BaseController
                 $limit = $request->input('limit');
 
                 $posteInfos = CpPost::join('service_main_ref', 'cp_post.cpp_int_service_main_ref', '=', 'service_main_ref.smr_int_ref')
-                    ->where('cpp_int_user_ref', $id)->paginate($limit);
+                    ->where('cpp_int_user_ref', $id)->orderBy('cpp_ts_created_at', 'desc')->paginate($limit);
 
                 if ($posteInfos->isEmpty()) {
                     return $this->sendResponse(message: 'No posts found.', code: 404);

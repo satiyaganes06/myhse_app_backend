@@ -41,7 +41,7 @@ class BookingMainController extends BaseController
                         'cp_service.*',
                         'service_main_ref.*',
                         'user_profile.*',
-                    )->paginate($limit);
+                    )->orderBy('br_ts_created_at', 'desc')->paginate($limit);
 
                 if ($bookingDetails->isEmpty()) {
                     return $this->sendError(errorMEssage: 'No booking found', code: 404);
