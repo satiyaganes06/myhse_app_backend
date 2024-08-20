@@ -86,7 +86,7 @@ class PostController extends BaseController
                 'cpp_txt_desc' => $request->input('description'),
                 'cpp_var_image' => $fileURL,
                 'cpp_int_service_main_ref' => $request->input('serviceCategory'),
-                'cpp_int_status' => 0
+                'cpp_int_status' => 1
             ]);
 
             if ($cpPost) {
