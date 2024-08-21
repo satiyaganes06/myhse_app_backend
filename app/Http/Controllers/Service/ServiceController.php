@@ -109,7 +109,7 @@ class ServiceController extends BaseController
             ->where('cps_int_user_ref', '!=', $id)
             ->where('cps_int_service_ref', $category)
             ->where('cps_int_status', 1)
-                    ->orderBy('cps_ts_created_at', 'desc')->paginate($limit);
+            ->orderBy('cps_ts_created_at', 'desc')->paginate($limit);
 
             if ($services->isEmpty()) {
                 return $this->sendError(errorMEssage: 'No service found', code: 404);
