@@ -127,6 +127,28 @@ class ServiceController extends BaseController
         }
     }
 
+    public function getSearchServiceResult(Request $request, $id)
+    {
+        try {
+            $limit = $request->input('limit');
+            $query = $request->input('query');
+
+            $services = CpService::join('service_main_ref', 'cp_service.cps_int_service_ref', '=', 'service_main_ref.smr_int_ref')
+                ->where('cps_int_user_ref', '!=', $id)
+                ->where('cps_int_status', 1)
+                ->where('cps_var_title', 'like', '%' . $query . '%')
+                ->orderBy('cps_ts_created_at', 'desc')->paginate($limit);
+
+            if ($services->isEmpty()) {
+                return $this->sendError(errorMEssage: 'No service found', code: 404);
+            }
+
+            return $this->sendResponse(message: 'Get Service Details', result: $services);
+        } catch (Exception $e) {
+            return $this->sendError('Error : ' . $e, 500);
+        }
+    }
+
     public function addServiceDetail(Request $request)
     {
 
