@@ -83,6 +83,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::group(['prefix' => 'v2/client'], function(){
         Route::get("/post/getAllPostDetails/{id}", [PostController::class, 'getAllPostDetails']);
+        Route::get("/service/getAllService/{id}", [ServiceController::class, 'getAllService']);
     });
 
     Route::group(['prefix' => 'v2/competent-person'], function(){
