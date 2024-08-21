@@ -102,9 +102,9 @@ class ServiceController extends BaseController
     {
         try {
             $limit = $request->input('limit');
-            $category = $request->input('category');
+            $category = $request->input('category') ?? null;
 
-            if (empty($category)) {
+            if ($category != null) {
                 $services = CpService::join('service_main_ref', 'cp_service.cps_int_service_ref', '=', 'service_main_ref.smr_int_ref')
                     ->where('cps_int_user_ref', '!=', $id)
                     ->where('cps_int_service_ref', $category)
