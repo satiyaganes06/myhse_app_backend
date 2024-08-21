@@ -187,7 +187,7 @@ class ServiceController extends BaseController
                 $validator = Validator::make($request->all(), [
                     'cpsID' => 'required|integer',
                     'serviceMainRefID' => 'required|integer',
-                    'serviceTitle' => 'required|integer',
+                    'serviceTitle' => 'required|string',
                     'serviceDescription' => 'required|string',
                     'startingPrice' => 'required|string',
                     'estimateDeliveryTime' => 'required|integer',
