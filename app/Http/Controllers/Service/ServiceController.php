@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Service;
 
 use App\Http\Controllers\Base\BaseController as BaseController;
+use App\Models\Certificate\CpCertificate;
 use App\Models\Certificate\CpCertLink;
 use App\Models\Post\CpPostLink;
 use App\Models\Services\CpService;
@@ -89,14 +90,6 @@ class ServiceController extends BaseController
                 if ($services->isEmpty()) {
                     return $this->sendError(errorMEssage: 'No service found', code: 404);
                 }
-
-                //! //Fetch states for each service
-                // foreach ($services as $service) {
-                //     $states = CpServicesState::where('css_int_services_ref', $service->cps_int_ref)
-                //         ->pluck('css_int_states_ref')
-                //         ->toArray();
-                //     $service->states = $states;
-                // }
 
                 return $this->sendResponse(message: 'Get Service Details', result: $services);
             }
@@ -187,7 +180,6 @@ class ServiceController extends BaseController
         }
     }
 
-
     public function updateServiceDetail(Request $request, $id)
     {
         try {
@@ -230,43 +222,67 @@ class ServiceController extends BaseController
                     $updateData['cps_var_image'] = $fileURL;
                 }
 
+
+                DB::beginTransaction();
+
                 $updateService = CpService::where('cps_int_ref', $request->input('cpsID'))->update($updateData);
 
+                // Certificate
+                $existingCerts = CpCertificate::where('cpcl_int_cps_ref', $service->cps_int_ref)
+                    ->pluck('cpcl_int_cc_ref')
+                    ->toArray();
 
-                // DB::beginTransaction();
+                $newCerts = json_decode($request->input('serviceCertificates'), true);
 
-                // $updateService = CompetentPersonService::where('cps_int_ref', $request->input('cpsID'))->update($updateData);
-                // $existingStates = CpServicesState::where('css_int_services_ref', $service->cps_int_ref)
-                //     ->pluck('css_int_states_ref')
-                //     ->toArray();
+                // Determine certificate to add
+                $certsToAdd = array_diff($newCerts, $existingCerts);
 
-                // $newStates = json_decode($request->input('serviceState'), true);
+                // Determine certificate to delete
+                $certsToDelete = array_diff($existingCerts, $newCerts);
 
-                // // Determine states to add
-                // $statesToAdd = array_diff($newStates, $existingStates);
+                // Add new certificates
+                foreach ($certsToAdd as $cert) {
+                    $certificateLinkTable = new CpCertLink();
+                    $certificateLinkTable->cpcl_int_cps_ref = $service->cps_int_ref;
+                    $certificateLinkTable->cpcl_int_cc_ref = $cert;
+                    $certificateLinkTable->save();
+                }
 
-                // // Determine states to delete
-                // $statesToDelete = array_diff($existingStates, $newStates);
+                // Delete removed certificates
+                CpCertLink::where('cpcl_int_cps_ref', $service->cps_int_ref)
+                    ->whereIn('cpcl_int_cc_ref', $certsToDelete)
+                    ->delete();
 
-                // // Add new states
-                // foreach ($statesToAdd as $state) {
-                //     $stateTable = new CpServicesState();
-                //     $stateTable->css_int_services_ref = $service->cps_int_ref;
-                //     $stateTable->css_int_states_ref = $state;
-                //     $stateTable->save();
-                // }
+                // Post
+                $existingPosts = CpPostLink::where('cppl_int_cps_ref', $service->cps_int_ref)
+                ->pluck('cppl_int_cpp_ref')
+                ->toArray();
 
-                // // Delete removed states
-                // CpServicesState::where('css_int_services_ref', $service->cps_int_ref)
-                //     ->whereIn('css_int_states_ref', $statesToDelete)
-                //     ->delete();
+                $newPosts = json_decode($request->input('servicePosts'), true);
 
-                // DB::commit();
+                // Determine post to add
+                $postsToAdd = array_diff($newPosts, $existingPosts);
+
+                // Determine post to delete
+                $postsToDelete = array_diff($existingPosts, $newPosts);
+
+                // Add new posts
+                foreach ($postsToAdd as $post) {
+                    $postLinkTable = new CpPostLink();
+                    $postLinkTable->cppl_int_cps_ref = $service->cps_int_ref;
+                    $postLinkTable->cppl_int_cpp_ref = $post;
+                    $postLinkTable->save();
+                }
+
+                // Delete removed posts
+                CpPostLink::where('cppl_int_cps_ref', $service->cps_int_ref)
+                    ->whereIn('cppl_int_cpp_ref', $postsToDelete)
+                    ->delete();
+
+                 DB::commit();
 
                 if ($updateService) {
-                    $service = CpService::join('service_main_ref', 'cp_service.cps_int_service_ref', '=', 'service_main_ref.smr_int_ref')
-                    ->where('cps_int_ref', $request->input('cpsID'))->first();
-                    return $this->sendResponse(message: 'Updated Successfully', result: $service);
+                    return $this->sendResponse(message: 'Updated Successfully');
                 } else {
                     //DB::rollBack();
                     return $this->sendError(errorMEssage: 'Something went wrong', code: 500);
@@ -275,7 +291,7 @@ class ServiceController extends BaseController
 
             return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
         } catch (Exception $e) {
-           // DB::rollBack();
+            DB::rollBack();
             return $this->sendError(errorMEssage: 'Error : ' . $e->getMessage(), code: 500);
         }
     }
