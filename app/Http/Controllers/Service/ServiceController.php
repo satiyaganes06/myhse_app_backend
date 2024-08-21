@@ -33,11 +33,11 @@ class ServiceController extends BaseController
     public function getRelatedCertificate($id, $serviceID)
     {
         try {
-            if($this->isAuthorizedUser($id)){
+            if ($this->isAuthorizedUser($id)) {
                 $certificate = CpCertLink::join('cp_certificate', 'cp_cert_link.cpcl_int_cc_ref', '=', 'cp_certificate.cc_int_ref')
-                ->where('cpcl_int_cps_ref', $serviceID)
-                ->select('cp_certificate.*')
-                ->get();
+                    ->where('cpcl_int_cps_ref', $serviceID)
+                    ->select('cp_certificate.*')
+                    ->get();
 
                 if ($certificate->isEmpty()) {
                     return $this->sendError(errorMEssage: 'No certificate found', code: 404);
@@ -47,7 +47,6 @@ class ServiceController extends BaseController
             }
 
             return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
-
         } catch (\Exception $e) {
             return $this->sendError(errorMEssage: 'Error : ' . $e, code: 500);
         }
@@ -57,11 +56,11 @@ class ServiceController extends BaseController
     public function getRelatedPost($id, $serviceID)
     {
         try {
-            if($this->isAuthorizedUser($id)){
+            if ($this->isAuthorizedUser($id)) {
                 $certificate = CpPostLink::join('cp_post', 'cp_post_link.cppl_int_cpp_ref', '=', 'cp_post.cpp_int_ref')
-                ->where('cppl_int_cps_ref', $serviceID)
-                ->select('cp_post.*')
-                ->get();
+                    ->where('cppl_int_cps_ref', $serviceID)
+                    ->select('cp_post.*')
+                    ->get();
 
                 if ($certificate->isEmpty()) {
                     return $this->sendError(errorMEssage: 'No post found', code: 404);
@@ -74,7 +73,6 @@ class ServiceController extends BaseController
         } catch (\Exception $e) {
             return $this->sendError(errorMEssage: 'Error : ' . $e, code: 500);
         }
-
     }
 
     public function getServicesDetailByID(Request $request, $id)
@@ -100,16 +98,24 @@ class ServiceController extends BaseController
         }
     }
 
-    public function getAllService(Request $request, $id){
+    public function getAllService(Request $request, $id)
+    {
         try {
             $limit = $request->input('limit');
-            $category = $request->input('category') ?? null;
+            $category = $request->input('category');
 
-            $services = CpService::join('service_main_ref', 'cp_service.cps_int_service_ref', '=', 'service_main_ref.smr_int_ref')
-            ->where('cps_int_user_ref', '!=', $id)
-            ->where('cps_int_service_ref', $category)
-            ->where('cps_int_status', 1)
-            ->orderBy('cps_ts_created_at', 'desc')->paginate($limit);
+            if (empty($category)) {
+                $services = CpService::join('service_main_ref', 'cp_service.cps_int_service_ref', '=', 'service_main_ref.smr_int_ref')
+                    ->where('cps_int_user_ref', '!=', $id)
+                    ->where('cps_int_service_ref', $category)
+                    ->where('cps_int_status', 1)
+                    ->orderBy('cps_ts_created_at', 'desc')->paginate($limit);
+            } else {
+                $services = CpService::join('service_main_ref', 'cp_service.cps_int_service_ref', '=', 'service_main_ref.smr_int_ref')
+                    ->where('cps_int_user_ref', '!=', $id)
+                    ->where('cps_int_status', 1)
+                    ->orderBy('cps_ts_created_at', 'desc')->paginate($limit);
+            }
 
             if ($services->isEmpty()) {
                 return $this->sendError(errorMEssage: 'No service found', code: 404);
@@ -145,7 +151,7 @@ class ServiceController extends BaseController
                 return $this->sendError(errorMEssage: 'Image Upload Error', code: 400);
             }
 
-             DB::beginTransaction();
+            DB::beginTransaction();
 
             $service = new CpService();
             $service->cps_int_user_ref = $request->input('userID');
@@ -276,8 +282,8 @@ class ServiceController extends BaseController
 
                 // Post
                 $existingPosts = CpPostLink::where('cppl_int_cps_ref', $service->cps_int_ref)
-                ->pluck('cppl_int_cpp_ref')
-                ->toArray();
+                    ->pluck('cppl_int_cpp_ref')
+                    ->toArray();
 
                 $newPosts = json_decode($request->input('servicePosts'), true);
 
@@ -300,7 +306,7 @@ class ServiceController extends BaseController
                     ->whereIn('cppl_int_cpp_ref', $postsToDelete)
                     ->delete();
 
-                 DB::commit();
+                DB::commit();
 
                 if ($updateService) {
                     return $this->sendResponse(message: 'Updated Successfully');
