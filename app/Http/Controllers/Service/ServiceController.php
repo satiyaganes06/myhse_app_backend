@@ -108,6 +108,7 @@ class ServiceController extends BaseController
             $services = CpService::join('service_main_ref', 'cp_service.cps_int_service_ref', '=', 'service_main_ref.smr_int_ref')
             ->where('cps_int_user_ref', '!=', $id)
             ->where('cps_int_service_ref', $category)
+            ->where('cps_int_status', 1)
                     ->orderBy('cps_ts_created_at', 'desc')->paginate($limit);
 
             if ($services->isEmpty()) {
