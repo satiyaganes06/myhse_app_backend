@@ -103,7 +103,7 @@ class ServiceController extends BaseController
     public function getAllService(Request $request, $id){
         try {
             $limit = $request->input('limit');
-            $category = $request->input('category');
+            $category = $request->input('category') ?? null;
 
             $services = CpService::join('service_main_ref', 'cp_service.cps_int_service_ref', '=', 'service_main_ref.smr_int_ref')
             ->where('cps_int_user_ref', '!=', $id)
