@@ -228,7 +228,7 @@ class ServiceController extends BaseController
                 $updateService = CpService::where('cps_int_ref', $request->input('cpsID'))->update($updateData);
 
                 // Certificate
-                $existingCerts = CpCertificate::where('cpcl_int_cps_ref', $service->cps_int_ref)
+                $existingCerts = CpCertLink::where('cpcl_int_cps_ref', $service->cps_int_ref)
                     ->pluck('cpcl_int_cc_ref')
                     ->toArray();
 
