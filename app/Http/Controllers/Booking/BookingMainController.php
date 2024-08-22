@@ -56,7 +56,51 @@ class BookingMainController extends BaseController
         }
     }
 
-    public function addBookingRequest(Request $request) {}
+    public function addBookingRequest(Request $request) {
+        try {
+            $validator = Validator::make($request->all(), [
+                'serviceID' => 'required|integer',
+                'userID' => 'required|integer',
+                'price' => 'required|numeric',
+                'deadline' => 'required|string',
+                'details' => 'required|string',
+                'address' => 'somethimes|string',
+                'zipCode' => 'somethimes|string',
+                'state' => 'somethimes|string',
+            ]);
+
+            if ($validator->fails()) {
+                return $this->sendError(errorMEssage: 'Validation Error: ' . $validator->errors()->first(), code: 400);
+            }
+
+            $bookingRequest = new BookingRequest([
+                'br_int_cps_ref' => $request->input('serviceID'),
+                'br_int_req_user_ref' => $request->input('userID'),
+                'br_double_price' => $request->input('price'),
+                'br_var_delivery_time' => $request->input('deadline'),
+                'br_txt_task_detail' => $request->input('details'),
+                'br_int_status' => 0,
+                'br_ts_created_at' =>  now()
+            ]);
+
+            $optionalFields = ['address' => 'br_var_address', 'zipCode' => 'br_int_zip_code', 'state' => 'br_var_state'];
+            foreach ($optionalFields as $input => $field) {
+                if ($request->input($input)) {
+                    $bookingRequest->$field = $request->input($input);
+                }
+            }
+
+            $bookingRequest->save();
+
+            if ($bookingRequest) {
+                return $this->sendResponse(message: 'Request Sent Successfully', result: $bookingRequest);
+            } else {
+                return $this->sendError(errorMEssage: 'Something went wrong', code: 500);
+            }
+        } catch (Exception $e) {
+            return $this->sendError(errorMEssage: 'Error : ' . $e->getMessage(), code: 500);
+        }
+    }
 
     public function getBookingRequestNegotiationDetailByID($id, $brID, Request $request)
     {

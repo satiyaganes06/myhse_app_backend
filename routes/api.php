@@ -85,10 +85,13 @@ Route::middleware('auth:sanctum')->group(function () {
         //Post
         Route::get("/post/getAllPostDetails/{id}", [PostController::class, 'getAllPostDetails']);
 
+        // Booking
+        Route::post("/booking/addBookingRequest", [BookingMainController::class, 'addBookingRequest']);
 
         //Service
         Route::get("/service/getAllService/{id}", [ServiceController::class, 'getAllService']);
         Route::get("/service/getSearchServiceResult/{id}", [ServiceController::class, 'getSearchServiceResult']);
+
     });
 
     Route::group(['prefix' => 'v2/competent-person'], function(){
