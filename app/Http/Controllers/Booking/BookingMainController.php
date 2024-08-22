@@ -64,9 +64,9 @@ class BookingMainController extends BaseController
                 'price' => 'required|numeric',
                 'deadline' => 'required|string',
                 'details' => 'required|string',
-                'address' => 'somethimes|string',
-                'zipCode' => 'somethimes|string',
-                'state' => 'somethimes|string',
+                'address' => 'sometimes|string',
+                'zipCode' => 'sometimes|string',
+                'state' => 'sometimes|string',
             ]);
 
             if ($validator->fails()) {
