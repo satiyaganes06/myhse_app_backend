@@ -140,12 +140,12 @@ class UserDetailsController extends BaseController
     {
         try {
 
-            if ($this->isAuthorizedUser($id)) {
+          //  if ($this->isAuthorizedUser($id)) {
                 $userProfile = UserProfile::where('up_int_ref', $id)->first();
                 return $this->sendResponse(message: 'Get My Profile Informations', result: $userProfile);
-            }
+          //  }
 
-            return $this->sendError('Unauthorized Request', 401);
+           // return $this->sendError('Unauthorized Request', 401);
         } catch (Exception $e) {
 
             return $this->sendError(errorMEssage: 'Error : ' . $e->getMessage(), code: 500);
