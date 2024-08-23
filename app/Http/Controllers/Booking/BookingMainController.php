@@ -32,8 +32,8 @@ class BookingMainController extends BaseController
 
                 $bookingDetails = BookingRequest::join('cp_service', 'booking_request.br_int_cps_ref', '=', 'cp_service.cps_int_ref')
                     ->join('service_main_ref', 'cp_service.cps_int_service_ref', '=', 'service_main_ref.smr_int_ref')
-                 //   ->join('user_profile', 'cp_service.cps_int_user_ref', '=', 'user_profile.up_int_ref')
-                 ->join('user_profile', $role == 0 ? 'booking_request.br_int_req_user_ref' : 'cp_service.cps_int_user_ref', '=', 'user_profile.up_int_ref')
+                    //   ->join('user_profile', 'cp_service.cps_int_user_ref', '=', 'user_profile.up_int_ref')
+                    ->join('user_profile', $role == 0 ? 'cp_service.cps_int_user_ref'  : 'booking_request.br_int_req_user_ref', '=', 'user_profile.up_int_ref')
                     ->where('cp_service.cps_int_user_ref',  $id)
                     ->where('booking_request.br_int_status', $request->input('status'))
                     ->select(
@@ -56,7 +56,8 @@ class BookingMainController extends BaseController
         }
     }
 
-    public function addBookingRequest(Request $request) {
+    public function addBookingRequest(Request $request)
+    {
         try {
             $validator = Validator::make($request->all(), [
                 'serviceID' => 'required|integer',
@@ -215,7 +216,7 @@ class BookingMainController extends BaseController
     public function updateBookingMainNegotiationStatusByID(Request $request, $id)
     {
         try {
-            if($this->isAuthorizedUser($id)){
+            if ($this->isAuthorizedUser($id)) {
                 $validator = Validator::make($request->all(), [
                     'bookingRequestID' => 'required|integer',
                     'deadline' => 'required|string',
@@ -269,7 +270,6 @@ class BookingMainController extends BaseController
             }
 
             return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
-
         } catch (Exception $e) {
 
             DB::rollBack();
