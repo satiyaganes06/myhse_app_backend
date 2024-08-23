@@ -70,6 +70,15 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get("/service/getRelatedCertificate/{id}/{serviceID}", [ServiceController::class, 'getRelatedCertificate']);
         Route::get("/service/getRelatedPost/{id}/{serviceId}", [ServiceController::class, 'getRelatedPost']);
 
+
+        // Booking
+        Route::get('/booking/getBookingsRequestDetailByID/{id}', [BookingMainController::class, 'getBookingsRequestDetailByID']);
+        Route::get('/booking/getBookingRequestNegotiationDetailByID/{id}/{brID}', [BookingMainController::class, 'getBookingRequestNegotiationDetailByID']);
+        Route::post('/booking/addBookingRequestNegotiationDetail', [BookingMainController::class, 'addBookingRequestNegotiationDetail']);
+        Route::patch('/booking/updateBookingRequestNegotiationStatusByID/{id}', [BookingMainController::class, 'updateBookingRequestNegotiationStatusByID']);
+        Route::patch('/booking/updateBookingMainNegotiationStatusByID/{id}', [BookingMainController::class, 'updateBookingMainNegotiationStatusByID']); // Un-finished
+
+
         // Job
         Route::get('/job/getJobInitialPaymentStatusByID/{id}/{brID}/{jmID}', [JobPaymentController::class, 'getJobInitialPaymentStatusByID']);
         Route::get('/job/getJobFinalPaymentStatusByID/{id}/{brID}/{jmID}', [JobPaymentController::class, 'getJobFinalPaymentStatusByID']);
@@ -126,11 +135,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
         // Booking
-        Route::get('/booking/getBookingsRequestDetailByID/{id}', [BookingMainController::class, 'getBookingsRequestDetailByID']);
-        Route::get('/booking/getBookingRequestNegotiationDetailByID/{id}/{brID}', [BookingMainController::class, 'getBookingRequestNegotiationDetailByID']);
-        Route::post('/booking/addBookingRequestNegotiationDetail', [BookingMainController::class, 'addBookingRequestNegotiationDetail']);
-        Route::patch('/booking/updateBookingRequestNegotiationStatusByID/{id}', [BookingMainController::class, 'updateBookingRequestNegotiationStatusByID']);
-        Route::patch('/booking/updateBookingMainNegotiationStatusByID/{id}', [BookingMainController::class, 'updateBookingMainNegotiationStatusByID']); // Un-finished
+
 
         // Job
         Route::get('/job/getJobMainDetailsByID/{id}', [JobMainController::class, 'getJobMainDetailsByID']);
