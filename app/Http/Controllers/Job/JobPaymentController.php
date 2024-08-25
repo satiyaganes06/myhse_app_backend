@@ -39,7 +39,7 @@ class JobPaymentController extends BaseController
                 return $this->sendError('Validation Error.', $validator->errors());
             }
 
-            $fileURL = $this->uploadMedia($request->file('JobPaymentReceipt'), 7);
+            $fileURL = $this->uploadMedia($request->file('jobPaymentReceipt'), 7);
 
             if (empty($fileURL)) {
                 return $this->sendError(errorMEssage: 'Image Upload Error', code: 400);
