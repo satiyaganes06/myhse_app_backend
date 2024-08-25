@@ -32,6 +32,7 @@ class JobPaymentController extends BaseController
                 'jp_var_acount_transfer_name' => 'required:string',
                 'jp_date_account_transfer_date' => 'required:date',
                 'jp_double_account_transfer_amount' => 'required:double',
+                'remark' => 'required:string',
                 'jp_int_status' => 'required:integer'
             ]);
 
@@ -53,6 +54,7 @@ class JobPaymentController extends BaseController
             $jobPayment->jp_date_account_transfer_date = $request->jp_date_account_transfer_date;
             $jobPayment->jp_double_account_transfer_amount = $request->jp_double_account_transfer_amount;
             $jobPayment->jp_int_status = $request->jp_int_status;
+            $jobPayment->jp_var_account_transfer_remark = $request->remark;
             $jobPayment->jp_var_receipt = $fileURL;
             $jobPayment->save();
 
