@@ -46,17 +46,17 @@ class JobPaymentController extends BaseController
                 return $this->sendError(errorMEssage: 'Image Upload Error', code: 400);
             }
 
-            // $jobPayment = new JobPayment();
-            // $jobPayment->jp_jm_ref = $request->jp_jm_ref;
-            // $jobPayment->jp_var_up_ref = $request->jp_var_up_ref;
-            // $jobPayment->jp_int_type = $request->jp_int_type;
-            // $jobPayment->jp_var_acount_transfer_name = $request->jp_var_acount_transfer_name;
-            // $jobPayment->jp_date_account_transfer_date = $request->jp_date_account_transfer_date;
-            // $jobPayment->jp_double_account_transfer_amount = $request->jp_double_account_transfer_amount;
-            // $jobPayment->jp_int_status = $request->jp_int_status;
-            // $jobPayment->jp_var_account_transfer_remark = $request->remark;
-            // $jobPayment->jp_var_receipt = $fileURL;
-            // $jobPayment->save();
+            $jobPayment = new JobPayment();
+            $jobPayment->jp_jm_ref = $request->jp_jm_ref;
+            $jobPayment->jp_var_up_ref = $request->jp_var_up_ref;
+            $jobPayment->jp_int_type = $request->jp_int_type;
+            $jobPayment->jp_var_acount_transfer_name = $request->jp_var_acount_transfer_name;
+            $jobPayment->jp_date_account_transfer_date = $request->jp_date_account_transfer_date;
+            $jobPayment->jp_double_account_transfer_amount = $request->jp_double_account_transfer_amount;
+            $jobPayment->jp_int_status = $request->jp_int_status;
+            $jobPayment->jp_var_account_transfer_remark = $request->remark;
+            $jobPayment->jp_var_receipt = $fileURL;
+            $jobPayment->save();
 
             return $this->sendResponse('Payment receipt submited successfully', );
         } catch (Exception $e) {
