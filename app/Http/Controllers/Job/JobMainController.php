@@ -42,7 +42,7 @@ class JobMainController extends BaseController
                         'cp_service.*',
                         'service_main_ref.*',
                         'user_profile.*'
-                    )->paginate($limit);
+                    )->orderBy('job_main.jm_ts_created_at', 'desc')->paginate($limit);
 
 
                 if ($jobMain->isEmpty()) {
