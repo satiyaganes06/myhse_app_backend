@@ -51,7 +51,7 @@ class BaseController extends Controller
 
     protected function uploadMedia($file, $folder)
     {
-        $folderName = ['UserProfileImage', 'PostImage', 'CertificateImage', 'ServiceImage', 'ServiceDocument', 'PaymentReceipt', 'JobResultFile'];
+        $folderName = ['UserProfileImage', 'PostImage', 'CertificateImage', 'ServiceImage', 'ServiceDocument', 'PaymentReceipt', 'JobResultFile', 'JobPaymentReceipt'];
 
         try {
 

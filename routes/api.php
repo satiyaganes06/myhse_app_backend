@@ -81,6 +81,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/job/getJobMainDetailsByID/{id}', [JobMainController::class, 'getJobMainDetailsByID']);
         Route::get('/job/getJobMainDetailByID/{id}/{brID}', [JobMainController::class, 'getJobMainDetailByID']);
 
+        Route::post('/job/addJobPayment', [JobPaymentController::class, 'insertJobPayment']);
         Route::get('/job/getJobInitialPaymentStatusByID/{id}/{brID}/{jmID}', [JobPaymentController::class, 'getJobInitialPaymentStatusByID']);
         Route::get('/job/getJobInitialPaymentDetailByID/{id}/{jmID}', [JobPaymentController::class, 'getJobInitialPaymentDetailByID']);
         Route::get('/job/getJobFinalPaymentStatusByID/{id}/{brID}/{jmID}', [JobPaymentController::class, 'getJobFinalPaymentStatusByID']);
