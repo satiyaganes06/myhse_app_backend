@@ -70,7 +70,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get("/service/getRelatedCertificate/{id}/{serviceID}", [ServiceController::class, 'getRelatedCertificate']);
         Route::get("/service/getRelatedPost/{id}/{serviceId}", [ServiceController::class, 'getRelatedPost']);
 
-
         // Booking
         Route::get('/booking/getBookingsRequestDetailByID/{id}', [BookingMainController::class, 'getBookingsRequestDetailByID']);
         Route::get('/booking/getBookingRequestNegotiationDetailByID/{id}/{brID}', [BookingMainController::class, 'getBookingRequestNegotiationDetailByID']);
@@ -78,8 +77,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::patch('/booking/updateBookingRequestNegotiationStatusByID/{id}', [BookingMainController::class, 'updateBookingRequestNegotiationStatusByID']);
         Route::patch('/booking/updateBookingMainNegotiationStatusByID/{id}', [BookingMainController::class, 'updateBookingMainNegotiationStatusByID']); // Un-finished
 
-
         // Job
+        Route::get('/job/getJobMainDetailsByID/{id}', [JobMainController::class, 'getJobMainDetailsByID']);
+        Route::get('/job/getJobMainDetailByID/{id}/{brID}', [JobMainController::class, 'getJobMainDetailByID']);
+
         Route::get('/job/getJobInitialPaymentStatusByID/{id}/{brID}/{jmID}', [JobPaymentController::class, 'getJobInitialPaymentStatusByID']);
         Route::get('/job/getJobFinalPaymentStatusByID/{id}/{brID}/{jmID}', [JobPaymentController::class, 'getJobFinalPaymentStatusByID']);
         Route::get('/job/getJobResultByID/{id}/{jmID}', [JobResultController::class, 'getJobResultByID']);
@@ -138,8 +139,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
         // Job
-        Route::get('/job/getJobMainDetailsByID/{id}', [JobMainController::class, 'getJobMainDetailsByID']);
-        Route::get('/job/getJobMainDetailByID/{id}/{brID}', [JobMainController::class, 'getJobMainDetailByID']);
         Route::patch('/job/updateJobMainResultStatus/{id}', [JobMainController::class, 'updateJobMainResultStatus']);
         Route::post('/job/addJobResult', [JobResultController::class, 'addJobResult']);
 

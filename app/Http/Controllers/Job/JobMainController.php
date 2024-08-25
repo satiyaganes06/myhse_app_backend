@@ -34,8 +34,8 @@ class JobMainController extends BaseController
                 $jobMain = JobMain::join('booking_request', 'job_main.jm_br_ref', '=', 'booking_request.br_int_ref')
                     ->join('cp_service', 'booking_request.br_int_cps_ref', '=', 'cp_service.cps_int_ref')
                     ->join('service_main_ref', 'cp_service.cps_int_service_ref', '=', 'service_main_ref.smr_int_ref')
-                    ->join('user_profile', $role == 0 ? 'booking_request.br_int_req_user_ref' : 'cp_service.cps_int_user_ref', '=', 'user_profile.up_int_ref')
-                    ->where('cp_service.cps_int_user_ref',  $id)
+                    ->join('user_profile', $role == 0 ? 'cp_service.cps_int_user_ref'  : 'booking_request.br_int_req_user_ref', '=', 'user_profile.up_int_ref')
+                    ->where($role == 0 ? 'booking_request.br_int_req_user_ref' : 'cp_service.cps_int_user_ref',  $id)
                     ->where('job_main.jm_int_status', $request->input('status'))
                     ->select(
                         'booking_request.*',
@@ -43,6 +43,7 @@ class JobMainController extends BaseController
                         'service_main_ref.*',
                         'user_profile.*'
                     )->paginate($limit);
+
 
                 if ($jobMain->isEmpty()) {
                     return $this->sendError(errorMEssage: 'No order found', code: 404);
