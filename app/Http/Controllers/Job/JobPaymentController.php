@@ -58,7 +58,7 @@ class JobPaymentController extends BaseController
             $jobPayment->jp_var_receipt = $fileURL;
             $jobPayment->save();
 
-            return $this->sendResponse('Payment receipt submited successfully', );
+            return $this->sendResponse('Payment receipt submited successfully', result: $jobPayment);
         } catch (Exception $e) {
             return $this->sendError('Error : ' . $e->getMessage(), 500);
         }
