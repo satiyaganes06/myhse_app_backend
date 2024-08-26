@@ -109,7 +109,37 @@ class JobMainController extends BaseController
         }
     }
 
+    public function updateJobMainTimeline(Request $request, $id)
+    {
+        try {
+            if($this->isAuthorizedUser($id)){
+                $validator = Validator::make($request->all(), [
+                    'jmID' => 'required|integer',
+                    'timeline' => 'required|integer',
+                ]);
 
+                if ($validator->fails()) {
+                    return $this->sendError(errorMEssage: 'Validation Error: ' . $validator->errors()->first(), code: 400);
+                }
+
+                $update = JobMain::where('jm_int_ref', $request->input('jmID'))->update(
+                    array(
+                        'jm_int_timeline_status' => $request->input('timeline')
+                    )
+                );
+
+                if($update){
+                    return $this->sendResponse(message: 'Update the timeline status successfully.', result: $request->input('timeline'));
+                }
+
+                return $this->sendError(errorMEssage: 'Something went wrong', code: 500);
+            }
+
+            return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
+        } catch (Exception $e) {
+            return $this->sendError(errorMEssage: 'Error : ' . $e->getMessage(), code: 500);
+        }
+    }
 }
 
 // public function cpJobMainListDetails(Request $request)
