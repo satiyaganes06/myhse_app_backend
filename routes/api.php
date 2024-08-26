@@ -107,7 +107,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get("/service/getSearchServiceResult/{id}", [ServiceController::class, 'getSearchServiceResult']);
 
         // Job
-        Route::post('/job/addJobUserRating', [JobUserRatingController::class, 'addJobUserRating']);
+        Route::post('/job/addJobUserRating/{id}', [JobUserRatingController::class, 'addJobUserRating']);
 
     });
 
