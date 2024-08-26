@@ -59,13 +59,12 @@ class JobPaymentController extends BaseController
             $jobPayment->save();
 
             if ($jobPayment) {
-                $data = JobPayment::find($jobPayment->jp_int_ref);
-                return $this->sendResponse(message: 'Request Sent Successfully', result: $data);
+                // $data = JobPayment::find($jobPayment->jp_int_ref);
+                return $this->sendResponse(message: 'Payment receipt submited successfully');
             } else {
                 return $this->sendError(errorMEssage: 'Something went wrong', code: 500);
             }
 
-            return $this->sendResponse('Payment receipt submited successfully', result: $jobPayment);
         } catch (Exception $e) {
             return $this->sendError('Error : ' . $e->getMessage(), 500);
         }
