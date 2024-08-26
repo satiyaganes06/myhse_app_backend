@@ -149,7 +149,7 @@ class JobPaymentController extends BaseController
 
                 $jobPayment = JobPayment::where('jp_jm_ref', $jmID)->where('jp_int_type', 1)->get();
 
-                if (!$jobPayment) {
+                if ($jobPayment->isEmpty()) {
                     return $this->sendError(errorMEssage: 'Payment not found', code: 404);
                 }
 
