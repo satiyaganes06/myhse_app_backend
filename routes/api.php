@@ -80,7 +80,7 @@ Route::middleware('auth:sanctum')->group(function () {
         // Job
         Route::get('/job/getJobMainDetailsByID/{id}', [JobMainController::class, 'getJobMainDetailsByID']);
         Route::get('/job/getJobMainDetailByID/{id}/{brID}', [JobMainController::class, 'getJobMainDetailByID']);
-        Route::patch('/job/updateJobMainTimeline/{id}/{jmID}', [JobMainController::class, 'updateJobMainTimeline']);
+        Route::patch('/job/updateJobMainTimeline/{id}', [JobMainController::class, 'updateJobMainTimeline']);
 
         Route::post('/job/addJobPayment', [JobPaymentController::class, 'insertJobPayment']);
         Route::get('/job/getJobInitialPaymentStatusByID/{id}/{brID}/{jmID}', [JobPaymentController::class, 'getJobInitialPaymentStatusByID']);
