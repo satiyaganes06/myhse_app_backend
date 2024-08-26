@@ -186,6 +186,27 @@ class JobPaymentController extends BaseController
         }
     }
 
+    public function getJobFinalPaymentDetailByID($id, $jmID)
+    {
+        try {
+            if ($this->isAuthorizedUser($id)) {
+
+                $jobPayment = JobPayment::where('jp_jm_ref', $jmID)->where('jp_int_type', 1)->orderBy('jp_ts_created_at', 'desc')->get();
+
+                if ($jobPayment->isEmpty()) {
+                    return $this->sendError(errorMEssage: 'No payment yet', code: 404);
+                }
+
+                return $this->sendResponse(message: 'Final Payment Details', result: $jobPayment);
+            }
+
+            return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
+        } catch (Exception $e) {
+            return $this->sendError(errorMEssage: 'Error : ' . $e->getMessage(), code: 500);
+        }
+    }
+
+
 }
 
 // public function cpJobMainListDetails(Request $request)
