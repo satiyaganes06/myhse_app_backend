@@ -24,7 +24,6 @@ use Symfony\Component\Console\Input\Input;
 class JobUserRatingController extends BaseController
 {
 
-
     public function getJobUserRatingByID($id, $jmID)
     {
         try {
@@ -45,6 +44,37 @@ class JobUserRatingController extends BaseController
     }
 
 
+    public function addJobUserRating(Request $request, $id)
+    {
+        try {
+            if ($this->isAuthorizedUser($id)) {
 
+                $validator = Validator::make($request->all(), [
+                    'jmID' => 'required:integer',
+                    'serviceID' => 'required:integer',
+                    'rating_point' => 'required:double',
+                    'comment' => 'required:string'
+                ]);
 
+                if ($validator->fails()) {
+                    return $this->sendError(errorMEssage: $validator->errors(), code: 400);
+                }
+
+                $jobUserRating = new JobUserRating();
+                $jobUserRating->jur_jm_ref = $request->input('jmID');
+                $jobUserRating->jur_var_up_ref = $id;
+                $jobUserRating->jur_rating_point = $request->input('rating_point');
+                $jobUserRating->jur_txt_comment = $request->input('comment');
+                $jobUserRating->jur_int_cps_ref = $request->input('serviceID');
+
+                $jobUserRating->save();
+
+                return $this->sendResponse(message: 'Thank you for feedback.', result: $jobUserRating);
+            }
+
+            return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
+        } catch (Exception $e) {
+            return $this->sendError(errorMEssage: 'Error : ' . $e->getMessage(), code: 500);
+        }
+    }
 }

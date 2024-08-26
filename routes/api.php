@@ -102,9 +102,12 @@ Route::middleware('auth:sanctum')->group(function () {
         // Booking
         Route::post("/booking/addBookingRequest", [BookingMainController::class, 'addBookingRequest']);
 
-        //Service
+        // Service
         Route::get("/service/getAllService/{id}", [ServiceController::class, 'getAllService']);
         Route::get("/service/getSearchServiceResult/{id}", [ServiceController::class, 'getSearchServiceResult']);
+
+        // Job
+        Route::post('/job/addJobUserRating', [JobUserRatingController::class, 'addJobUserRating']);
 
     });
 
