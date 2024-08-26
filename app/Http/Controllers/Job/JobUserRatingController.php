@@ -69,7 +69,14 @@ class JobUserRatingController extends BaseController
 
                 $jobUserRating->save();
 
-                return $this->sendResponse(message: 'Thank you for feedback.', result: $jobUserRating);
+                if ($jobUserRating) {
+                    $data = JobUserRating::find($jobUserRating->jur_int_ref);
+                    return $this->sendResponse(message: 'Thank you for feedback.', result: $data);
+                }else{
+                    return $this->sendError(errorMEssage: 'Error in adding rating', code: 500);
+                }
+
+
             }
 
             return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
