@@ -170,7 +170,7 @@ class UserDetailsController extends BaseController
     {
         try {
             if ($this->isAuthorizedUser($id)) {
-                $role = User::select('ul_int_role')->where('ul_int_profile_ref', $id)->first();
+                $role = User::select('ul_var_role')->where('ul_int_profile_ref', $id)->first();
                 return $this->sendResponse(message: 'Get My Role', result: $role);
             }
 
@@ -188,7 +188,7 @@ class UserDetailsController extends BaseController
                 $validator = validator::make(
                     $request->all(),
                     [
-                        'ul_int_role' => 'required|integer'
+                        'ul_var_role' => 'required|integer'
                     ]
                 );
 
@@ -196,23 +196,23 @@ class UserDetailsController extends BaseController
                     return $this->sendError(errorMEssage: 'Validator ' . $validator->errors()->first(), code: 400);
                 }
 
-                if($request->ul_int_role == 'CLIENT' || $request->ul_int_role == 'CP'){
+                if($request->ul_var_role == 'CLIENT' || $request->ul_var_role == 'CP'){
                     return $this->sendError(errorMEssage: 'Invalid role', code: 400);
                 }
 
-                $existingRoles = User::where('ul_int_profile_ref', $id)->value('ul_int_role');
+                $existingRoles = User::where('ul_int_profile_ref', $id)->value('ul_var_role');
                 $rolesArray = explode(',', $existingRoles);
 
                 // Add the new role if it's not already present
-                if (!in_array($request->ul_int_role, $rolesArray)) {
-                    $rolesArray[] = $request->ul_int_role;
+                if (!in_array($request->ul_var_role, $rolesArray)) {
+                    $rolesArray[] = $request->ul_var_role;
                 }
 
                 $updatedRoles = implode(',', $rolesArray);
 
                 $role = User::where('ul_int_profile_ref', $id)->update(
                     array(
-                        'ul_int_role' => $updatedRoles
+                        'ul_var_role' => $updatedRoles
                     )
                 );
 
