@@ -15,125 +15,6 @@ use App\Models\Common\CompetentPersonTypes;
 class UserDetailsController extends BaseController
 {
 
-    //!! Version 1
-    // public function cpProfileDetails(Request $request)
-    // {
-
-    //     try {
-    //         $userProfileDetails = UserProfile::where('up_int_ref', $request->input('cpID'))->first();
-
-    //         return $this->sendResponse('get cp info', '', $userProfileDetails);
-    //     } catch (Exception $e) {
-
-    //         return $this->sendError('Error : ' . $e->getMessage(), 500);
-    //     }
-    // }
-
-    // public function cpEmailVerificationStatusCheck(Request $request)
-    // {
-
-    //     try {
-    //         $status = UserLogin::select('ul_ts_email_verified_at')->where('ul_var_emailaddress', $request->input('cpEmail'))->first();
-    //        // view('emailVerification', ['status' => $status]);
-    //         return $this->sendResponse('cp email verification status', '', $status);
-    //     } catch (Exception $e) {
-
-    //         return $this->sendError('Error : ' . $e->getMessage(), 500);
-    //     }
-    // }
-
-    // public function cpFirstTimeStatusCheck(Request $request)
-    // {
-
-    //     try {
-    //         $status = UserLogin::select('ul_int_first_time_login')->where('ul_var_emailaddress', $request->input('cpEmail'))->first();
-
-    //         return $this->sendResponse('cp first time status', '', $status);
-    //     } catch (Exception $e) {
-
-    //         return $this->sendError('Error : ' . $e->getMessage(), 500);
-    //     }
-    // }
-
-    // public function cpEmailVerificationStatusUpdate(Request $request)
-    // {
-
-    //     try {
-    //         $status  = UserLogin::where('ul_var_emailaddress', $request->input('cpEmail'))->update(array('ul_ts_email_verified_at' => date('Y-m-d H:i:s')));
-
-    //         return $this->sendResponse('Verified', '', $status);
-    //     } catch (Exception $e) {
-
-    //         return $this->sendError('Error : ' . $e->getMessage(), 500);
-    //     }
-    // }
-
-    // public function cpCompleteProfile(Request $request)
-    // {
-
-    //     try {
-
-    //         $validatorUser = Validator::make($request->all(), [
-    //             'cpID' => 'required|integer',
-    //             'cpAddress' => 'required|string|max:255',
-    //             'cpZipCode' => 'required|integer',
-    //             'cpState' => 'required|string|max:255'
-    //         ]);
-
-    //         UserProfile::where('up_int_ref', $request->input('cpID'))->update(
-    //             array(
-    //                 'up_var_address' => $request->input('cpAddress'),
-    //                 'up_int_zip_code' => $request->input('cpZipCode'),
-    //                 'up_var_state' => $request->input('cpState'),
-
-    //             )
-    //         );
-
-    //         UserLogin::where('ul_int_profile_ref', $request->input('cpID'))->update(
-    //             array(
-    //                 'ul_int_first_time_login' => 1,
-    //             )
-    //         );
-
-
-    //         return $this->sendResponse('Successfully complete your profile', '');
-    //     } catch (Exception $e) {
-
-    //         return $this->sendError('Error : ' . $e->getMessage(), 500);
-    //     }
-    // }
-
-    // public function updateProfileInfo(Request $request){
-    //     try {
-
-    //         UserProfile::where('up_int_ref', $request->input('cpID'))->update(
-    //             array(
-    //                 'up_var_first_name' => $request->input('cpFirstName'),
-    //                 'up_var_last_name' => $request->input('cpLastName'),
-    //                 'up_var_nric' => $request->input('cpNRIC'),
-    //                 'up_var_email_contact' => $request->input('cpEmail'),
-    //                 'up_var_contact_no' => $request->input('cpPhoneNumber'),
-    //                 'up_var_address' => $request->input('cpAddress'),
-    //                 'up_int_zip_code' => $request->input('cpZipCode'),
-    //                 'up_var_state' => $request->input('cpState')
-    //             )
-    //         );
-
-    //         UserLogin::where('ul_int_profile_ref', $request->input('cpID'))->update(
-    //             array(
-    //                 'ul_int_first_time_login' => 1,
-    //             )
-    //         );
-
-
-    //         return $this->sendResponse('Successfully complete your profile', '');
-    //     } catch (Exception $e) {
-
-    //         return $this->sendError('Error : ' . $e->getMessage(), 500);
-    //     }
-    // }
-
-
     //!! Version 2
 
     public function getMyProfileDetailsByID($id)
@@ -281,6 +162,71 @@ class UserDetailsController extends BaseController
 
             DB::rollBack();
             return $this->sendError('Error : ' . $e->getMessage(), 500);
+        }
+    }
+
+    // Role
+    public function getRoleByID($id)
+    {
+        try {
+            if ($this->isAuthorizedUser($id)) {
+                $role = User::select('ul_int_role')->where('ul_int_profile_ref', $id)->first();
+                return $this->sendResponse(message: 'Get My Role', result: $role);
+            }
+
+            return $this->sendError('Unauthorized Request', 401);
+        } catch (Exception $e) {
+
+            return $this->sendError(errorMEssage: 'Error : ' . $e->getMessage(), code: 500);
+        }
+    }
+
+    public function updateRoleByID(Request $request, $id)
+    {
+        try {
+            if ($this->isAuthorizedUser($id)) {
+                $validator = validator::make(
+                    $request->all(),
+                    [
+                        'ul_int_role' => 'required|integer'
+                    ]
+                );
+
+                if ($validator->fails()) {
+                    return $this->sendError(errorMEssage: 'Validator ' . $validator->errors()->first(), code: 400);
+                }
+
+                if($request->ul_int_role == 'CLIENT' || $request->ul_int_role == 'CP'){
+                    return $this->sendError(errorMEssage: 'Invalid role', code: 400);
+                }
+
+                $existingRoles = User::where('ul_int_profile_ref', $id)->value('ul_int_role');
+                $rolesArray = explode(',', $existingRoles);
+
+                // Add the new role if it's not already present
+                if (!in_array($request->ul_int_role, $rolesArray)) {
+                    $rolesArray[] = $request->ul_int_role;
+                }
+
+                $updatedRoles = implode(',', $rolesArray);
+
+                $role = User::where('ul_int_profile_ref', $id)->update(
+                    array(
+                        'ul_int_role' => $updatedRoles
+                    )
+                );
+
+                if ($role) {
+                    return $this->sendResponse(message: 'Role Updated Successfully', result: $role);
+                } else {
+                    return $this->sendError(errorMEssage: 'Role Update Failed', code: 500);
+                }
+            }
+
+            return $this->sendError('Unauthorized Request', 401);
+        } catch (Exception $e) {
+
+            return $this->sendError(errorMEssage: 'Error : ' . $e->getMessage(), code: 500);
         }
     }
 
