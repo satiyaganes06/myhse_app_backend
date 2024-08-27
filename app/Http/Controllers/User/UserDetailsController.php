@@ -188,7 +188,7 @@ class UserDetailsController extends BaseController
                 $validator = validator::make(
                     $request->all(),
                     [
-                        'ul_var_role' => 'required|integer'
+                        'role' => 'required|integer'
                     ]
                 );
 
@@ -196,7 +196,7 @@ class UserDetailsController extends BaseController
                     return $this->sendError(errorMEssage: 'Validator ' . $validator->errors()->first(), code: 400);
                 }
 
-                if($request->ul_var_role == 'CLIENT' || $request->ul_var_role == 'CP'){
+                if($request->role == 'CLIENT' || $request->role == 'CP'){
                     return $this->sendError(errorMEssage: 'Invalid role', code: 400);
                 }
 
@@ -204,8 +204,8 @@ class UserDetailsController extends BaseController
                 $rolesArray = explode(',', $existingRoles);
 
                 // Add the new role if it's not already present
-                if (!in_array($request->ul_var_role, $rolesArray)) {
-                    $rolesArray[] = $request->ul_var_role;
+                if (!in_array($request->role, $rolesArray)) {
+                    $rolesArray[] = $request->role;
                 }
 
                 $updatedRoles = implode(',', $rolesArray);
