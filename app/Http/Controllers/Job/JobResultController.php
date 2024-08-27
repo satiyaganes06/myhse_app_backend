@@ -155,8 +155,19 @@ class JobResultController extends BaseController
                 $jobResult = JobResult::find($request->input('jrID'));
 
                 if($jobResult){
+
+                    DB::beginTransaction();
                     $jobResult->jr_int_status = $request->input('status');
                     $jobResult->save();
+
+                    if($request->input('status') == 1){
+                        $jobMain = JobMain::find($jobResult->jr_jm_ref);
+                        $jobMain->jm_int_status = 1;
+                        $jobMain->jm_int_timeline_status = 4;
+                        $jobMain->save();
+                    }
+
+                    DB::commit();
 
                     return $this->sendResponse(message: 'Status Updated Successfully', result: $jobResult);
                 }
@@ -167,6 +178,7 @@ class JobResultController extends BaseController
             return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
 
         } catch (Exception $e) {
+            DB::rollBack();
             return $this->sendError(errorMEssage: 'Error : ' . $e->getMessage(), code: 500);
         }
     }
