@@ -108,6 +108,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Job
         Route::post('/job/addJobUserRating/{id}', [JobUserRatingController::class, 'addJobUserRating']);
+        Route::patch('/job/updateJobResultStatus/{id}', [JobResultController::class, 'updateJobResultStatus']);
 
     });
 

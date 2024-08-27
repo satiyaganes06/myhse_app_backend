@@ -138,10 +138,10 @@ class JobResultController extends BaseController
         }
     }
 
-    public function updateJobResultStatus(Request $request){
+    public function updateJobResultStatus(Request $request, $id){
 
         try {
-            if($this->isAuthorizedUser($request->input('userID'))){
+            if($this->isAuthorizedUser($id)){
 
                 $validator = Validator::make($request->all(), [
                     'jrID' => 'required|integer',
