@@ -196,6 +196,7 @@ class UserDetailsController extends BaseController
 
                 if ($request->role == 'CLIENT' || $request->role == 'CP') {
                     $existingRoles = User::where('ul_int_profile_ref', $id)->value('ul_var_role');
+                    $existingRoles = trim($existingRoles, '[]');
                     $rolesArray = explode(',', $existingRoles);
 
                     // Add the new role if it's not already present
@@ -207,12 +208,12 @@ class UserDetailsController extends BaseController
 
                     $role = User::where('ul_int_profile_ref', $id)->update(
                         array(
-                            'ul_var_role' => $updatedRoles
+                            'ul_var_role' => '[' . $updatedRoles .']'
                         )
                     );
 
                     if ($role) {
-                        return $this->sendResponse(message: 'Role Updated Successfully', result: $role);
+                        return $this->sendResponse(message: 'Role Updated Successfully', result: $updatedRoles);
                     } else {
                         return $this->sendError(errorMEssage: 'Role Update Failed', code: 500);
                     }
