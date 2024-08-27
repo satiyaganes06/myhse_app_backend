@@ -213,7 +213,7 @@ class UserDetailsController extends BaseController
                     );
 
                     if ($role) {
-                        return $this->sendResponse(message: 'Role Updated Successfully', result: $updatedRoles);
+                        return $this->sendResponse(message: 'Role Updated Successfully', result: '[' . $updatedRoles .']');
                     } else {
                         return $this->sendError(errorMEssage: 'Role Update Failed', code: 500);
                     }
