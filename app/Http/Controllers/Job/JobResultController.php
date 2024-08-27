@@ -230,7 +230,7 @@ class JobResultController extends BaseController
         try {
             if ($this->isAuthorizedUser($id)) {
 
-                $jobResults = JobResult::where('jr_jm_ref', $jmID)->where('jr_int_type_item', 1)->orderBy('jr_ts_created_at', 'asc')->get();
+                $jobResults = JobResult::where('jr_jm_ref', $jmID)->where('jr_int_type_item', 1)->orderBy('jr_ts_created_at', 'desc')->get();
 
                 if ($jobResults->isEmpty()) {
                     return $this->sendError(errorMEssage: 'No result found', code: 404);
@@ -246,7 +246,7 @@ class JobResultController extends BaseController
                     $jobResult->mediaURL = $groupedImages[$jobResult->jr_int_ref] ?? [];
                 }
 
-                return $this->sendResponse(message: 'Get Result Details', result: $jobResults[0]);
+                return $this->sendResponse(message: 'Get Result Details', result: $jobResults->last());
             }
 
             return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
