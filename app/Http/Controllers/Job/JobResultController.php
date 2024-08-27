@@ -138,6 +138,39 @@ class JobResultController extends BaseController
         }
     }
 
+    public function updateJobResultStatus(Request $request){
+
+        try {
+            if($this->isAuthorizedUser($request->input('userID'))){
+
+                $validator = Validator::make($request->all(), [
+                    'jrID' => 'required|integer',
+                    'status' => 'required|integer'
+                ]);
+
+                if ($validator->fails()) {
+                    return $this->sendError(errorMEssage: 'Validation Error: ' . $validator->errors()->first(), code: 400);
+                }
+
+                $jobResult = JobResult::find($request->input('jrID'));
+
+                if($jobResult){
+                    $jobResult->jr_int_status = $request->input('status');
+                    $jobResult->save();
+
+                    return $this->sendResponse(message: 'Status Updated Successfully', result: $jobResult);
+                }
+
+                return $this->sendError(errorMEssage: 'No result found', code: 404);
+            }
+
+            return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
+
+        } catch (Exception $e) {
+            return $this->sendError(errorMEssage: 'Error : ' . $e->getMessage(), code: 500);
+        }
+    }
+
     public function getJobResultCommentsByID(Request $request, $id, $jrID)
     {
         try {
