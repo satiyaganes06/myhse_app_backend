@@ -188,7 +188,7 @@ class UserDetailsController extends BaseController
                 $validator = validator::make(
                     $request->all(),
                     [
-                        'role' => 'required|integer'
+                        'role' => 'required|string:max:50'
                     ]
                 );
 
