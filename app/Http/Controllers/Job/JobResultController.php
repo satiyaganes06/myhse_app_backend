@@ -246,7 +246,7 @@ class JobResultController extends BaseController
                     $jobResult->mediaURL = $groupedImages[$jobResult->jr_int_ref] ?? [];
                 }
 
-                return $this->sendResponse(message: 'Get Result Details', result: $jobResults->last());
+                return $this->sendResponse(message: 'Get Result Details', result: $jobResults);
             }
 
             return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
