@@ -202,6 +202,8 @@ class UserDetailsController extends BaseController
                     // Add the new role if it's not already present
                     if (!in_array($request->role, $rolesArray)) {
                         $rolesArray[] = $request->role;
+                    }else{
+                        return $this->sendResponse(message: 'Already you been as competent person and client.', result: '[' . $existingRoles .']');
                     }
 
                     $updatedRoles = implode(',', $rolesArray);
