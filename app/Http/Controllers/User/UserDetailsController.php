@@ -196,7 +196,7 @@ class UserDetailsController extends BaseController
                     return $this->sendError(errorMEssage: 'Validator ' . $validator->errors()->first(), code: 400);
                 }
 
-                if($request->role == 'CLIENT' || $request->role == 'CP'){
+                if($request->role != 'CLIENT' || $request->role != 'CP'){
                     return $this->sendError(errorMEssage: 'Invalid role', code: 400);
                 }
 
