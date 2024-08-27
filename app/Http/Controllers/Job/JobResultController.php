@@ -230,7 +230,7 @@ class JobResultController extends BaseController
         try {
             if ($this->isAuthorizedUser($id)) {
 
-                $jobResults = JobResult::where('jr_jm_ref', $jmID)->where('jr_int_type_item', 1)->orderBy('jr_ts_created_at', 'desc')->get();
+                $jobResults = JobResult::where('jr_jm_ref', $jmID)->where('jr_int_type_item', 1)->orderBy('jr_ts_created_at', 'asc')->get();
 
                 if ($jobResults->isEmpty()) {
                     return $this->sendError(errorMEssage: 'No result found', code: 404);
