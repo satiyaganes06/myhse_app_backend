@@ -44,9 +44,18 @@ class PostController extends BaseController
         try {
             if ($this->isAuthorizedUser($id)) {
                 $limit = $request->input('limit');
+                $status = $request->input('status') ?? null;
 
-                $posteInfos = CpPost::join('service_main_ref', 'cp_post.cpp_int_service_main_ref', '=', 'service_main_ref.smr_int_ref')
+                if($status != null) {
+                    $posteInfos = CpPost::join('service_main_ref', 'cp_post.cpp_int_service_main_ref', '=', 'service_main_ref.smr_int_ref')
+                    ->where('cpp_int_user_ref', $id)
+                    ->where('cpp_int_status', $status)
+                    ->orderBy('cpp_ts_created_at', 'desc')->paginate($limit);
+                } else {
+                    $posteInfos = CpPost::join('service_main_ref', 'cp_post.cpp_int_service_main_ref', '=', 'service_main_ref.smr_int_ref')
                     ->where('cpp_int_user_ref', $id)->orderBy('cpp_ts_created_at', 'desc')->paginate($limit);
+                }
+
 
                 if ($posteInfos->isEmpty()) {
                     return $this->sendResponse(message: 'No posts found.', code: 404);

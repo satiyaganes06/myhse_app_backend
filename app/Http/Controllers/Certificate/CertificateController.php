@@ -29,7 +29,16 @@ class CertificateController extends BaseController
         try {
             if ($this->isAuthorizedUser($id)) {
                 $limit = $request->input('limit'); // limit must
-                $certificates = CpCertificate::where('cc_int_user_ref', $id)->orderBy('cc_ts_created_at', 'desc')->paginate($limit);
+                $status = $request->input('status') ?? null;
+
+                if ($status != null) {
+                    $certificates = CpCertificate::where('cc_int_user_ref', $id)
+                        ->where('cc_int_status', $status)
+                        ->orderBy('cc_ts_created_at', 'desc')->paginate($limit);
+                } else {
+
+                    $certificates = CpCertificate::where('cc_int_user_ref', $id)->orderBy('cc_ts_created_at', 'desc')->paginate($limit);
+                }
 
                 if ($certificates->isEmpty()) {
                     return $this->sendResponse(message: 'No certificate found.', code: 404);
@@ -131,7 +140,7 @@ class CertificateController extends BaseController
                     'cc_int_status' => 0
                 ];
 
-                if($request->has('certExpiryDate')){
+                if ($request->has('certExpiryDate')) {
                     $updateData['cc_date_expiry_date'] = $request->input('certExpiryDate');
                 }
 

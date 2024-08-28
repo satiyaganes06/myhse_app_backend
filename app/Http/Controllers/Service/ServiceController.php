@@ -80,10 +80,18 @@ class ServiceController extends BaseController
         try {
             if ($this->isAuthorizedUser($id)) {
                 $limit = $request->input('limit');
+                $status = $request->input('status') ?? null;
 
+                if ($status != null) {
+                    $services = CpService::join('service_main_ref', 'cp_service.cps_int_service_ref', '=', 'service_main_ref.smr_int_ref')
+                        ->where('cps_int_user_ref', $id)
+                        ->where('cps_int_status', $status)
+                        ->orderBy('cps_ts_created_at', 'desc');
+                } else {
+                    $services = CpService::join('service_main_ref', 'cp_service.cps_int_service_ref', '=', 'service_main_ref.smr_int_ref')
+                        ->where('cps_int_user_ref', $id)->orderBy('cps_ts_created_at', 'desc')->paginate($limit);
+                }
 
-                $services = CpService::join('service_main_ref', 'cp_service.cps_int_service_ref', '=', 'service_main_ref.smr_int_ref')
-                    ->where('cps_int_user_ref', $id)->orderBy('cps_ts_created_at', 'desc')->paginate($limit);
 
                 if ($services->isEmpty()) {
                     return $this->sendError(errorMEssage: 'No service found', code: 404);
