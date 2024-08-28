@@ -98,6 +98,22 @@ class ServiceController extends BaseController
         }
     }
 
+    public function getServiceByID($id)
+    {
+        try {
+            $service = CpService::join('service_main_ref', 'cp_service.cps_int_service_ref', '=', 'service_main_ref.smr_int_ref')
+            ->find($id);
+
+            if ($service == null) {
+                return $this->sendError(errorMEssage: 'No service found', code: 404);
+            }
+
+            return $this->sendResponse(message: 'Get Service Details', result: $service);
+        } catch (Exception $e) {
+            return $this->sendError('Error : ' . $e, 500);
+        }
+    }
+
     public function getAllService(Request $request, $id)
     {
         try {

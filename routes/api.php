@@ -71,6 +71,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get("/state/getStateList", [StateController::class, 'getStateList']);
 
         // Service
+        Route::get("/service/getServiceByID", [ServiceController::class, 'getServiceByID']);
         Route::get("/service/getRelatedCertificate/{id}/{serviceID}", [ServiceController::class, 'getRelatedCertificate']);
         Route::get("/service/getRelatedPost/{id}/{serviceId}", [ServiceController::class, 'getRelatedPost']);
 
@@ -273,8 +274,7 @@ Route::post('/cp/uploadSubscriptionPayment', [PaymentSubscribeController::class,
 Route::post('/cp/checkUserSubscription', [PaymentSubscribeController::class, 'checkUserSubscription']);
 Route::post('/cp/checkIfUserCP', [PaymentSubscribeController::class, 'checkIfUserCP']);
 
-//Normal User Operations
-Route::post("/clientUser/getClientUserProfileDetails", [ClientUserDetailsController::class, 'clientUserProfileDetails']); // Done to V2
+
 
 //PDF View
 // routes/web.php or routes/api.php
