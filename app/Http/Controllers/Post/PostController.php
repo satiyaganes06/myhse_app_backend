@@ -50,7 +50,7 @@ class PostController extends BaseController
                     $posteInfos = CpPost::join('service_main_ref', 'cp_post.cpp_int_service_main_ref', '=', 'service_main_ref.smr_int_ref')
                     ->where('cpp_int_user_ref', $id)
                     ->where('cpp_int_status', $status)
-                    ->orderBy('cpp_ts_created_at', 'desc')->paginate($limit);
+                    ->orderBy('cpp_ts_created_at', 'desc')->get();
                 } else {
                     $posteInfos = CpPost::join('service_main_ref', 'cp_post.cpp_int_service_main_ref', '=', 'service_main_ref.smr_int_ref')
                     ->where('cpp_int_user_ref', $id)->orderBy('cpp_ts_created_at', 'desc')->paginate($limit);

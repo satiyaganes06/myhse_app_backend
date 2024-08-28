@@ -86,7 +86,7 @@ class ServiceController extends BaseController
                     $services = CpService::join('service_main_ref', 'cp_service.cps_int_service_ref', '=', 'service_main_ref.smr_int_ref')
                         ->where('cps_int_user_ref', $id)
                         ->where('cps_int_status', $status)
-                        ->orderBy('cps_ts_created_at', 'desc');
+                        ->orderBy('cps_ts_created_at', 'desc')->get();
                 } else {
                     $services = CpService::join('service_main_ref', 'cp_service.cps_int_service_ref', '=', 'service_main_ref.smr_int_ref')
                         ->where('cps_int_user_ref', $id)->orderBy('cps_ts_created_at', 'desc')->paginate($limit);

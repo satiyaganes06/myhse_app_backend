@@ -34,7 +34,7 @@ class CertificateController extends BaseController
                 if ($status != null) {
                     $certificates = CpCertificate::where('cc_int_user_ref', $id)
                         ->where('cc_int_status', $status)
-                        ->orderBy('cc_ts_created_at', 'desc')->paginate($limit);
+                        ->orderBy('cc_ts_created_at', 'desc')->get();
                 } else {
 
                     $certificates = CpCertificate::where('cc_int_user_ref', $id)->orderBy('cc_ts_created_at', 'desc')->paginate($limit);
