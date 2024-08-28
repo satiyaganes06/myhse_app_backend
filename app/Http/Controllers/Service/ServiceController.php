@@ -93,7 +93,7 @@ class ServiceController extends BaseController
                 }
 
 
-                if ($services->isEmpty()) {
+                if ($services->count() === 0) {
                     return $this->sendError(errorMEssage: 'No service found', code: 404);
                 }
 
