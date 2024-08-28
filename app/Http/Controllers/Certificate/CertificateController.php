@@ -53,6 +53,31 @@ class CertificateController extends BaseController
         }
     }
 
+    public function getCpCertificatesDetails(Request $request, $id, $cpID)
+    {
+        try {
+            if ($this->isAuthorizedUser($id)) {
+                $status = $request->input('status');
+
+
+                $certificates = CpCertificate::where('cc_int_user_ref', $cpID)
+                    ->where('cc_int_status', $status)
+                    ->orderBy('cc_ts_created_at', 'desc')->get();
+
+
+                if ($certificates->isEmpty()) {
+                    return $this->sendResponse(message: 'No certificate found.', code: 404);
+                }
+
+                return $this->sendResponse(message: 'Get Certificate Details', result: $certificates);
+            }
+
+            return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
+        } catch (Exception $e) {
+            return $this->sendError(errorMEssage: 'Error : ' . $e, code: 500);
+        }
+    }
+
     public function addCertificateDetail(Request $request)
     {
         try {

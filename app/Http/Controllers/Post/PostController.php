@@ -39,22 +39,48 @@ class PostController extends BaseController
         }
     }
 
-    public function getCpPostDetails(Request $request, $id)
+    public function getPostDetailsByID(Request $request, $id)
     {
         try {
             if ($this->isAuthorizedUser($id)) {
                 $limit = $request->input('limit');
                 $status = $request->input('status') ?? null;
 
-                if($status != null) {
+                if ($status != null) {
                     $posteInfos = CpPost::join('service_main_ref', 'cp_post.cpp_int_service_main_ref', '=', 'service_main_ref.smr_int_ref')
-                    ->where('cpp_int_user_ref', $id)
-                    ->where('cpp_int_status', $status)
-                    ->orderBy('cpp_ts_created_at', 'desc')->get();
+                        ->where('cpp_int_user_ref', $id)
+                        ->where('cpp_int_status', $status)
+                        ->orderBy('cpp_ts_created_at', 'desc')->get();
                 } else {
                     $posteInfos = CpPost::join('service_main_ref', 'cp_post.cpp_int_service_main_ref', '=', 'service_main_ref.smr_int_ref')
-                    ->where('cpp_int_user_ref', $id)->orderBy('cpp_ts_created_at', 'desc')->paginate($limit);
+                        ->where('cpp_int_user_ref', $id)->orderBy('cpp_ts_created_at', 'desc')->paginate($limit);
                 }
+
+
+                if ($posteInfos->isEmpty()) {
+                    return $this->sendResponse(message: 'No posts found.', code: 404);
+                }
+
+                return $this->sendResponse(message: 'Get My Post Details', result: $posteInfos);
+            }
+
+            return $this->sendError('Unauthorized User', 401);
+        } catch (\Throwable $th) {
+            return $this->sendError('Error : ' . $th->getMessage(), 500);
+        }
+    }
+
+    public function getCpPostDetails(Request $request, $id, $cpID)
+    {
+        try {
+            if ($this->isAuthorizedUser($id)) {
+                $status = $request->input('status') ?? null;
+
+
+                $posteInfos = CpPost::join('service_main_ref', 'cp_post.cpp_int_service_main_ref', '=', 'service_main_ref.smr_int_ref')
+                    ->where('cpp_int_user_ref', $cpID)
+                    ->where('cpp_int_status', $status)
+                    ->orderBy('cpp_ts_created_at', 'desc')->get();
 
 
                 if ($posteInfos->isEmpty()) {

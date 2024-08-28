@@ -80,17 +80,37 @@ class ServiceController extends BaseController
         try {
             if ($this->isAuthorizedUser($id)) {
                 $limit = $request->input('limit');
-                $status = $request->input('status') ?? null;
 
-                if ($status != null) {
-                    $services = CpService::join('service_main_ref', 'cp_service.cps_int_service_ref', '=', 'service_main_ref.smr_int_ref')
-                        ->where('cps_int_user_ref', $id)
-                        ->where('cps_int_status', $status)
-                        ->orderBy('cps_ts_created_at', 'desc')->get();
-                } else {
-                    $services = CpService::join('service_main_ref', 'cp_service.cps_int_service_ref', '=', 'service_main_ref.smr_int_ref')
-                        ->where('cps_int_user_ref', $id)->orderBy('cps_ts_created_at', 'desc')->paginate($limit);
+
+                $services = CpService::join('service_main_ref', 'cp_service.cps_int_service_ref', '=', 'service_main_ref.smr_int_ref')
+                    ->where('cps_int_user_ref', $id)->orderBy('cps_ts_created_at', 'desc')->paginate($limit);
+
+
+
+                if ($services->count() === 0) {
+                    return $this->sendError(errorMEssage: 'No service found', code: 404);
                 }
+
+                return $this->sendResponse(message: 'Get Service Details', result: $services);
+            }
+
+            return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
+        } catch (Exception $e) {
+            return $this->sendError('Error : ' . $e, 500);
+        }
+    }
+
+    public function getCpServicesDetails(Request $request, $id, $cpID)
+    {
+        try {
+            if ($this->isAuthorizedUser($id)) {
+                $status = $request->input('status');
+
+                $services = CpService::join('service_main_ref', 'cp_service.cps_int_service_ref', '=', 'service_main_ref.smr_int_ref')
+                    ->where('cps_int_user_ref', $cpID)
+                    ->where('cps_int_status', $status)
+                    ->orderBy('cps_ts_created_at', 'desc')->get();
+
 
 
                 if ($services->count() === 0) {

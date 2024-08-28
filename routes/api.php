@@ -107,7 +107,14 @@ Route::middleware('auth:sanctum')->group(function () {
         // Booking
         Route::post("/booking/addBookingRequest", [BookingMainController::class, 'addBookingRequest']);
 
+        // Certificate
+        Route::get("/certificate/getCpCertificatesDetails/{id}/{cpID}", [CertificateController::class, 'getCpCertificatesDetails']);
+
+        // Post
+        Route::get("/post/getCpPostDetails/{id}/{cpID}", [PostController::class, 'getCpPostDetails']);
+
         // Service
+        Route::get("/service/getCpServicesDetails/{id}/{cpID}", [ServiceController::class, 'getCpServicesDetails']);
         Route::get("/service/getAllService/{id}", [ServiceController::class, 'getAllService']);
         Route::get("/service/getSearchServiceResult/{id}", [ServiceController::class, 'getSearchServiceResult']);
 
@@ -133,7 +140,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete("/certificate/deleteCertificateDetailByID/{id}/{ccID}", [CertificateController::class, 'deleteCertificateDetailByID']);
 
         // Post
-        Route::get("/post/getCpPostDetailsByID/{id}", [PostController::class, 'getCpPostDetails']);
+        Route::get("/post/getPostDetailsByID/{id}", [PostController::class, 'getPostDetailsByID']);
         Route::post("/post/addPostDetail", [PostController::class, 'addPostDetail']);
         Route::patch("/post/updatePostDetail/{id}", [PostController::class, 'updatePostDetail']);
         Route::delete("/post/deletePostDetailByID/{id}/{postID}", [PostController::class, 'deletePostDetail']);
