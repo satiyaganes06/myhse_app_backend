@@ -98,17 +98,21 @@ class ServiceController extends BaseController
         }
     }
 
-    public function getServiceByID($id)
+    public function getServiceByID($id, $serviceID)
     {
         try {
-            $service = CpService::join('service_main_ref', 'cp_service.cps_int_service_ref', '=', 'service_main_ref.smr_int_ref')
-            ->find($id);
+            if ($this->isAuthorizedUser($id)) {
+                $service = CpService::join('service_main_ref', 'cp_service.cps_int_service_ref', '=', 'service_main_ref.smr_int_ref')
+                    ->find($serviceID);
 
-            if ($service == null) {
-                return $this->sendError(errorMEssage: 'No service found', code: 404);
+                if ($service == null) {
+                    return $this->sendError(errorMEssage: 'No service found', code: 404);
+                }
+
+                return $this->sendResponse(message: 'Get Service Details', result: $service);
             }
 
-            return $this->sendResponse(message: 'Get Service Details', result: $service);
+            return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
         } catch (Exception $e) {
             return $this->sendError('Error : ' . $e, 500);
         }

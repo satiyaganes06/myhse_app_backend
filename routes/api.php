@@ -71,7 +71,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get("/state/getStateList", [StateController::class, 'getStateList']);
 
         // Service
-        Route::get("/service/getServiceByID", [ServiceController::class, 'getServiceByID']);
+        Route::get("/service/getServiceByID/{id}/{serviceID}", [ServiceController::class, 'getServiceByID']);
         Route::get("/service/getRelatedCertificate/{id}/{serviceID}", [ServiceController::class, 'getRelatedCertificate']);
         Route::get("/service/getRelatedPost/{id}/{serviceId}", [ServiceController::class, 'getRelatedPost']);
 
