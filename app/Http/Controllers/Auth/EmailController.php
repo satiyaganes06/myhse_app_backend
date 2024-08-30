@@ -23,7 +23,7 @@ class EmailController extends BaseController
 
 
 
-    public function sendVerificationEmail($cpEmail)
+    public function sendVerificationEmail($userEmail)
     {
        Mail::to('satiyaganes.sg@gmail.com')->send(new VerificationMail(2133));
 
