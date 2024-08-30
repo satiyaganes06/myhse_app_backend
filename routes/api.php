@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Auth\EmailController;
 use App\Http\Controllers\Test\test;
 use App\Http\Controllers\User\UserDetailsController;
 use App\Http\Controllers\User\ClientUserDetailsController;
@@ -37,6 +38,7 @@ Route::group(['prefix' => 'v2/auth'], function(){
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
     Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+    Route::post('/verify-email', [EmailController::class, 'sendVerificationEmail']);
 });
 
 // John Doe: 63|ksDgiSwEaT21xsTBh4GGMsqRFLcvFgE0vLYAysQx76ed7af1
@@ -45,7 +47,6 @@ Route::group(['prefix' => 'v2/auth'], function(){
 Route::middleware('auth:sanctum')->group(function () {
 
     Route::group(['prefix' => 'v2/common'], function(){
-
 
         // Auth
         Route::get('/auth/logout', [AuthController::class, 'logout']);
