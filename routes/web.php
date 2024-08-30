@@ -34,5 +34,5 @@ Route::group(['prefix' => 'common'], function(){
 });
 
 Route::get('/pdfviewer/{filename}', [CommonDataController::class, 'pdfView'])->where('filename', '.*');
-Route::get('/emailVerification/{cpLoginID}', [EmailController::class, 'verifyEmailAddress']);
+Route::get('/emailVerification/{id}', [EmailController::class, 'verifyEmailAddress']);
 

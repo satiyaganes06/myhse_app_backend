@@ -21,8 +21,6 @@ use Illuminate\Support\Facades\Mail;
 class EmailController extends BaseController
 {
 
-
-
     public function sendVerificationEmail(Request $request, $id)
     {
         try {
@@ -37,9 +35,9 @@ class EmailController extends BaseController
                 }
 
                 if($this->checkIfEmailVerified($id)){
-                    return $this->sendError('Email already verified', 500);
+                    return $this->sendError(errorMEssage: 'Email already verified', code:401);
                 }
-                Mail::to($request->input('userEmail'))->send(new VerificationMail(2133));
+                Mail::to($request->input('userEmail'))->send(new VerificationMail($id));
 
                 return $this->sendResponse(message: 'Verification email sent');
             }
@@ -61,18 +59,23 @@ class EmailController extends BaseController
         return false;
     }
 
-    public function verifyEmailAddress($cpLoginID){
+    public function verifyEmailAddress($id){
 
         try {
-            $status  = UserLogin::where('ul_int_ref', $this->decode_data($cpLoginID))->update(array('ul_ts_email_verified_at' => date('Y-m-d H:i:s')));
+            $status  = User::where('ul_int_profile_ref', $this->decode_data($id))->update(array('ul_ts_email_verified_at' => date('Y-m-d H:i:s')));
 
-            return view('emailVerifcation.successEmailVerification');
+            if($status){
+                return view('emailVerifcation.successEmailVerification');
+            }else{
+                return view('emailVerifcation.failureEmailVerification');
+            }
         } catch (Exception $e) {
 
             return view('emailVerifcation.failureEmailVerification');
         }
 
     }
+
     // public function verifyEmailAddress($lid)
 	// {
 
