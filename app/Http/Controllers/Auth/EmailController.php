@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Base\BaseController as BaseController;
 use App\Mail\VerificationMail;
 use Illuminate\Http\Request;
-use App\Models\UserProfile;
-use App\Models\User\UserLogin;
+use App\Models\User\UserProfile;
+use App\Models\User;
 use App\Models\RoleLogin;
 use Laravel\Sanctum\PersonalAccessToken;
 use Exception;
@@ -36,9 +36,9 @@ class EmailController extends BaseController
                     return $this->sendError('Validation Error.', $validator->errors());
                 }
 
-                // if($this->checkIfEmailVerified($id)){
-                //     return $this->sendError('Email already verified', 500);
-                // }
+                if($this->checkIfEmailVerified($id)){
+                    return $this->sendError('Email already verified', 500);
+                }
                 Mail::to($request->input('userEmail'))->send(new VerificationMail(2133));
 
                 return $this->sendResponse(message: 'Verification email sent');
@@ -50,6 +50,15 @@ class EmailController extends BaseController
             return $this->sendError('Verification email not sent', 500);
         }
 
+    }
+
+    public function checkIfEmailVerified($id)
+    {
+        $user = User::where('ul_int_profile_ref', $id)->first();
+        if($user->ul_ts_email_verified_at != null){
+            return true;
+        }
+        return false;
     }
 
     public function verifyEmailAddress($cpLoginID){
