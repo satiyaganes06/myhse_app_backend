@@ -38,7 +38,7 @@ Route::group(['prefix' => 'v2/auth'], function(){
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
     Route::post('/reset-password', [AuthController::class, 'resetPassword']);
-    Route::post('/verify-email/{userEmail}', [EmailController::class, 'sendVerificationEmail']);
+
 });
 
 // John Doe: 63|ksDgiSwEaT21xsTBh4GGMsqRFLcvFgE0vLYAysQx76ed7af1
@@ -51,6 +51,7 @@ Route::middleware('auth:sanctum')->group(function () {
         // Auth
         Route::get('/auth/logout', [AuthController::class, 'logout']);
         Route::get('/auth/getUserID', [AuthController::class, 'getUserID']);
+        Route::post('/verify-email/{id}', [EmailController::class, 'sendVerificationEmail']);
 
         // Upload Media
         Route::post('/uploadMediaWithPost', [BaseController::class, 'uploadMediaWithPost']);

@@ -23,11 +23,33 @@ class EmailController extends BaseController
 
 
 
-    public function sendVerificationEmail($userEmail)
+    public function sendVerificationEmail(Request $request, $id)
     {
-       Mail::to('satiyaganes.sg@gmail.com')->send(new VerificationMail(2133));
+        try {
 
-       return response()->json(['message' => 'Verification email sent']);
+            if($this->isAuthorizedUser($id)){
+                $validator = Validator::make($request->all(), [
+                    'userEmail' => 'required|email',
+                ]);
+
+                if ($validator->fails()) {
+                    return $this->sendError('Validation Error.', $validator->errors());
+                }
+
+                // if($this->checkIfEmailVerified($id)){
+                //     return $this->sendError('Email already verified', 500);
+                // }
+                Mail::to($request->input('userEmail'))->send(new VerificationMail(2133));
+
+                return $this->sendResponse(message: 'Verification email sent');
+            }
+
+            return $this->sendError('Unauthorized Request', 401);
+
+        } catch (\Throwable $th) {
+            return $this->sendError('Verification email not sent', 500);
+        }
+
     }
 
     public function verifyEmailAddress($cpLoginID){
