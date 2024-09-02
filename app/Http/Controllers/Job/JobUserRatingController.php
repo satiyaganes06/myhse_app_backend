@@ -75,8 +75,6 @@ class JobUserRatingController extends BaseController
                 $review = JobUserRating::where('jur_int_cps_ref', $serviceID)
                 ->orderby('jur_ts_created_at', 'desc')->paginate($limit);
 
-
-
                 if ($review) {
                     return $this->sendResponse(message: 'Get User Review Details', result: $review);
                 }
