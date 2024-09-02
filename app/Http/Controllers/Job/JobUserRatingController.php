@@ -78,7 +78,7 @@ class JobUserRatingController extends BaseController
                 ->where('jur_int_cps_ref', $serviceID)
                 ->orderby('jur_ts_created_at', 'desc')->paginate($limit);
 
-                if ($review.isEmpty()) {
+                if ($review->isEmpty()) {
                     return $this->sendError(errorMEssage: 'No review found', code: 404);
 
                 }
