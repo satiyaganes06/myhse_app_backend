@@ -55,7 +55,6 @@ class JobUserRatingController extends BaseController
 
                 $rating = $review->avg('jur_rating_point');
 
-                $rating = round($rating, 1);
 
                 if ($review) {
                     return $this->sendResponse(message: 'Get User Rating Details', result: [
