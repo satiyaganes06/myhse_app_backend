@@ -43,7 +43,29 @@ class JobUserRatingController extends BaseController
         }
     }
 
-    public function getRatingByServiceID(Request $request, $id, $serviceID)
+    public function getRatingByServiceID($id, $serviceID)
+    {
+        try {
+            if ($this->isAuthorizedUser($id)) {
+
+                $review = JobUserRating::where('jur_int_cps_ref', $serviceID)->get();
+                $rating = $review->avg('jur_rating_point');
+
+                if ($review) {
+                    return $this->sendResponse(message: 'Get User Rating Details', result: round($rating, 1));
+                }
+                return $this->sendError(errorMEssage: 'No rating found', code: 404);
+            }
+
+            return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
+        } catch (Exception $e) {
+            return $this->sendError(errorMEssage: 'Error : ' . $e->getMessage(), code: 500);
+        }
+    }
+
+
+
+    public function getReviewByServiceID(Request $request, $id, $serviceID)
     {
         try {
             if ($this->isAuthorizedUser($id)) {
@@ -57,7 +79,7 @@ class JobUserRatingController extends BaseController
 
 
                 if ($review) {
-                    return $this->sendResponse(message: 'Get User Rating Details', result: [
+                    return $this->sendResponse(message: 'Get User Review Details', result: [
                         'data' => $review,
                         'total' => $rating
                     ]);

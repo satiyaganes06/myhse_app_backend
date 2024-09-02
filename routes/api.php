@@ -97,8 +97,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/job/getJobResultCommentsByID/{id}/{jrID}', [JobResultController::class, 'getJobResultCommentsByID']);
         Route::post('/job/addJobResultComment', [JobResultController::class, 'addJobResultComment']);
         Route::get('/job/getJobUserRatingByID/{id}/{jmID}', [JobUserRatingController::class, 'getJobUserRatingByID']);
+        Route::get('/job/getReviewByServiceID/{id}/{serviceID}', [JobUserRatingController::class, 'getReviewByServiceID']);
         Route::get('/job/getRatingByServiceID/{id}/{serviceID}', [JobUserRatingController::class, 'getRatingByServiceID']);
-
     });
 
     Route::group(['prefix' => 'v2/client'], function(){
