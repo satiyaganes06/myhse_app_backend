@@ -51,7 +51,7 @@ class JobUserRatingController extends BaseController
                 $limit = $request->input('limit') ?? 10;
 
                 $review = JobUserRating::where('jur_int_cps_ref', $serviceID)
-                ->orderby('jur_ts_created_at', 'desc')->pagination($limit);
+                ->orderby('jur_ts_created_at', 'desc')->paginate($limit);
 
                 $rating = $review->avg('jur_rating_point');
 
