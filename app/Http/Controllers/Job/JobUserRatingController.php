@@ -78,11 +78,16 @@ class JobUserRatingController extends BaseController
                 ->where('jur_int_cps_ref', $serviceID)
                 ->orderby('jur_ts_created_at', 'desc')->paginate($limit);
 
+                $rating = JobUserRating::where('jur_int_cps_ref', $serviceID)->avg('jur_rating_point');
+
                 if ($review->isEmpty()) {
                     return $this->sendError(errorMEssage: 'No review found', code: 404);
 
                 }
-                return $this->sendResponse(message: 'Get User Review Details', result: $review);
+                return $this->sendResponse(message: 'Get User Review Details', result: [
+                    'rating' => round($rating, 1),
+                    'review' => $review
+                ]);
             }
 
             return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
