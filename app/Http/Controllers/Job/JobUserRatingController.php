@@ -43,6 +43,34 @@ class JobUserRatingController extends BaseController
         }
     }
 
+    public function getRatingByServiceID(Request $request, $id, $serviceID)
+    {
+        try {
+            if ($this->isAuthorizedUser($id)) {
+
+                $limit = $request->input('limit') ?? 10;
+
+                $review = JobUserRating::where('jur_int_cps_ref', $serviceID)
+                ->orderby('jur_ts_created_at', 'desc')->pagination($limit);
+
+                $rating = $review->avg('jur_rating_point');
+
+                $rating = round($rating, 1);
+
+                if ($review) {
+                    return $this->sendResponse(message: 'Get User Rating Details', result: [
+                        'data' => $review,
+                        'total' => $rating
+                    ]);
+                }
+                return $this->sendError(errorMEssage: 'No review found', code: 404);
+            }
+
+            return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
+        } catch (Exception $e) {
+            return $this->sendError(errorMEssage: 'Error : ' . $e->getMessage(), code: 500);
+        }
+    }
 
     public function addJobUserRating(Request $request, $id)
     {

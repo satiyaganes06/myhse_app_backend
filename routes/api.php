@@ -41,8 +41,6 @@ Route::group(['prefix' => 'v2/auth'], function(){
 
 });
 
-// John Doe: 63|ksDgiSwEaT21xsTBh4GGMsqRFLcvFgE0vLYAysQx76ed7af1
-// Pan Doe: 62|S7NbS7Ef0Fd2yk17Yj7EuJl2MqDE7esUGG3R2hMie742015e
 
 Route::middleware('auth:sanctum')->group(function () {
 
