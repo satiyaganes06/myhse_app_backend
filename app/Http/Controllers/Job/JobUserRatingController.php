@@ -72,7 +72,8 @@ class JobUserRatingController extends BaseController
 
                 $limit = $request->input('limit') ?? 10;
 
-                $review = JobUserRating::where('jur_int_cps_ref', $serviceID)
+                $review = JobUserRating::join('user_profile', 'user_profile.up_int_ref', '=', 'job_user_rating.jur_var_up_ref')
+                ->where('jur_int_cps_ref', $serviceID)
                 ->orderby('jur_ts_created_at', 'desc')->paginate($limit);
 
                 if ($review) {
