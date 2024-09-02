@@ -21,6 +21,8 @@ use Exception;
 use Nette\Schema\Expect;
 use Symfony\Component\Console\Input\Input;
 
+use function PHPUnit\Framework\isEmpty;
+
 class JobUserRatingController extends BaseController
 {
 
@@ -76,10 +78,11 @@ class JobUserRatingController extends BaseController
                 ->where('jur_int_cps_ref', $serviceID)
                 ->orderby('jur_ts_created_at', 'desc')->paginate($limit);
 
-                if ($review) {
-                    return $this->sendResponse(message: 'Get User Review Details', result: $review);
+                if ($review.isEmpty()) {
+                    return $this->sendError(errorMEssage: 'No review found', code: 404);
+
                 }
-                return $this->sendError(errorMEssage: 'No review found', code: 404);
+                return $this->sendResponse(message: 'Get User Review Details', result: $review);
             }
 
             return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
