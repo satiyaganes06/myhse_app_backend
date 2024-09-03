@@ -17,6 +17,7 @@ use App\Http\Controllers\Job\JobUserRatingController;
 use App\Http\Controllers\PaymentSubscribeController;
 use App\Http\Controllers\Post\PostController;
 use App\Http\Controllers\State\StateController;
+use App\Http\Controllers\Subscription\SubscriptionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -130,7 +131,6 @@ Route::middleware('auth:sanctum')->group(function () {
         //Test Routes
         Route::get("/test/getData", [test::class, 'testttt']);
 
-
         // Manage User
         Route::get("/manage-user/getCompetentPersonTypeList", [UserDetailsController::class, 'getCompententPersonTypeList']);
 
@@ -155,13 +155,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::patch('/service/updateServiceDetail/{id}', [ServiceController::class, 'updateServiceDetail']);
         Route::delete('/service/deleteServiceDetails/{id}/{cpsID}', [ServiceController::class, 'deleteServiceDetails']);
 
-
-        // Booking
-
-
         // Job
         Route::patch('/job/updateJobMainResultStatus/{id}', [JobMainController::class, 'updateJobMainResultStatus']);
         Route::post('/job/addJobResult', [JobResultController::class, 'addJobResult']);
+
+        // Subscription
+        Route::get('/subscription/getSubscriptionPlans/{id}', [SubscriptionController::class, 'getSubscriptionPlans']);
+        Route::get('/subscription/getSubscriptionUserByID/{id}', [SubscriptionController::class, 'getSubscriptionUserByID']);
+        Route::get('/subscription/getSubscriptionPaymentByID/{id}', [SubscriptionController::class, 'getSubscriptionPaymentByID']);
 
 
         //Image and File Viewer
