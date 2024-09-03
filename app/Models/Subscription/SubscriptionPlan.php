@@ -19,7 +19,8 @@ class SubscriptionPlan extends Model
     protected $fillable = [
         'sp_var_name',
         'sp_var_description',
-        'sp_dou_price',
+        'sp_double_monthly_price',
+        'sp_double_annual_price',
         'sp_enum_billing_cycle',
         'sp_json_features'
     ];
