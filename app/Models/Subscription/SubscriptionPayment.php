@@ -24,7 +24,8 @@ class SubscriptionPayment extends Model
         'spay_date_payment_date',
         'spay_var_remark',
         'spay_var_payment_image',
-        'spay_enum_status'
+        'spay_enum_status',
+        'spay_var_reject_reason'
     ];
 
     const CREATED_AT = 'spay_ts_created_at';
