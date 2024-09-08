@@ -20,7 +20,9 @@ class SubscriptionController extends BaseController
     {
         try {
             if ($this->isAuthorizedUser($id)) {
-                $subscriptionPlans = SubscriptionPlan::all();
+                $subscriptionPlans = SubscriptionPlan::join('subscription_feature', 'subscription_plan.sp_int_ref', '=', 'subscription_feature.sf_int_sp_ref')
+                    ->select('subscription_plan.*', 'subscription_feature.sf_var_feature_description')
+                    ->get();
                 if ($subscriptionPlans->isEmpty()) {
                     return $this->sendError(errorMEssage: 'No Subscription Plans found', code: 404);
                 }
