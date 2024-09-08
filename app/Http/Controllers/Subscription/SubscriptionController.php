@@ -33,7 +33,7 @@ class SubscriptionController extends BaseController
                 $groupedDescription = $description->groupBy('sf_int_sp_ref');
 
                 foreach ($subscriptionPlans as $subscriptionPlan) {
-                    $subscriptionPlans->description = $groupedDescription[$subscriptionPlans->sp_int_ref] ?? [];
+                    $subscriptionPlan->description = $groupedDescription[$subscriptionPlan->sp_int_ref] ?? [];
                 }
 
                 return $this->sendResponse(message: 'Get Subscription Plans', result: $subscriptionPlans);
