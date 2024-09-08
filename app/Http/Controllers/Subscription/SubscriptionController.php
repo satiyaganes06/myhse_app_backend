@@ -8,6 +8,7 @@ use App\Models\Common\CompetentPersonTypes;
 use App\Models\Common\ServiceMain;
 use App\Models\Common\SubService;
 use App\Models\Common\State;
+use App\Models\Subscription\SubscriptionFeature;
 use Illuminate\Http\Request;
 use App\Models\Subscription\SubscriptionPlan;
 use App\Models\Subscription\SubscriptionUser;
@@ -25,6 +26,14 @@ class SubscriptionController extends BaseController
                     ->get();
                 if ($subscriptionPlans->isEmpty()) {
                     return $this->sendError(errorMEssage: 'No Subscription Plans found', code: 404);
+                }
+
+                $description = SubscriptionFeature::whereIn('sf_int_sp_ref', $subscriptionPlans->pluck('sp_int_ref'))->get();
+
+                $groupedDescription = $description->groupBy('sf_int_sp_ref');
+
+                foreach ($subscriptionPlans as $subscriptionPlan) {
+                    $subscriptionPlans->description = $groupedDescription[$subscriptionPlans->sp_int_ref] ?? [];
                 }
 
                 return $this->sendResponse(message: 'Get Subscription Plans', result: $subscriptionPlans);
