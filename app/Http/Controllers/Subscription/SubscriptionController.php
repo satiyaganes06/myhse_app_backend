@@ -67,6 +67,7 @@ class SubscriptionController extends BaseController
                 $subscriptionUser = SubscriptionUser::join('subscription_plan', 'subscription_user.su_int_sp_ref', '=', 'subscription_plan.sp_int_ref')
                     ->select('subscription_plan.sp_var_name')
                     ->where('su_int_up_ref', $id)->first();
+
                 if (!$subscriptionUser) {
                     return $this->sendError(errorMEssage: 'User has no subscription', code: 404);
                 }

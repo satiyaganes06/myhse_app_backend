@@ -161,10 +161,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Subscription
         Route::get('/subscription/getSubscriptionPlans/{id}', [SubscriptionController::class, 'getSubscriptionPlans']);
+        Route::get('/subscription/checkUserSubscription/{id}', [SubscriptionController::class, 'checkUserSubscription']);
         Route::get('/subscription/getSubscriptionUserByID/{id}', [SubscriptionController::class, 'getSubscriptionUserByID']);
         Route::post('/subscription/addSubscriptionPayment', [SubscriptionController::class, 'addSubscriptionPayment']);
         Route::get('/subscription/getSubscriptionPaymentByID/{id}', [SubscriptionController::class, 'getSubscriptionPaymentByID']);
-        Route::get('/subscription/checkUserSubscription/{id}', [SubscriptionController::class, 'checkUserSubscription']);
 
         //Image and File Viewer
         Route::get('/viewer/pdfviewer/{filename}', [CommonDataController::class, 'fileView'])->where('filename', '.*'); // Un-finished
