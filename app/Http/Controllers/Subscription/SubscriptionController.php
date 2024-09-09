@@ -78,7 +78,7 @@ class SubscriptionController extends BaseController
                 return $this->sendError('Validation Error.', $validator->errors());
             }
 
-            $fileURL = $this->uploadMedia($request->file('paymentReceipt'), 7);
+            $fileURL = $this->uploadMedia($request->file('paymentReceipt'), 5);
 
             if (empty($fileURL)) {
                 return $this->sendError(errorMEssage: 'Image Upload Error', code: 400);
