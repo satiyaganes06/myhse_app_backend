@@ -92,6 +92,7 @@ class SubscriptionController extends BaseController
             $payment->spay_dou_amount = $request->paymentAmount;
             $payment->spay_var_remark = $request->remark;
             $payment->spay_var_payment_image = $fileURL;
+            $payment->spay_var_reject_reason = null;
             $payment->save();
 
             if ($payment) {
