@@ -54,7 +54,6 @@ class SubscriptionController extends BaseController
                     return $this->sendError(errorMEssage: 'No User Subscription found', code: 404);
                 }
                 return $this->sendResponse(message: 'Get User Subscription Details', result: $subscriptionPlan);
-
             }
             return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
         } catch (Exception $e) {
@@ -87,12 +86,12 @@ class SubscriptionController extends BaseController
             $payment = new SubscriptionPayment();
             $payment->spay_int_up_ref = $request->userID;
             $payment->spay_int_su_ref = $request->suID;
-            $payment->spay_var_account_name = $request->account_name;
+            $payment->spay_var_account_name = $request->accountName;
             $payment->spay_date_payment_date = $request->paymentDate;
             $payment->spay_dou_amount = $request->paymentAmount;
             $payment->spay_var_remark = $request->remark;
             $payment->spay_var_payment_image = $fileURL;
-            $payment->spay_var_reject_reason = '';
+            $payment->spay_var_reject_reason = $request->rejectReason;
             $payment->save();
 
             if ($payment) {
@@ -100,7 +99,6 @@ class SubscriptionController extends BaseController
             } else {
                 return $this->sendError(errorMEssage: 'Something went wrong', code: 500);
             }
-
         } catch (Exception $e) {
             return $this->sendError('Error : ' . $e->getMessage(), 500);
         }
@@ -116,7 +114,6 @@ class SubscriptionController extends BaseController
                     return $this->sendError(errorMEssage: 'No Subscription Payment found', code: 404);
                 }
                 return $this->sendResponse(message: 'Get Subscription Payment Details', result: $subscriptionPayment);
-
             }
             return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
         } catch (Exception $e) {
