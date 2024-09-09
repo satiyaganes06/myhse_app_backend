@@ -68,7 +68,7 @@ class SubscriptionController extends BaseController
             $validator = Validator::make($request->all(), [
                 'userID' => 'required:integer',
                 'suID' => 'required:integer',
-                'account_name' => 'required:string',
+                'accountName' => 'required:string',
                 'paymentDate' => 'required:date',
                 'paymentAmount' => 'required:double',
                 'remark' => 'required:string'
