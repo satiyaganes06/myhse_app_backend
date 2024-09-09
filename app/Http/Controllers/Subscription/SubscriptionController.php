@@ -14,6 +14,7 @@ use App\Models\Subscription\SubscriptionPlan;
 use App\Models\Subscription\SubscriptionUser;
 use App\Models\Subscription\SubscriptionPayment;
 use Exception;
+use Illuminate\Support\Facades\Validator;
 
 class SubscriptionController extends BaseController
 {
@@ -58,6 +59,49 @@ class SubscriptionController extends BaseController
             return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
         } catch (Exception $e) {
             return $this->sendError(errorMEssage: 'Error : ' . $e->getMessage(), code: 500);
+        }
+    }
+
+    public function addSubscriptionPayment(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'userID' => 'required:integer',
+                'suID' => 'required:integer',
+                'account_name' => 'required:string',
+                'paymentDate' => 'required:date',
+                'paymentAmount' => 'required:double',
+                'remark' => 'required:string'
+            ]);
+
+            if ($validator->fails()) {
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+
+            $fileURL = $this->uploadMedia($request->file('paymentReceipt'), 7);
+
+            if (empty($fileURL)) {
+                return $this->sendError(errorMEssage: 'Image Upload Error', code: 400);
+            }
+
+            $payment = new SubscriptionPayment();
+            $payment->spay_int_up_ref = $request->userID;
+            $payment->spay_int_su_ref = $request->suID;
+            $payment->spay_var_account_name = $request->account_name;
+            $payment->spay_date_payment_date = $request->paymentDate;
+            $payment->spay_dou_amount = $request->paymentAmount;
+            $payment->spay_var_remark = $request->remark;
+            $payment->spay_var_payment_image = $fileURL;
+            $payment->save();
+
+            if ($payment) {
+                return $this->sendResponse(message: 'Payment receipt submited successfully');
+            } else {
+                return $this->sendError(errorMEssage: 'Something went wrong', code: 500);
+            }
+
+        } catch (Exception $e) {
+            return $this->sendError('Error : ' . $e->getMessage(), 500);
         }
     }
 

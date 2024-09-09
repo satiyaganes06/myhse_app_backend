@@ -162,6 +162,7 @@ Route::middleware('auth:sanctum')->group(function () {
         // Subscription
         Route::get('/subscription/getSubscriptionPlans/{id}', [SubscriptionController::class, 'getSubscriptionPlans']);
         Route::get('/subscription/getSubscriptionUserByID/{id}', [SubscriptionController::class, 'getSubscriptionUserByID']);
+        Route::post('/subscription/addSubscriptionPayment', [SubscriptionController::class, 'addSubscriptionPayment']);
         Route::get('/subscription/getSubscriptionPaymentByID/{id}', [SubscriptionController::class, 'getSubscriptionPaymentByID']);
 
 
