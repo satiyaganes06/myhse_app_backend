@@ -21,8 +21,7 @@ class SubscriptionPlan extends Model
         'sp_var_description',
         'sp_double_monthly_price',
         'sp_double_annual_price',
-        'sp_enum_billing_cycle',
-        'sp_json_features'
+        'sp_enum_billing_cycle'
     ];
 
     const CREATED_AT = 'sp_ts_created_at';
