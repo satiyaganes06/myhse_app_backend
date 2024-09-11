@@ -50,7 +50,7 @@ class SubscriptionController extends BaseController
         try {
             if ($this->isAuthorizedUser($id)) {
                 $subscriptionPlan = SubscriptionUser::join('subscription_plan', 'subscription_user.su_int_sp_ref', '=', 'subscription_plan.sp_int_ref')
-                    ->select('subscription_plan.*')
+                    ->select('subscription_plan.*', 'subscription_user.*')
                     ->where('su_int_up_ref', $id)->first();
                 if (!$subscriptionPlan) {
                     return $this->sendError(errorMEssage: 'No User Subscription found', code: 404);
