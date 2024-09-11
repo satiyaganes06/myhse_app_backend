@@ -15,6 +15,7 @@ use App\Models\Subscription\SubscriptionUser;
 use App\Models\Subscription\SubscriptionPayment;
 use Exception;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 
 class SubscriptionController extends BaseController
 {
@@ -23,18 +24,11 @@ class SubscriptionController extends BaseController
         try {
             if ($this->isAuthorizedUser($id)) {
                 $subscriptionPlans = SubscriptionPlan::join('subscription_feature', 'subscription_plan.sp_int_ref', '=', 'subscription_feature.sf_int_sp_ref')
-                    ->select('subscription_plan.*', 'subscription_feature.sf_var_feature_description')
+                    ->select('subscription_plan.*', DB::raw('GROUP_CONCAT(subscription_feature.sf_var_feature_description) as features'))
+                    ->groupBy('subscription_plan.sp_int_ref')
                     ->get();
                 if ($subscriptionPlans->isEmpty()) {
                     return $this->sendError(errorMEssage: 'No Subscription Plans found', code: 404);
-                }
-
-                $description = SubscriptionFeature::whereIn('sf_int_sp_ref', $subscriptionPlans->pluck('sp_int_ref'))->get();
-
-                $groupedDescription = $description->groupBy('sf_int_sp_ref');
-
-                foreach ($subscriptionPlans as $subscriptionPlan) {
-                    $subscriptionPlan->description = $groupedDescription[$subscriptionPlan->sp_int_ref] ?? [];
                 }
 
                 return $this->sendResponse(message: 'Get Subscription Plans', result: $subscriptionPlans);
