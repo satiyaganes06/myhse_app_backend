@@ -67,8 +67,8 @@ class SubscriptionController extends BaseController
         try {
             if ($this->isAuthorizedUser($id)) {
                 $subscriptionUser = SubscriptionUser::join('subscription_plan', 'subscription_user.su_int_sp_ref', '=', 'subscription_plan.sp_int_ref')
-                    ->select('subscription_plan.sp_var_name, subscription_user.su_enum_status')
-                    ->where('su_int_up_ref', $id)->first();
+                ->select('subscription_plan.sp_var_name', 'subscription_user.su_enum_status') // Fixed column selection
+                ->where('su_int_up_ref', $id)->first();
 
                 if (!$subscriptionUser) {
                     return $this->sendError(errorMEssage: 'User has no subscription', code: 404);
