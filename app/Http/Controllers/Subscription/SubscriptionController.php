@@ -67,7 +67,7 @@ class SubscriptionController extends BaseController
         try {
             if ($this->isAuthorizedUser($id)) {
                 $subscriptionUser = SubscriptionUser::join('subscription_plan', 'subscription_user.su_int_sp_ref', '=', 'subscription_plan.sp_int_ref')
-                    ->select('subscription_plan.sp_var_name, subscription_user.su_enum_status')
+                    ->select('subscription_plan.sp_var_name, subscription_user.*')
                     ->where('su_int_up_ref', $id)->first();
 
                 if (!$subscriptionUser) {
