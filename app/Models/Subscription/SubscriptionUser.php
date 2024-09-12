@@ -21,7 +21,7 @@ class SubscriptionUser extends Model
         'su_int_sp_ref',
         'su_date_start_date',
         'su_date_end_date',
-        'su_enum_status',
+        'su_enum_status'
     ];
 
     const CREATED_AT = 'su_ts_created_at';
