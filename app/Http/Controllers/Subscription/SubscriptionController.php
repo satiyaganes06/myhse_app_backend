@@ -67,7 +67,7 @@ class SubscriptionController extends BaseController
         try {
             if ($this->isAuthorizedUser($id)) {
                 $subscriptionUser = SubscriptionUser::join('subscription_plan', 'subscription_user.su_int_sp_ref', '=', 'subscription_plan.sp_int_ref')
-                    ->select('subscription_plan.sp_var_name')
+                    ->select('subscription_plan.sp_var_name, subscription_user.su_enum_status')
                     ->where('su_int_up_ref', $id)->first();
 
                 if (!$subscriptionUser) {
@@ -75,7 +75,8 @@ class SubscriptionController extends BaseController
                 }
 
                 return $this->sendResponse(message: 'Get Current Subscription', result: [
-                    'Current-Subscription' => $subscriptionUser->sp_var_name
+                    'Current-Subscription' => $subscriptionUser->sp_var_name,
+                    'Subscription-Status' => $subscriptionUser->su_enum_status
                 ]);
             }
             return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
