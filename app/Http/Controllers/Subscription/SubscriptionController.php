@@ -74,7 +74,10 @@ class SubscriptionController extends BaseController
                     return $this->sendError(errorMEssage: 'User has no subscription', code: 404);
                 }
 
-                return $this->sendResponse(message: 'Get Current Subscription', result: $subscriptionUser);
+                return $this->sendResponse(message: 'Get Current Subscription', result: [
+                    'CurrentSubscription' => $subscriptionUser->sp_var_name,
+                    'SubscriptionStatus' => $subscriptionUser->su_enum_status
+                ]);
             }
             return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
         } catch (Exception $e) {
