@@ -131,6 +131,9 @@ Route::middleware('auth:sanctum')->group(function () {
         //Test Routes
         Route::get("/test/getData", [test::class, 'testttt']);
 
+        // Summary
+        Route::get("/summary/getCpSummaryDetailsByID/{id}", [JobMainController::class, 'getCpSummaryDetailsByID']);
+
         // Manage User
         Route::get("/manage-user/getCompetentPersonTypeList", [UserDetailsController::class, 'getCompententPersonTypeList']);
 

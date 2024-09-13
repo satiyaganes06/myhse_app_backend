@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Booking\BookingMain;
 use App\Models\Booking\BookingRequest;
 use App\Models\Job\JobMain;
+use App\Models\Job\JobUserRating;
 use App\Models\Job\JobPayment;
 use App\Models\Job\JobResult;
 use Illuminate\Support\Facades\Validator;
@@ -138,6 +139,60 @@ class JobMainController extends BaseController
             return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
         } catch (Exception $e) {
             return $this->sendError(errorMEssage: 'Error : ' . $e->getMessage(), code: 500);
+        }
+    }
+
+    public function getCpSummaryDetailsByID($id){
+        try {
+
+            if(!$this->isAuthorizedUser($id)){
+                return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
+            }
+
+            $jobMain = JobMain::join('booking_request', 'job_main.jm_br_ref', '=', 'booking_request.br_int_ref')
+            ->join('cp_service', 'booking_request.br_int_cps_ref', '=', 'cp_service.cps_int_ref')
+            ->where('cp_service.cps_int_user_ref', $id)
+            ->select('job_main.*', 'booking_request.*', 'cp_service.*')
+            ->get();
+
+            $bookingRequest = BookingRequest::join('cp_service', 'booking_request.br_int_cps_ref', '=', 'cp_service.cps_int_ref')
+            ->where('cp_service.cps_int_user_ref', $id)
+            ->where('booking_request.br_int_status', 0)
+            ->get();
+
+            $totalBookingRequest = $bookingRequest->count();
+
+            $totalJob = $jobMain->count();
+            $totalJobMainStatus0 = $jobMain->where('jm_int_status', 0)->count();
+            $totalJobMainStatus1 = $jobMain->where('jm_int_status', 1)->count();
+            $totalJobMainStatus2 = $jobMain->where('jm_int_status', 2)->count();
+
+            // $revenue = ExpertRevenueAccount::where('era_up_var_ref',  $request->input('expertID'))->first();
+
+            // $totalEarning = $revenue->era_double_total_balance;
+
+            $totalRating = JobUserRating::join('job_main', 'job_user_rating.jur_jm_ref', '=', 'job_main.jm_int_ref')
+            ->join('booking_request', 'job_main.jm_br_ref', '=', 'booking_request.br_int_ref')
+            ->join('cp_service', 'booking_request.br_int_cps_ref', '=', 'cp_service.cps_int_ref')
+            ->where('cp_service.cps_int_user_ref', $id)
+            ->avg('job_user_rating.jur_rating_point');
+
+
+            $summary = array(
+                'totalJob' => $totalJob,
+                'totalBookingRequest' => $totalBookingRequest,
+                'totalJobMainStatus0' => $totalJobMainStatus0,
+                'totalJobMainStatus1' => $totalJobMainStatus1,
+                'totalJobMainStatus2' => $totalJobMainStatus2,
+                'totalRating' => number_format($totalRating, 2) ?? 0,
+            );
+
+            return $this->sendResponse(message: 'Get Summary', result: $summary);
+
+        } catch (\Throwable $th) {
+
+            return $this->sendError(errorMEssage: $th->getMessage(), code:500);
+
         }
     }
 }
