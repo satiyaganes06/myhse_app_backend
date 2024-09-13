@@ -179,12 +179,12 @@ class JobMainController extends BaseController
 
 
             $summary = array(
-                'totalJob' => $totalJob,
+                'OrdersCount' => $totalJob,
                 'totalBookingRequest' => $totalBookingRequest,
-                'totalJobMainStatus0' => $totalJobMainStatus0,
-                'totalJobMainStatus1' => $totalJobMainStatus1,
-                'totalJobMainStatus2' => $totalJobMainStatus2,
-                'totalRating' => number_format($totalRating, 2) ?? 0,
+                'BookingCount' => $totalJobMainStatus0,
+                'CompletedCount' => $totalJobMainStatus1,
+                'OngoingCount' => $totalJobMainStatus2,
+                'AvgUserRating' => number_format($totalRating, 2) ?? 0,
             );
 
             return $this->sendResponse(message: 'Get Summary', result: $summary);
