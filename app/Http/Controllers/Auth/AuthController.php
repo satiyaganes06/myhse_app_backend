@@ -5,11 +5,13 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Base\BaseController as BaseController;
 use Illuminate\Http\Request;
 use App\Models\User\UserProfile;
+use App\Models\Subscription\SubscriptionUser;
 use App\Models\User;
 use App\Models\User\PasswordResets;
 use Laravel\Sanctum\PersonalAccessToken;
 use Exception;
 use Faker\Provider\ar_EG\Person;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -65,6 +67,16 @@ class AuthController extends BaseController
                     ]),
                 ]);
                 $userLogin->save();
+
+                //Insert user subscription
+                $userSubscription = new SubscriptionUser([
+                    'su_int_up_ref' => $userProfile->up_int_ref,
+                    'su_int_sp_ref' => 1,
+                    'su_date_start_date' => now(),
+                  //  'su_date_end_date' => now()->addMonths(1),
+                    'su_enum_status' => 'Active'
+                ]);
+                $userSubscription->save();
 
                 DB::commit();
 
