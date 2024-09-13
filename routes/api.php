@@ -131,9 +131,6 @@ Route::middleware('auth:sanctum')->group(function () {
         //Test Routes
         Route::get("/test/getData", [test::class, 'testttt']);
 
-        // Summary
-        Route::get("/summary/getCpSummaryDetailsByID/{id}", [JobMainController::class, 'getCpSummaryDetailsByID']);
-
         // Manage User
         Route::get("/manage-user/getCompetentPersonTypeList", [UserDetailsController::class, 'getCompententPersonTypeList']);
 
@@ -159,6 +156,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/service/deleteServiceDetails/{id}/{cpsID}', [ServiceController::class, 'deleteServiceDetails']);
 
         // Job
+        Route::get("/job/getCpSummaryDetailsByID/{id}", [JobMainController::class, 'getCpSummaryDetailsByID']);
         Route::patch('/job/updateJobMainResultStatus/{id}', [JobMainController::class, 'updateJobMainResultStatus']);
         Route::post('/job/addJobResult', [JobResultController::class, 'addJobResult']);
 
