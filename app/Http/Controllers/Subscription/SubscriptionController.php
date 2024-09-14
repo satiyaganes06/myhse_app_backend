@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\DB;
 class SubscriptionController extends BaseController
 {
 
-    public function createSubscription($id)
+    public function createSubscription($id, $returnValue = true)
     {
         try {
             $userSubscriptionn = SubscriptionUser::where('su_int_up_ref', $id)->first();
@@ -37,6 +37,12 @@ class SubscriptionController extends BaseController
                 'su_enum_status' => 'Active'
             ]);
             $userSubscription->save();
+
+            if($returnValue){
+                return $this->sendResponse(message: 'Created Subscription', result: $userSubscription);
+            }
+
+
         } catch (\Throwable $th) {
             return $this->sendError(errorMEssage: 'Error : ' . $th->getMessage(), code: 500);
         }

@@ -71,7 +71,7 @@ class AuthController extends BaseController
 
                 //Insert user subscription
                 $subscriptionController = new SubscriptionController();
-                $subscriptionController->createSubscription($userProfile->up_int_ref);
+                $subscriptionController->createSubscription($userProfile->up_int_ref, false);
 
                 //     'su_date_start_date' => now(),
                 //     //  'su_date_end_date' => now()->addMonths(1),
