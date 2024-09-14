@@ -103,6 +103,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::group(['prefix' => 'v2/client'], function(){
+
         //Post
         Route::get("/post/getAllPostDetails/{id}", [PostController::class, 'getAllPostDetails']);
 
@@ -123,6 +124,9 @@ Route::middleware('auth:sanctum')->group(function () {
         // Job
         Route::post('/job/addJobUserRating/{id}', [JobUserRatingController::class, 'addJobUserRating']);
         Route::patch('/job/updateJobResultStatus/{id}', [JobResultController::class, 'updateJobResultStatus']);
+
+        // Subscriptions
+        Route::post('/subscription/createSubscription/{id}', [SubscriptionController::class, 'createSubscription']);
 
     });
 

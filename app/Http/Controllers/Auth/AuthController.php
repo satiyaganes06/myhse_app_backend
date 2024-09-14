@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Base\BaseController as BaseController;
+use App\Http\Controllers\Subscription\SubscriptionController;
 use Illuminate\Http\Request;
 use App\Models\User\UserProfile;
 use App\Models\Subscription\SubscriptionUser;
@@ -69,14 +70,14 @@ class AuthController extends BaseController
                 $userLogin->save();
 
                 //Insert user subscription
-                $userSubscription = new SubscriptionUser([
-                    'su_int_up_ref' => $userProfile->up_int_ref,
-                    'su_int_sp_ref' => 1,
-                    'su_date_start_date' => now(),
-                  //  'su_date_end_date' => now()->addMonths(1),
-                    'su_enum_status' => 'Active'
-                ]);
-                $userSubscription->save();
+                $subscriptionController = new SubscriptionController();
+                $subscriptionController->createSubscription($userProfile->up_int_ref);
+
+                //     'su_date_start_date' => now(),
+                //     //  'su_date_end_date' => now()->addMonths(1),
+                //     'su_enum_status' => 'Active'
+                // ]);
+                // $userSubscription->save();
 
                 DB::commit();
 
@@ -87,6 +88,8 @@ class AuthController extends BaseController
             }
         }
     }
+
+
 
     public function login(Request $request)
     {

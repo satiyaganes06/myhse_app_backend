@@ -19,6 +19,29 @@ use Illuminate\Support\Facades\DB;
 
 class SubscriptionController extends BaseController
 {
+
+    public function createSubscription($id)
+    {
+        try {
+            $userSubscriptionn = SubscriptionUser::where('su_int_up_ref', $id)->first();
+
+            if ($userSubscriptionn) {
+                return $this->sendError(errorMEssage: 'Subscription already exists', code: 409);
+            }
+
+            $userSubscription = new SubscriptionUser([
+                'su_int_up_ref' => $id,
+                'su_int_sp_ref' => 1,
+                'su_date_start_date' => now(),
+                'su_date_end_date' => null,
+                'su_enum_status' => 'Active'
+            ]);
+            $userSubscription->save();
+        } catch (\Throwable $th) {
+            return $this->sendError(errorMEssage: 'Error : ' . $th->getMessage(), code: 500);
+        }
+    }
+
     public function getSubscriptionPlans($id)
     {
         try {
