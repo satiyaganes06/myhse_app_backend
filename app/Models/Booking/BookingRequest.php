@@ -25,6 +25,7 @@ class BookingRequest extends Model
         'br_int_zip_code',
         'br_var_state',
         'br_double_price',
+        'br_double_previous_price',
         'br_var_delivery_time',
         'br_int_status'
     ];

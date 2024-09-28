@@ -231,9 +231,12 @@ class BookingMainController extends BaseController
                 if ($request->input('status') == '1') {
                     DB::beginTransaction();
 
+                    $bookingRequest = BookingRequest::where('br_int_ref', $request->input('bookingRequestID'))->first();
+
                     BookingRequest::where('br_int_ref', $request->input('bookingRequestID'))->update(
                         array(
                             'br_double_price' => $request->input('newPrice'),
+                            'br_double_previous_price' => $bookingRequest->br_double_price,
                             'br_int_status' => $request->input('status'),
                             'br_var_delivery_time' => $request->input('deadline')
                         )
