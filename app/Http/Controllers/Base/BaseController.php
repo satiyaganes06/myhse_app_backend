@@ -3,16 +3,14 @@
 namespace App\Http\Controllers\Base;
 
 use App\Http\Controllers\Controller;
-use App\Models\User\UserLogin;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Exception;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Validator;
 
 class BaseController extends Controller
 {
-
     public function sendResponse($message, $token = '', $result = '', $code = 200)
     {
         $response = [
@@ -21,11 +19,11 @@ class BaseController extends Controller
             'message' => $message,
         ];
 
-        if (!empty($result)) {
+        if (! empty($result)) {
             $response['data'] = $result;
         }
 
-        if (!empty($token)) {
+        if (! empty($token)) {
             $response['token'] = $token;
         }
 
@@ -38,7 +36,7 @@ class BaseController extends Controller
         $response = [
             'success' => false,
             'status-code' => $code,
-            'message' => $errorMEssage
+            'message' => $errorMEssage,
         ];
 
         return response()->json(data: $response, status: $code);
@@ -54,10 +52,9 @@ class BaseController extends Controller
         $folderName = ['UserProfileImage', 'PostImage', 'CertificateImage', 'ServiceImage', 'ServiceDocument', 'PaymentReceipt', 'JobResultFile', 'JobPaymentReceipt'];
 
         try {
+            $fileName = time().'_'.$file->getClientOriginalName();
 
-            $fileName = time() . '_' . $file->getClientOriginalName();
-
-            $path = $file->storeAs('uploads/' . $folderName[$folder] , $fileName);
+            $path = $file->storeAs('uploads/'.$folderName[$folder], $fileName);
 
             //    // $path = $file->store('uploads/images/profile'); // 'pdfs' is the storage folder, you can change it as needed
             // $path = $file->store('uploads/images'); // 'pdfs' is the storage folder, you can change it as needed
@@ -71,11 +68,10 @@ class BaseController extends Controller
 
     protected function uploadMediaWithPost(Request $request)
     {
-
         try {
             $validator = validator::make($request->all(), [
                 'file' => 'required', // Adjust the file size limit as needed
-                'folder' => 'required|integer'
+                'folder' => 'required|integer',
             ]);
 
             if ($validator->fails()) {
@@ -90,14 +86,14 @@ class BaseController extends Controller
 
             return $this->sendResponse(message: 'Image Uploaded Successfully', result: $fileURL);
         } catch (Exception $e) {
-            return $this->sendError(errorMEssage: 'Error : ' . $e->getMessage(), code: 500);
+            return $this->sendError(errorMEssage: 'Error : '.$e->getMessage(), code: 500);
         }
     }
 
     public function imageViewer($filepath)
     {
         //    dd($this->decode_data($filepath));
-        $path = storage_path("app/" . $this->decode_data($filepath));
+        $path = storage_path('app/'.$this->decode_data($filepath));
         $contents = file_get_contents($path);
         $mime = mime_content_type($path);
 
@@ -108,7 +104,6 @@ class BaseController extends Controller
                 'Content-Disposition' => 'inline', // This header indicates to display the content inline (in the browser)
             ]);
         } else {
-
             $path1 = storage_path('app/uploads/images/CertificateDocument/504708-200.png');
             $contents1 = file_get_contents($path1);
             $mime1 = mime_content_type($path1);
@@ -145,11 +140,11 @@ class BaseController extends Controller
         }
     }
 
-
     public function encode_data($data)
     {
         $encData = base64_encode($data);
         $encURI = urlencode($data);
+
         return str_split($encURI);
     }
 
@@ -157,6 +152,7 @@ class BaseController extends Controller
     {
         $decData = urldecode($data);
         $decData = base64_decode($decData);
+
         return $decData;
     }
 }
