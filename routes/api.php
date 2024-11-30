@@ -2,23 +2,21 @@
 
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\EmailController;
-use App\Http\Controllers\Test\test;
-use App\Http\Controllers\User\UserDetailsController;
-use App\Http\Controllers\User\ClientUserDetailsController;
-use App\Http\Controllers\Common\CommonDataController;
-use App\Http\Controllers\Service\ServiceController;
-use App\Http\Controllers\Job\JobMainController;
-use App\Http\Controllers\Booking\BookingMainController;
 use App\Http\Controllers\Base\BaseController;
+use App\Http\Controllers\Booking\BookingMainController;
 use App\Http\Controllers\Certificate\CertificateController;
+use App\Http\Controllers\Common\CommonDataController;
+use App\Http\Controllers\Job\JobMainController;
 use App\Http\Controllers\Job\JobPaymentController;
 use App\Http\Controllers\Job\JobResultController;
 use App\Http\Controllers\Job\JobUserRatingController;
 use App\Http\Controllers\PaymentSubscribeController;
 use App\Http\Controllers\Post\PostController;
+use App\Http\Controllers\Service\ServiceController;
 use App\Http\Controllers\State\StateController;
 use App\Http\Controllers\Subscription\SubscriptionController;
-use Illuminate\Http\Request;
+use App\Http\Controllers\Test\test;
+use App\Http\Controllers\User\UserDetailsController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -34,19 +32,15 @@ use Illuminate\Support\Facades\Route;
 
 //!! Version 2 with Access Token
 
-Route::group(['prefix' => 'v2/auth'], function(){
+Route::group(['prefix' => 'v2/auth'], function () {
     Route::post('/register', [AuthController::class, 'registration']);
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
     Route::post('/reset-password', [AuthController::class, 'resetPassword']);
-
 });
 
-
 Route::middleware('auth:sanctum')->group(function () {
-
-    Route::group(['prefix' => 'v2/common'], function(){
-
+    Route::group(['prefix' => 'v2/common'], function () {
         // Auth
         Route::get('/auth/logout', [AuthController::class, 'logout']);
         Route::get('/auth/getUserID', [AuthController::class, 'getUserID']);
@@ -56,25 +50,25 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/uploadMediaWithPost', [BaseController::class, 'uploadMediaWithPost']);
 
         // View Image
-        Route::get('/imageViewer/{filepath}',[BaseController::class, 'imageViewer'])->name('image.show');
+        Route::get('/imageViewer/{filepath}', [BaseController::class, 'imageViewer'])->name('image.show');
 
         // Manage User
-        Route::get("/manage-user/getMyProfileDetailsByID/{id}", [UserDetailsController::class, 'getMyProfileDetailsByID']);
-        Route::get("/manage-user/getUserProfileDetailByID/{id}/{clientID}", [UserDetailsController::class, 'getUserProfileDetailByID']);
-        Route::patch("/manage-user/updateMyProfileDetailsByID/{id}", [UserDetailsController::class, 'updateMyProfileDetailsByID']);
-        Route::get("/manage-user/getEmailStatusByID/{id}", [UserDetailsController::class, 'getEmailStatusByID']);
-        Route::patch("/manage-user/updateEmailStatusByID/{id}", [UserDetailsController::class, 'updateEmailStatusByID']); //! Move out of the sanctum
-        Route::get("/manage-user/getMyFirstTimeStatusByID/{id}", [UserDetailsController::class, 'getMyFirstTimeStatusByID']);
-        Route::get("/manage-user/getRoleByID/{id}", [UserDetailsController::class, 'getRoleByID']);
-        Route::patch("/manage-user/updateRoleByID/{id}", [UserDetailsController::class, 'updateRoleByID']);
+        Route::get('/manage-user/getMyProfileDetailsByID/{id}', [UserDetailsController::class, 'getMyProfileDetailsByID']);
+        Route::get('/manage-user/getUserProfileDetailByID/{id}/{clientID}', [UserDetailsController::class, 'getUserProfileDetailByID']);
+        Route::patch('/manage-user/updateMyProfileDetailsByID/{id}', [UserDetailsController::class, 'updateMyProfileDetailsByID']);
+        Route::get('/manage-user/getEmailStatusByID/{id}', [UserDetailsController::class, 'getEmailStatusByID']);
+        Route::patch('/manage-user/updateEmailStatusByID/{id}', [UserDetailsController::class, 'updateEmailStatusByID']); //! Move out of the sanctum
+        Route::get('/manage-user/getMyFirstTimeStatusByID/{id}', [UserDetailsController::class, 'getMyFirstTimeStatusByID']);
+        Route::get('/manage-user/getRoleByID/{id}', [UserDetailsController::class, 'getRoleByID']);
+        Route::patch('/manage-user/updateRoleByID/{id}', [UserDetailsController::class, 'updateRoleByID']);
 
         // State
-        Route::get("/state/getStateList", [StateController::class, 'getStateList']);
+        Route::get('/state/getStateList', [StateController::class, 'getStateList']);
 
         // Service
-        Route::get("/service/getServiceByID/{id}/{serviceID}", [ServiceController::class, 'getServiceByID']);
-        Route::get("/service/getRelatedCertificate/{id}/{serviceID}", [ServiceController::class, 'getRelatedCertificate']);
-        Route::get("/service/getRelatedPost/{id}/{serviceId}", [ServiceController::class, 'getRelatedPost']);
+        Route::get('/service/getServiceByID/{id}/{serviceID}', [ServiceController::class, 'getServiceByID']);
+        Route::get('/service/getRelatedCertificate/{id}/{serviceID}', [ServiceController::class, 'getRelatedCertificate']);
+        Route::get('/service/getRelatedPost/{id}/{serviceId}', [ServiceController::class, 'getRelatedPost']);
 
         // Booking
         Route::get('/booking/getBookingsRequestDetailByID/{id}', [BookingMainController::class, 'getBookingsRequestDetailByID']);
@@ -102,24 +96,23 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/job/getRatingByServiceID/{id}/{serviceID}', [JobUserRatingController::class, 'getRatingByServiceID']);
     });
 
-    Route::group(['prefix' => 'v2/client'], function(){
-
+    Route::group(['prefix' => 'v2/client'], function () {
         //Post
-        Route::get("/post/getAllPostDetails/{id}", [PostController::class, 'getAllPostDetails']);
+        Route::get('/post/getAllPostDetails/{id}', [PostController::class, 'getAllPostDetails']);
 
         // Booking
-        Route::post("/booking/addBookingRequest", [BookingMainController::class, 'addBookingRequest']);
+        Route::post('/booking/addBookingRequest', [BookingMainController::class, 'addBookingRequest']);
 
         // Certificate
-        Route::get("/certificate/getCpCertificatesDetails/{id}/{cpID}", [CertificateController::class, 'getCpCertificatesDetails']);
+        Route::get('/certificate/getCpCertificatesDetails/{id}/{cpID}', [CertificateController::class, 'getCpCertificatesDetails']);
 
         // Post
-        Route::get("/post/getCpPostDetails/{id}/{cpID}", [PostController::class, 'getCpPostDetails']);
+        Route::get('/post/getCpPostDetails/{id}/{cpID}', [PostController::class, 'getCpPostDetails']);
 
         // Service
-        Route::get("/service/getCpServicesDetails/{id}/{cpID}", [ServiceController::class, 'getCpServicesDetails']);
-        Route::get("/service/getAllService/{id}", [ServiceController::class, 'getAllService']);
-        Route::get("/service/getSearchServiceResult/{id}", [ServiceController::class, 'getSearchServiceResult']);
+        Route::get('/service/getCpServicesDetails/{id}/{cpID}', [ServiceController::class, 'getCpServicesDetails']);
+        Route::get('/service/getAllService/{id}', [ServiceController::class, 'getAllService']);
+        Route::get('/service/getSearchServiceResult/{id}', [ServiceController::class, 'getSearchServiceResult']);
 
         // Job
         Route::post('/job/addJobUserRating/{id}', [JobUserRatingController::class, 'addJobUserRating']);
@@ -127,32 +120,31 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Subscriptions
         Route::post('/subscription/createSubscription/{id}', [SubscriptionController::class, 'createSubscription']);
-
     });
 
-    Route::group(['prefix' => 'v2/competent-person'], function(){
-
+    Route::group(['prefix' => 'v2/competent-person'], function () {
         //Test Routes
-        Route::get("/test/getData", [test::class, 'testttt']);
+        Route::get('/test/getData', [test::class, 'testttt']);
 
         // Manage User
-        Route::get("/manage-user/getCompetentPersonTypeList", [UserDetailsController::class, 'getCompententPersonTypeList']);
+        Route::get('/manage-user/getCompetentPersonTypeList', [UserDetailsController::class, 'getCompententPersonTypeList']);
 
         // Certificate
-        Route::get("/certificate/getCertificatesDetailByID/{id}", [CertificateController::class, 'getCertificatesDetailByID']);
-        Route::post("/certificate/addCertificateDetail", [CertificateController::class, 'addCertificateDetail']);
-        Route::patch("/certificate/updateCertificateDetail/{id}", [CertificateController::class, 'updateCertificateDetail']);
-        Route::delete("/certificate/deleteCertificateDetailByID/{id}/{ccID}", [CertificateController::class, 'deleteCertificateDetailByID']);
+        Route::get('/certificate/getCertificatesDetailByID/{id}', [CertificateController::class, 'getCertificatesDetailByID']);
+        Route::post('/certificate/addCertificateDetail', [CertificateController::class, 'addCertificateDetail']);
+        Route::patch('/certificate/updateCertificateDetail/{id}', [CertificateController::class, 'updateCertificateDetail']);
+        Route::delete('/certificate/deleteCertificateDetailByID/{id}/{ccID}', [CertificateController::class, 'deleteCertificateDetailByID']);
 
         // Post
-        Route::get("/post/getPostDetailsByID/{id}", [PostController::class, 'getPostDetailsByID']);
-        Route::post("/post/addPostDetail", [PostController::class, 'addPostDetail']);
-        Route::patch("/post/updatePostDetail/{id}", [PostController::class, 'updatePostDetail']);
-        Route::delete("/post/deletePostDetailByID/{id}/{postID}", [PostController::class, 'deletePostDetail']);
+        Route::get('/post/getPostDetailsByID/{id}', [PostController::class, 'getPostDetailsByID']);
+        Route::post('/post/addPostDetail', [PostController::class, 'addPostDetail']);
+        Route::patch('/post/updatePostDetail/{id}', [PostController::class, 'updatePostDetail']);
+        Route::delete('/post/deletePostDetailByID/{id}/{postID}', [PostController::class, 'deletePostDetail']);
 
         // Service
-        Route::get("/service/getServiceMainList", [ServiceController::class, 'getServiceMainList']);
-        Route::get("/service/getSubServiceList", [ServiceController::class, 'getSubServiceList']);
+        Route::get('/service/getCategoryMainList', [ServiceController::class, 'getCategoryMainList']);
+        Route::get('/service/getServiceMainList', [ServiceController::class, 'getServiceMainList']);
+        Route::get('/service/getSubServiceList', [ServiceController::class, 'getSubServiceList']);
 
         Route::get('/service/getServicesDetailByID/{id}', [ServiceController::class, 'getServicesDetailByID']);
         Route::post('/service/addServiceDetail', [ServiceController::class, 'addServiceDetail']);
@@ -160,7 +152,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/service/deleteServiceDetails/{id}/{cpsID}', [ServiceController::class, 'deleteServiceDetails']);
 
         // Job
-        Route::get("/job/getCpSummaryDetailsByID/{id}", [JobMainController::class, 'getCpSummaryDetailsByID']);
+        Route::get('/job/getCpSummaryDetailsByID/{id}', [JobMainController::class, 'getCpSummaryDetailsByID']);
         Route::patch('/job/updateJobMainResultStatus/{id}', [JobMainController::class, 'updateJobMainResultStatus']);
         Route::post('/job/addJobResult', [JobResultController::class, 'addJobResult']);
 
@@ -175,11 +167,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/viewer/pdfviewer/{filename}', [CommonDataController::class, 'fileView'])->where('filename', '.*'); // Un-finished
         Route::get('/viewer/imageviewer/{filename}', [CommonDataController::class, 'imageView'])->where('filename', '.*'); // Un-finished
         Route::get('/viewer/downloadfile/{filename}', [CommonDataController::class, 'downloadFileNImage'])->where('filename', '.*'); // Un-finished
-
     });
-
 });
-
 
 //! Version 3
 
@@ -233,7 +222,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
 // });
 
-
 //!! Version 1
 
 //Test
@@ -246,10 +234,10 @@ Route::post('/cp/test', [BaseController::class, 'getCpProfileDetails']);
 // Route::post("/cp/getFirstTimeStatus", [CpDetailsController::class, 'cpFirstTimeStatusCheck']); // Done to V2
 
 //Common
-Route::get("/cp/getStateList", [CommonDataController::class, 'getStateList']); // Done to V2
-Route::get("/cp/getServiceMainList", [CommonDataController::class, 'getServiceMainList']); // Done to V2
-Route::get("/cp/getSubServiceList", [CommonDataController::class, 'getSubServiceList']); // Done to V2
-Route::get("/cp/getCompetentPersonTypeList", [CommonDataController::class, 'getCompententPersonTypeList']); // Done to V2
+Route::get('/cp/getStateList', [CommonDataController::class, 'getStateList']); // Done to V2
+Route::get('/cp/getServiceMainList', [CommonDataController::class, 'getServiceMainList']); // Done to V2
+Route::get('/cp/getSubServiceList', [CommonDataController::class, 'getSubServiceList']); // Done to V2
+Route::get('/cp/getCompetentPersonTypeList', [CommonDataController::class, 'getCompententPersonTypeList']); // Done to V2
 
 // Route::put('/cp/completeProfile', [CpDetailsController::class, 'cpCompleteProfile']); // Done to V2
 // Route::put('/cp/updateCpProfileInfo', [CpDetailsController::class, 'updateProfileInfo']); // Done to V2
@@ -289,18 +277,12 @@ Route::post('/cp/uploadSubscriptionPayment', [PaymentSubscribeController::class,
 Route::post('/cp/checkUserSubscription', [PaymentSubscribeController::class, 'checkUserSubscription']);
 Route::post('/cp/checkIfUserCP', [PaymentSubscribeController::class, 'checkIfUserCP']);
 
-
-
 //PDF View
 // routes/web.php or routes/api.php
 
 Route::get('/pdfviewer/{filename}', [CommonDataController::class, 'pdfView'])->where('filename', '.*'); // Done to V2
 
-
 //Auth
-Route::post("/auth/register", [AuthController::class, 'register']); // Done to V2
-Route::post("/auth/login", [AuthController::class, 'login']); // Done to V2
-Route::post("/auth/logout", [AuthController::class, 'logout']); // Done to V2
-
-
-
+Route::post('/auth/register', [AuthController::class, 'register']); // Done to V2
+Route::post('/auth/login', [AuthController::class, 'login']); // Done to V2
+Route::post('/auth/logout', [AuthController::class, 'logout']); // Done to V2
