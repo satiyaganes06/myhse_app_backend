@@ -3,32 +3,61 @@
 namespace App\Http\Controllers\Service;
 
 use App\Http\Controllers\Base\BaseController as BaseController;
-use App\Models\Certificate\CpCertificate;
 use App\Models\Certificate\CpCertLink;
 use App\Models\Post\CpPostLink;
+use App\Models\Services\CategoryMain;
 use App\Models\Services\CpService;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Http\Request;
 use App\Models\Services\ServiceMainRef;
 use Exception;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class ServiceController extends BaseController
 {
-
-    public function getServiceMainList()
+    public function getCategoryMainList()
     {
         try {
-            $serviceMainList = ServiceMainRef::all();
+            $categoryMainList = CategoryMain::all();
+
+            if ($categoryMainList->isEmpty()) {
+                return $this->sendError(errorMEssage: 'No category found', code: 404);
+            }
+
+            return $this->sendResponse(message: 'Get Category Main List', result: $categoryMainList);
+        } catch (\Exception $e) {
+            return $this->sendError(errorMEssage: 'Error : '.$e, code: 500);
+        }
+    }
+
+    public function getServiceMainList(Request $request)
+    {
+        try {
+            $categoryID = $request->input('categoryID');
+
+            $serviceMainList = ServiceMainRef::where('smr_int_category_ref', $categoryID)->get();
 
             if ($serviceMainList->isEmpty()) {
                 return $this->sendError(errorMEssage: 'No service category found', code: 404);
             }
+
             return $this->sendResponse(message: 'Get Service Main List', result: $serviceMainList);
         } catch (\Exception $e) {
-            return $this->sendError(errorMEssage: 'Error : ' . $e, code: 500);
+            return $this->sendError(errorMEssage: 'Error : '.$e, code: 500);
         }
     }
+    // {
+    //     try {
+    //         $serviceMainList = ServiceMainRef::all();
+
+    //         if ($serviceMainList->isEmpty()) {
+    //             return $this->sendError(errorMEssage: 'No service category found', code: 404);
+    //         }
+    //         return $this->sendResponse(message: 'Get Service Main List', result: $serviceMainList);
+    //     } catch (\Exception $e) {
+    //         return $this->sendError(errorMEssage: 'Error : ' . $e, code: 500);
+    //     }
+    // }
 
     public function getRelatedCertificate($id, $serviceID)
     {
@@ -48,10 +77,9 @@ class ServiceController extends BaseController
 
             return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
         } catch (\Exception $e) {
-            return $this->sendError(errorMEssage: 'Error : ' . $e, code: 500);
+            return $this->sendError(errorMEssage: 'Error : '.$e, code: 500);
         }
     }
-
 
     public function getRelatedPost($id, $serviceID)
     {
@@ -71,7 +99,7 @@ class ServiceController extends BaseController
 
             return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
         } catch (\Exception $e) {
-            return $this->sendError(errorMEssage: 'Error : ' . $e, code: 500);
+            return $this->sendError(errorMEssage: 'Error : '.$e, code: 500);
         }
     }
 
@@ -81,11 +109,8 @@ class ServiceController extends BaseController
             if ($this->isAuthorizedUser($id)) {
                 $limit = $request->input('limit');
 
-
                 $services = CpService::join('service_main_ref', 'cp_service.cps_int_service_ref', '=', 'service_main_ref.smr_int_ref')
                     ->where('cps_int_user_ref', $id)->orderBy('cps_ts_created_at', 'desc')->paginate($limit);
-
-
 
                 if ($services->count() === 0) {
                     return $this->sendError(errorMEssage: 'No service found', code: 404);
@@ -96,7 +121,7 @@ class ServiceController extends BaseController
 
             return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
         } catch (Exception $e) {
-            return $this->sendError('Error : ' . $e, 500);
+            return $this->sendError('Error : '.$e, 500);
         }
     }
 
@@ -111,8 +136,6 @@ class ServiceController extends BaseController
                     ->where('cps_int_status', $status)
                     ->orderBy('cps_ts_created_at', 'desc')->get();
 
-
-
                 if ($services->count() === 0) {
                     return $this->sendError(errorMEssage: 'No service found', code: 404);
                 }
@@ -122,7 +145,7 @@ class ServiceController extends BaseController
 
             return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
         } catch (Exception $e) {
-            return $this->sendError('Error : ' . $e, 500);
+            return $this->sendError('Error : '.$e, 500);
         }
     }
 
@@ -142,7 +165,7 @@ class ServiceController extends BaseController
 
             return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
         } catch (Exception $e) {
-            return $this->sendError('Error : ' . $e, 500);
+            return $this->sendError('Error : '.$e, 500);
         }
     }
 
@@ -171,7 +194,7 @@ class ServiceController extends BaseController
 
             return $this->sendResponse(message: 'Get Service Details', result: $services);
         } catch (Exception $e) {
-            return $this->sendError('Error : ' . $e, 500);
+            return $this->sendError('Error : '.$e, 500);
         }
     }
 
@@ -184,7 +207,7 @@ class ServiceController extends BaseController
             $services = CpService::join('service_main_ref', 'cp_service.cps_int_service_ref', '=', 'service_main_ref.smr_int_ref')
                 ->where('cps_int_user_ref', '!=', $id)
                 ->where('cps_int_status', 1)
-                ->where('cps_var_title', 'like', '%' . $query . '%')
+                ->where('cps_var_title', 'like', '%'.$query.'%')
                 ->orderBy('cps_ts_created_at', 'desc')->paginate($limit);
 
             if ($services->isEmpty()) {
@@ -193,13 +216,12 @@ class ServiceController extends BaseController
 
             return $this->sendResponse(message: 'Get Service Details', result: $services);
         } catch (Exception $e) {
-            return $this->sendError('Error : ' . $e, 500);
+            return $this->sendError('Error : '.$e, 500);
         }
     }
 
     public function addServiceDetail(Request $request)
     {
-
         try {
             $validator = Validator::make($request->all(), [
                 'userID' => 'required|integer',
@@ -208,11 +230,11 @@ class ServiceController extends BaseController
                 'serviceDescription' => 'required|string',
                 'startingPrice' => 'required|string',
                 'estimateDeliveryTime' => 'required|integer',
-                'serviceImage' => 'required|max:10000'
+                'serviceImage' => 'required|max:10000',
             ]);
 
             if ($validator->fails()) {
-                return $this->sendError(errorMEssage: 'Invalid Input' . $validator->errors(), code: 400);
+                return $this->sendError(errorMEssage: 'Invalid Input'.$validator->errors(), code: 400);
             }
 
             $fileURL = $this->uploadMedia($request->file('serviceImage'), 3);
@@ -264,16 +286,13 @@ class ServiceController extends BaseController
 
             DB::commit();
 
-
             $getService = CpService::with(['certificates', 'posts'])
                 ->find($service->cps_int_ref);
-
-
 
             return $this->sendResponse(message: 'Saved Service Successfully', result: $getService);
         } catch (Exception $e) {
             // DB::rollBack();
-            return $this->sendError('Error : ' . $e, 500);
+            return $this->sendError('Error : '.$e, 500);
         }
     }
 
@@ -288,11 +307,11 @@ class ServiceController extends BaseController
                     'serviceDescription' => 'required|string',
                     'startingPrice' => 'required|string',
                     'estimateDeliveryTime' => 'required|integer',
-                    'serviceImage' => 'sometimes|max:10000'
+                    'serviceImage' => 'sometimes|max:10000',
                 ]);
 
                 if ($validator->fails()) {
-                    return $this->sendError(errorMEssage: 'Invalid Input' . $validator->errors(), code: 400);
+                    return $this->sendError(errorMEssage: 'Invalid Input'.$validator->errors(), code: 400);
                 }
 
                 $service = CpService::find($request->input('cpsID'));
@@ -307,7 +326,7 @@ class ServiceController extends BaseController
                     'cps_txt_description' => $request->input('serviceDescription'),
                     'cps_var_starting_price' => $request->input('startingPrice'),
                     'cps_estimate_delivery_time' => $request->input('estimateDeliveryTime'),
-                    'cps_int_status' => 0
+                    'cps_int_status' => 0,
                 ];
 
                 if ($request->hasFile('serviceImage')) {
@@ -318,7 +337,6 @@ class ServiceController extends BaseController
                     }
                     $updateData['cps_var_image'] = $fileURL;
                 }
-
 
                 DB::beginTransaction();
 
@@ -389,7 +407,8 @@ class ServiceController extends BaseController
             return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
         } catch (Exception $e) {
             DB::rollBack();
-            return $this->sendError(errorMEssage: 'Error : ' . $e->getMessage(), code: 500);
+
+            return $this->sendError(errorMEssage: 'Error : '.$e->getMessage(), code: 500);
         }
     }
 
@@ -401,9 +420,9 @@ class ServiceController extends BaseController
                 $deleteCertificate = CpService::find($cpsID);
 
                 if ($deleteCertificate) {
-
                     if ($deleteCertificate['cps_int_user_ref'] == $id) {
                         $deleteCertificate->delete();
+
                         return $this->sendResponse(message: 'Service Deleted Successfully');
                     }
 
@@ -415,7 +434,7 @@ class ServiceController extends BaseController
 
             return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
         } catch (Exception $e) {
-            return $this->sendError('Error : ' . $e, 500);
+            return $this->sendError('Error : '.$e, 500);
         }
     }
 }
@@ -459,7 +478,6 @@ class ServiceController extends BaseController
 //             //     GROUP BY cps.cps_int_ref, cps.cps_int_user_ref, cps.cps_int_service_ref, cps.cps_certification_ref, cps.cps_txt_description, cps.cps_var_starting_price, cps.cps_int_status, cps.cps_ts_created_at, cps.cps_ts_updated_at,
 //             // ");
 
-
 //             return $this->sendResponse('Service Details', '', $service);
 //         } catch (Exception $e) {
 //             return $this->sendError('Error : ' . $e, 500);
@@ -481,7 +499,6 @@ class ServiceController extends BaseController
 //                     'cps_int_status' => 0
 //                 )
 //             );
-
 
 //             return $this->sendResponse('Updated Successfully', '');
 //         } catch (Exception $e) {
