@@ -18,7 +18,7 @@ class ServiceController extends BaseController
     public function getCategoryMainList()
     {
         try {
-            $categoryMainList = CategoryMain::all();
+            $categoryMainList = CategoryMain::where('cm_int_status', true)->get();
 
             if ($categoryMainList->isEmpty()) {
                 return $this->sendError(errorMEssage: 'No category found', code: 404);
@@ -38,7 +38,7 @@ class ServiceController extends BaseController
             $serviceMainList = ServiceMainRef::where('smr_int_category_ref', $categoryID)->get();
 
             if ($serviceMainList->isEmpty()) {
-                return $this->sendError(errorMEssage: 'No service category found', code: 404);
+                return $this->sendError(errorMEssage: 'No service found', code: 404);
             }
 
             return $this->sendResponse(message: 'Get Service Main List', result: $serviceMainList);
