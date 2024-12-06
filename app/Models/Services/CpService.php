@@ -37,7 +37,9 @@ class CpService extends Model
 
     public function certificateLinks()
     {
-        return $this->hasMany(CpCertLink::class, 'cpcl_int_cps_ref', 'cps_int_ref');
+        return $this->hasMany(CpCertLink::class, 'cpcl_int_cps_ref', 'cps_int_ref')
+            ->join('cp_certificate', 'cp_cert_link.cpcl_int_cc_ref', '=', 'cp_certificate.cc_int_ref')
+            ->select('cp_certificate.*');
         // return $this->hasManyThrough(
         //     CpCertLink::class,
         //     CpService::class,
