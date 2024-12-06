@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Tag;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Base\BaseController;
 use App\Models\Tag\TagList;
 
-class TagController extends Controller
+class TagController extends BaseController
 {
     public function getTagList($id)
     {
