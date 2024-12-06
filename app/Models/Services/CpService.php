@@ -3,13 +3,14 @@
 namespace App\Models\Services;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Laravel\Sanctum\HasApiTokens;
-use Illuminate\Notifications\Notifiable;
 use App\Models\Booking\BookingRequest;
 use App\Models\Certificate\CpCertLink;
 use App\Models\Post\CpPostLink;
+use App\Models\Tag\CpTag;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
 class CpService extends Model
 {
@@ -27,12 +28,12 @@ class CpService extends Model
         'cps_var_starting_price',
         'cps_estimate_delivery_time',
         'cps_fl_average_rating',
-        'cps_int_status'
+        'cps_int_status',
     ];
 
     const CREATED_AT = 'cps_ts_created_at';
-    const UPDATED_AT = 'cps_ts_updated_at';
 
+    const UPDATED_AT = 'cps_ts_updated_at';
 
     public function certificates()
     {
@@ -47,6 +48,19 @@ class CpService extends Model
          ->select('cp_certificate.*');
     }
 
+    public function tags()
+    {
+        return $this->hasManyThrough(
+            CpTag::class,
+            CpService::class,
+            'cps_int_ref', // Foreign key on CpTag
+            'cpst_int_cps_ref', // Foreign key on CpService
+            'cps_int_ref', // Local key on CpService
+            'cpst_int_tag_ref' // Local key on CpTag
+        )->join('cp_tag', 'cp_tag.cpst_int_ref', '=', 'cp_tag.ct_int_ref')
+         ->select('cp_tag.*');
+    }
+
     public function posts()
     {
         return $this->hasManyThrough(
@@ -59,7 +73,6 @@ class CpService extends Model
         )->join('cp_post', 'cp_post_link.cppl_int_cpp_ref', '=', 'cp_post.cpp_int_ref')
          ->select('cp_post.*');
     }
-
 
     public function bookings()
     {

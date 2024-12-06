@@ -8,6 +8,7 @@ use App\Models\Post\CpPostLink;
 use App\Models\Services\CategoryMain;
 use App\Models\Services\CpService;
 use App\Models\Services\ServiceMainRef;
+use App\Models\Tag\CpTag;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -46,18 +47,6 @@ class ServiceController extends BaseController
             return $this->sendError(errorMEssage: 'Error : '.$e, code: 500);
         }
     }
-    // {
-    //     try {
-    //         $serviceMainList = ServiceMainRef::all();
-
-    //         if ($serviceMainList->isEmpty()) {
-    //             return $this->sendError(errorMEssage: 'No service category found', code: 404);
-    //         }
-    //         return $this->sendResponse(message: 'Get Service Main List', result: $serviceMainList);
-    //     } catch (\Exception $e) {
-    //         return $this->sendError(errorMEssage: 'Error : ' . $e, code: 500);
-    //     }
-    // }
 
     public function getRelatedCertificate($id, $serviceID)
     {
@@ -266,14 +255,23 @@ class ServiceController extends BaseController
                 $certLink->save();
             }
 
-            // Store the post one by one
-            $posts = json_decode($request->input('servicePosts'), true);
-            foreach ($posts as $post) {
-                $postLink = new CpPostLink();
-                $postLink->cppl_int_cps_ref = $service->cps_int_ref;
-                $postLink->cppl_int_cpp_ref = $post;
-                $postLink->save();
+            // Store the tag one by one
+            $tags = json_decode($request->input('serviceTags'), true);
+            foreach ($tags as $tag) {
+                $tagLink = new CpTag();
+                $tagLink->cpst_int_cps_ref = $service->cps_int_ref;
+                $tagLink->cpst_int_tag_ref = $tag;
+                $tagLink->save();
             }
+
+            // Store the post one by one
+            // $posts = json_decode($request->input('servicePosts'), true);
+            // foreach ($posts as $post) {
+            //     $postLink = new CpPostLink();
+            //     $postLink->cppl_int_cps_ref = $service->cps_int_ref;
+            //     $postLink->cppl_int_cpp_ref = $post;
+            //     $postLink->save();
+            // }
 
             // Store the state one by one
             // $states = json_decode($request->input('serviceState'), true);
@@ -286,7 +284,7 @@ class ServiceController extends BaseController
 
             DB::commit();
 
-            $getService = CpService::with(['certificates', 'posts'])
+            $getService = CpService::with(['certificates', 'tags'])
                 ->find($service->cps_int_ref);
 
             return $this->sendResponse(message: 'Saved Service Successfully', result: $getService);
