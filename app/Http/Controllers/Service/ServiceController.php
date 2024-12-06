@@ -284,7 +284,7 @@ class ServiceController extends BaseController
 
             DB::commit();
 
-            $getService = CpService::with(['certificateLinks', 'tags'])
+            $getService = CpService::with(['certificates', 'tags'])
                 ->find($service->cps_int_ref);
 
             return $this->sendResponse(message: 'Saved Service Successfully', result: $getService);
