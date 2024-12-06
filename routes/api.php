@@ -71,6 +71,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/service/getServiceByID/{id}/{serviceID}', [ServiceController::class, 'getServiceByID']);
         Route::get('/service/getRelatedCertificate/{id}/{serviceID}', [ServiceController::class, 'getRelatedCertificate']);
         Route::get('/service/getRelatedPost/{id}/{serviceId}', [ServiceController::class, 'getRelatedPost']);
+        Route::get('/service/getRelatedTag/{id}/{serviceId}', [ServiceController::class, 'getRelatedTag']);
 
         // Booking
         Route::get('/booking/getBookingsRequestDetailByID/{id}', [BookingMainController::class, 'getBookingsRequestDetailByID']);

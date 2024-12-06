@@ -92,6 +92,28 @@ class ServiceController extends BaseController
         }
     }
 
+    public function getRelatedTag($id, $serviceID)
+    {
+        try {
+            if ($this->isAuthorizedUser($id)) {
+                $certificate = CpTag::join('cp_tags', 'cp_tag.cpst_int_tag_ref', '=', 'cp_tags.ct_int_ref')
+                    ->where('cpst_int_cps_ref', $serviceID)
+                    ->select('cp_tags.*')
+                    ->get();
+
+                if ($certificate->isEmpty()) {
+                    return $this->sendError(errorMEssage: 'No tag found', code: 404);
+                }
+
+                return $this->sendResponse(message: 'Get Tag List', result: $certificate);
+            }
+
+            return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
+        } catch (\Exception $e) {
+            return $this->sendError(errorMEssage: 'Error : '.$e, code: 500);
+        }
+    }
+
     public function getServicesDetailByID(Request $request, $id)
     {
         try {
