@@ -11,7 +11,7 @@ class TagController extends BaseController
     {
         try {
             if ($this->isAuthorizedUser($id)) {
-                $tagList = TagList::where('tag_int_status', 1)->get();
+                $tagList = TagList::all();
 
                 if ($tagList->isEmpty()) {
                     return $this->sendError(errorMEssage: 'No tag found', code: 404);
