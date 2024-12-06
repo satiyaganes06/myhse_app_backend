@@ -20,7 +20,7 @@ class Bank extends Model
         'bref_int_status',
     ];
 
-    public function bankInfo()
+    public function bankInfos()
     {
         return $this->hasMany(BankInfo::class, 'bi_int_bank_ref', 'bref_int_ref');
     }
