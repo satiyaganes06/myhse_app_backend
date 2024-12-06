@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Bank;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Base\BaseController;
 use App\Models\Bank\BankInfo;
 
-class BankController extends Controller
+class BankController extends BaseController
 {
     public function getBankInfoList()
     {
