@@ -50,15 +50,7 @@ class CpService extends Model
 
     public function tags()
     {
-        return $this->hasManyThrough(
-            CpTag::class,
-            CpService::class,
-            'cps_int_ref', // Foreign key on CpTag
-            'cpst_int_cps_ref', // Foreign key on CpService
-            'cps_int_ref', // Local key on CpService
-            'cpst_int_tag_ref' // Local key on CpTag
-        )->join('cp_tag', 'cp_tag.cpst_int_ref', '=', 'cp_tag.ct_int_ref')
-         ->select('cp_tag.*');
+        return $this->hasMany(CpTag::class, 'cpst_int_cps_ref', 'cps_int_ref');
     }
 
     public function posts()
