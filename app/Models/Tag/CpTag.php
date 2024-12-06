@@ -19,4 +19,6 @@ class CpTag extends Model
     ];
 
     const CREATED_AT = 'cpst_dt_created_at';
+
+    const UPDATED_AT = 'cpst_dt_updated_at';
 }
