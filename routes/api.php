@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\EmailController;
+use App\Http\Controllers\Bank\BankController;
 use App\Http\Controllers\Base\BaseController;
 use App\Http\Controllers\Booking\BookingMainController;
 use App\Http\Controllers\Certificate\CertificateController;
@@ -95,6 +96,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/job/getJobUserRatingByID/{id}/{jmID}', [JobUserRatingController::class, 'getJobUserRatingByID']);
         Route::get('/job/getReviewByServiceID/{id}/{serviceID}', [JobUserRatingController::class, 'getReviewByServiceID']);
         Route::get('/job/getRatingByServiceID/{id}/{serviceID}', [JobUserRatingController::class, 'getRatingByServiceID']);
+
+        // Bank Info
+        Route::get('/bank/getBankInfoList', [BankController::class, 'getBankInfoList']);
     });
 
     Route::group(['prefix' => 'v2/client'], function () {
