@@ -12,8 +12,8 @@ class BankController extends BaseController
         try {
             // with bank ref
             $bankList = BankInfo::join('bank_ref', 'bank_info.bi_int_bank_ref', '=', 'bank_ref.bref_int_ref')
+                ->where('bi_int_status', 1)
                 ->select('bank_info.*', 'bank_ref.*')
-            ->where('bi_int_status', 1)
                 ->get();
 
             return $this->sendResponse(message: 'Get Bank List', result: $bankList);
