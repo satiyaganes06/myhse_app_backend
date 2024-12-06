@@ -19,4 +19,9 @@ class Bank extends Model
         'bref_var_logo_path',
         'bref_int_status',
     ];
+
+    public function bankInfo()
+    {
+        return $this->hasMany(BankInfo::class, 'bi_int_bank_ref', 'bref_int_ref');
+    }
 }
