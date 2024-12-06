@@ -15,6 +15,7 @@ use App\Http\Controllers\Post\PostController;
 use App\Http\Controllers\Service\ServiceController;
 use App\Http\Controllers\State\StateController;
 use App\Http\Controllers\Subscription\SubscriptionController;
+use App\Http\Controllers\Tag\TagController;
 use App\Http\Controllers\Test\test;
 use App\Http\Controllers\User\UserDetailsController;
 use Illuminate\Support\Facades\Route;
@@ -125,6 +126,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::group(['prefix' => 'v2/competent-person'], function () {
         //Test Routes
         Route::get('/test/getData', [test::class, 'testttt']);
+
+        // Tag
+        Route::get('/tag/getTagList/{id}', [TagController::class, 'getTagList']);
 
         // Manage User
         Route::get('/manage-user/getCompetentPersonTypeList', [UserDetailsController::class, 'getCompententPersonTypeList']);
