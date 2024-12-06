@@ -20,5 +20,5 @@ class TagList extends Model
 
     const CREATED_AT = 'tl_dt_created_at';
 
-    const UPDATED_AT = 'tl_dt_created_at';
+    const UPDATED_AT = 'tl_dt_updated_at';
 }
