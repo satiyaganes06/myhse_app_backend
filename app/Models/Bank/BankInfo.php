@@ -25,4 +25,9 @@ class BankInfo extends Model
     const UPDATED_AT = 'bi_ts_updated_at';
 
     const DELETED_AT = 'bi_ts_deleted_at';
+
+    public function bank()
+    {
+        return $this->belongsTo(Bank::class, 'bi_int_bank_ref', 'bref_int_ref');
+    }
 }

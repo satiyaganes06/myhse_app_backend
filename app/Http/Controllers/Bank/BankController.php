@@ -10,7 +10,7 @@ class BankController extends BaseController
     public function getBankInfoList()
     {
         try {
-            $bankList = BankInfo::where('bi_int_status', 1)->get();
+            $bankList = BankInfo::where('bi_int_status', 1)->with('bank')->get();
 
             return $this->sendResponse(message: 'Get Bank List', result: $bankList);
         } catch (\Exception $e) {
