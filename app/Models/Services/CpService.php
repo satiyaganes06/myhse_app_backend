@@ -35,6 +35,20 @@ class CpService extends Model
 
     const UPDATED_AT = 'cps_ts_updated_at';
 
+    public function certificateLinks()
+    {
+        return $this->hasMany(CpCertLink::class, 'cpcl_int_cps_ref', 'cps_int_ref');
+        // return $this->hasManyThrough(
+        //     CpCertLink::class,
+        //     CpService::class,
+        //     'cps_int_ref', // Foreign key on CpCertLink
+        //     'cpcl_int_cps_ref', // Foreign key on CpService
+        //     'cps_int_ref', // Local key on CpService
+        //     'cpcl_int_cc_ref' // Local key on CpCertLink
+        // )->join('cp_certificate', 'cp_cert_link.cpcl_int_cc_ref', '=', 'cp_certificate.cc_int_ref')
+        //  ->select('cp_certificate.*');
+    }
+
     public function certificates()
     {
         return $this->hasManyThrough(
