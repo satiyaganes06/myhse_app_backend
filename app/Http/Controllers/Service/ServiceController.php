@@ -9,6 +9,7 @@ use App\Models\Services\CategoryMain;
 use App\Models\Services\CpService;
 use App\Models\Services\ServiceMainRef;
 use App\Models\Tag\CpTag;
+use App\Models\Tag\TagList;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -96,8 +97,8 @@ class ServiceController extends BaseController
     {
         try {
             if ($this->isAuthorizedUser($id)) {
-                $tags = CpTag::join('tag_list', 'cp_tag.cpst_int_tag_ref', '=', 'tag_list.tl_int_ref')
-                    ->where('cpst_int_cps_ref', $serviceID)
+                $tags = TagList::join('cps_tag', 'tag_list.tl_int_ref', '=', 'cps_tag.cpst_int_tag_ref')
+                    ->where('cps_tag.cpst_int_cps_ref', $serviceID)
                     ->select('tag_list.*')
                     ->get();
 
