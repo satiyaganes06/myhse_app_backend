@@ -96,9 +96,9 @@ class ServiceController extends BaseController
     {
         try {
             if ($this->isAuthorizedUser($id)) {
-                $tags = CpTag::join('cp_tags', 'cp_tag.cpst_int_tag_ref', '=', 'cp_tags.ct_int_ref')
+                $tags = CpTag::join('tag_list', 'cp_tag.cpst_int_tag_ref', '=', 'tag_list.tl_int_ref')
                     ->where('cpst_int_cps_ref', $serviceID)
-                    ->select('cp_tags.*')
+                    ->select('tag_list.*')
                     ->get();
 
                 if ($tags->isEmpty()) {
