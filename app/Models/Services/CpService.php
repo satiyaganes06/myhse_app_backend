@@ -48,7 +48,7 @@ class CpService extends Model
             'cps_int_ref', // Local key on CpService
             'cpcl_int_cc_ref' // Local key on CpCertLink
         )->join('cp_certificate', 'cp_cert_link.cpcl_int_cc_ref', '=', 'cp_certificate.cc_int_ref')
-         ->select('cp_certificate.*');
+            ->select('cp_certificate.*');
     }
 
     public function certificates()
@@ -60,7 +60,12 @@ class CpService extends Model
 
     public function tags()
     {
+        // tag list
         return $this->hasMany(CpTag::class, 'cpst_int_cps_ref', 'cps_int_ref');
+        //  ->join('tag_list', 'cps_tag.cpst_int_tag_ref', '=', 'tag_list.tl_int_ref')
+        // ->select('tag_list.*');
+        //  ->join('tag_list', 'cps_tag.cpst_int_tag_ref', '=', 'tag_list.tl_int_ref')
+        // ->select('tag_list.*');
     }
 
     public function posts()
@@ -73,7 +78,7 @@ class CpService extends Model
             'cps_int_ref', // Local key on CpService
             'cppl_int_cpp_ref' // Local key on CpPostLink
         )->join('cp_post', 'cp_post_link.cppl_int_cpp_ref', '=', 'cp_post.cpp_int_ref')
-         ->select('cp_post.*');
+            ->select('cp_post.*');
     }
 
     public function bookings()
