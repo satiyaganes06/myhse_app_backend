@@ -217,13 +217,16 @@ class ServiceController extends BaseController
     public function getSearchServiceResult(Request $request, $id)
     {
         try {
-            $limit = $request->input('limit');
+            $limit = $request->input('limit') ?? 10;
             $query = $request->input('query');
 
             $services = CpService::join('service_main_ref', 'cp_service.cps_int_service_ref', '=', 'service_main_ref.smr_int_ref')
+                ->join('cps_tag', 'cp_service.cps_int_ref', '=', 'cps_tag.cpst_int_cps_ref')
+                ->join('tag_list', 'cps_tag.cpst_int_tag_ref', '=', 'tag_list.tl_int_ref')
                 ->where('cps_int_user_ref', '!=', $id)
                 ->where('cps_int_status', 1)
                 ->where('cps_var_title', 'like', '%' . $query . '%')
+                ->orWhere('tag_list.tl_var_name', 'like', '%' . $query . '%')
                 ->orderBy('cps_ts_created_at', 'desc')->paginate($limit);
 
             if ($services->isEmpty()) {
