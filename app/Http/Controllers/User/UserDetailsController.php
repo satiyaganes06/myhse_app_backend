@@ -197,9 +197,9 @@ class UserDetailsController extends BaseController
                 );
 
 
-                $userProfilePic = UserProfile::find($id)->select('up_var_pic');
+                $userProfilePic = UserProfile::find($id);
 
-                return $this->sendResponse(message: 'Profile Picture Updated Successfully', result: $userProfilePic);
+                return $this->sendResponse(message: 'Profile Picture Updated Successfully', result: $userProfilePic->up_var_pic);
             }
 
             return $this->sendError('Unauthorized Request', 401);
