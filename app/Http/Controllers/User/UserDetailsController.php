@@ -163,6 +163,53 @@ class UserDetailsController extends BaseController
         }
     }
 
+    public function updateMyProfilePicByID(Request $request, $id)
+    {
+        try {
+
+            if ($this->isAuthorizedUser($id)) {
+                $validator = validator::make(
+                    $request->all(),
+                    [
+                        'up_var_pic' => 'sometimes|max:2048'
+                    ]
+                );
+
+                if ($validator->fails()) {
+                    return $this->sendError(errorMEssage: 'Validator ' . $validator->errors()->first(), code: 400);
+                }
+
+                $updatedData = $request->except(['_method']);
+
+                if ($request->hasFile('up_var_pic')) {
+                    $picPath = $this->uploadMedia($request->file('up_var_pic'), 0);
+
+                    if (empty($picPath)) {
+                        return $this->sendError(errorMEssage: 'Image Upload Error', code: 400);
+                    }
+
+                    $updatedData['up_var_pic'] = $picPath;
+                }
+
+
+                UserProfile::where('up_int_ref', $id)->update(
+                    $updatedData
+                );
+
+
+                $userProfilePic = UserProfile::find($id)->select('up_var_pic');
+
+                return $this->sendResponse(message: 'Profile Picture Updated Successfully', result: $userProfilePic);
+            }
+
+            return $this->sendError('Unauthorized Request', 401);
+        } catch (Exception $e) {
+
+            DB::rollBack();
+            return $this->sendError('Error : ' . $e->getMessage(), 500);
+        }
+    }
+
     // Role
     public function getRoleByID($id)
     {
@@ -202,20 +249,20 @@ class UserDetailsController extends BaseController
                     // Add the new role if it's not already present
                     if (!in_array($request->role, $rolesArray)) {
                         $rolesArray[] = $request->role;
-                    }else{
-                        return $this->sendResponse(message: 'Already you been as competent person and client.', result: '[' . $existingRoles .']');
+                    } else {
+                        return $this->sendResponse(message: 'Already you been as competent person and client.', result: '[' . $existingRoles . ']');
                     }
 
                     $updatedRoles = implode(',', $rolesArray);
 
                     $role = User::where('ul_int_profile_ref', $id)->update(
                         array(
-                            'ul_var_role' => '[' . $updatedRoles .']'
+                            'ul_var_role' => '[' . $updatedRoles . ']'
                         )
                     );
 
                     if ($role) {
-                        return $this->sendResponse(message: 'Role Updated Successfully', result: '[' . $updatedRoles .']');
+                        return $this->sendResponse(message: 'Role Updated Successfully', result: '[' . $updatedRoles . ']');
                     } else {
                         return $this->sendError(errorMEssage: 'Role Update Failed', code: 500);
                     }

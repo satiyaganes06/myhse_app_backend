@@ -58,6 +58,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/manage-user/getMyProfileDetailsByID/{id}', [UserDetailsController::class, 'getMyProfileDetailsByID']);
         Route::get('/manage-user/getUserProfileDetailByID/{id}/{clientID}', [UserDetailsController::class, 'getUserProfileDetailByID']);
         Route::patch('/manage-user/updateMyProfileDetailsByID/{id}', [UserDetailsController::class, 'updateMyProfileDetailsByID']);
+        Route::patch('/manage-user/updateMyProfilePicByID/{id}', [UserDetailsController::class, 'updateMyProfilePicByID']);
         Route::get('/manage-user/getEmailStatusByID/{id}', [UserDetailsController::class, 'getEmailStatusByID']);
         Route::patch('/manage-user/updateEmailStatusByID/{id}', [UserDetailsController::class, 'updateEmailStatusByID']); //! Move out of the sanctum
         Route::get('/manage-user/getMyFirstTimeStatusByID/{id}', [UserDetailsController::class, 'getMyFirstTimeStatusByID']);
