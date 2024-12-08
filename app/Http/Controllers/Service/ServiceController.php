@@ -394,30 +394,57 @@ class ServiceController extends BaseController
                     ->delete();
 
                 // Post
-                $existingPosts = CpPostLink::where('cppl_int_cps_ref', $service->cps_int_ref)
-                    ->pluck('cppl_int_cpp_ref')
+                // $existingPosts = CpPostLink::where('cppl_int_cps_ref', $service->cps_int_ref)
+                //     ->pluck('cppl_int_cpp_ref')
+                //     ->toArray();
+
+                // $newPosts = json_decode($request->input('servicePosts'), true);
+
+                // // Determine post to add
+                // $postsToAdd = array_diff($newPosts, $existingPosts);
+
+                // // Determine post to delete
+                // $postsToDelete = array_diff($existingPosts, $newPosts);
+
+                // // Add new posts
+                // foreach ($postsToAdd as $post) {
+                //     $postLinkTable = new CpPostLink();
+                //     $postLinkTable->cppl_int_cps_ref = $service->cps_int_ref;
+                //     $postLinkTable->cppl_int_cpp_ref = $post;
+                //     $postLinkTable->save();
+                // }
+
+                // // Delete removed posts
+                // CpPostLink::where('cppl_int_cps_ref', $service->cps_int_ref)
+                //     ->whereIn('cppl_int_cpp_ref', $postsToDelete)
+                //     ->delete();
+
+                // Tag
+                $existingTags = CpTag::where('cpst_int_cps_ref', $service->cps_int_ref)
+                    ->pluck('cpst_int_tag_ref')
                     ->toArray();
 
-                $newPosts = json_decode($request->input('servicePosts'), true);
+                $newTags = json_decode($request->input('serviceTags'), true);
 
-                // Determine post to add
-                $postsToAdd = array_diff($newPosts, $existingPosts);
+                // Determine tag to add
+                $tagsToAdd = array_diff($newTags, $existingTags);
 
-                // Determine post to delete
-                $postsToDelete = array_diff($existingPosts, $newPosts);
+                // Determine tag to delete
+                $tagsToDelete = array_diff($existingTags, $newTags);
 
-                // Add new posts
-                foreach ($postsToAdd as $post) {
-                    $postLinkTable = new CpPostLink();
-                    $postLinkTable->cppl_int_cps_ref = $service->cps_int_ref;
-                    $postLinkTable->cppl_int_cpp_ref = $post;
-                    $postLinkTable->save();
+                // Add new tags
+                foreach ($tagsToAdd as $tag) {
+                    $tagLinkTable = new CpTag();
+                    $tagLinkTable->cpst_int_cps_ref = $service->cps_int_ref;
+                    $tagLinkTable->cpst_int_tag_ref = $tag;
+                    $tagLinkTable->save();
                 }
 
-                // Delete removed posts
-                CpPostLink::where('cppl_int_cps_ref', $service->cps_int_ref)
-                    ->whereIn('cppl_int_cpp_ref', $postsToDelete)
+                // Delete removed tags
+                CpTag::where('cpst_int_cps_ref', $service->cps_int_ref)
+                    ->whereIn('cpst_int_tag_ref', $tagsToDelete)
                     ->delete();
+
 
                 DB::commit();
 
