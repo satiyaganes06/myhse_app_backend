@@ -25,10 +25,4 @@ class CpServicesState extends Model
     //! FIXME: Add this in database (Prod)
     const CREATED_AT = 'css_ts_created_at';
     const UPDATED_AT = 'css_ts_updated_at';
-
-    public function competentPersonService()
-    {
-        return $this->belongsTo(CompetentPersonService::class, 'css_int_services_ref', 'cps_int_ref');
-    }
-
 }

@@ -7,6 +7,7 @@ use App\Models\Certificate\CpCertLink;
 use App\Models\Post\CpPostLink;
 use App\Models\Services\CategoryMain;
 use App\Models\Services\CpService;
+use App\Models\Services\CpServicesState;
 use App\Models\Services\ServiceMainRef;
 use App\Models\Tag\CpTag;
 use App\Models\Tag\TagList;
@@ -292,6 +293,14 @@ class ServiceController extends BaseController
                 $tagLink->cpst_int_cps_ref = $service->cps_int_ref;
                 $tagLink->cpst_int_tag_ref = $tag;
                 $tagLink->save();
+            }
+
+            $states = json_decode($request->input('serviceState'), true);
+            foreach ($states as $state) {
+                $stateTable = new CpServicesState();
+                $stateTable->css_int_services_ref = $service->cps_int_ref;
+                $stateTable->css_int_states_ref = $state;
+                $stateTable->save();
             }
 
             // Store the post one by one

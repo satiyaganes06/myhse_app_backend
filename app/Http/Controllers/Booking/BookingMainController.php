@@ -245,6 +245,7 @@ class BookingMainController extends BaseController
 
                     $jobMain = new JobMain([
                         'jm_br_ref' => $request->input('bookingRequestID'),
+                        'jm_double_price' => $request->input('newPrice'),
                         'jm_date_deadline' => $request->input('deadline'),
                         'jm_int_timeline_status' => 0,
                         'jm_int_status' => 0

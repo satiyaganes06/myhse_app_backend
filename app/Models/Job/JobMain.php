@@ -16,6 +16,7 @@ class JobMain extends Model
     protected $fillable = [
         'jm_br_ref',
         'jm_result_complete_status',
+        'jm_double_price',
         'jm_date_deadline',
         'jm_int_timeline_status',
         'jm_int_status'

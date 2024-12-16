@@ -3,45 +3,29 @@
 namespace App\Http\Controllers\Job;
 
 use App\Http\Controllers\Base\BaseController as BaseController;
-use App\Http\Controllers\Controller;
-use App\Models\Booking\BookingMain;
-use App\Models\Booking\BookingRequest;
-use App\Models\Job\JobMain;
-use App\Models\Job\JobPayment;
-use App\Models\Job\JobResult;
 use App\Models\Job\JobUserRating;
-use Illuminate\Support\Facades\Validator;
-use App\Models\UserLogin;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Http\Request;
-use App\Models\UserProfile;
-use Illuminate\Support\Facades\Storage;
-
 use Exception;
-use Nette\Schema\Expect;
-use Symfony\Component\Console\Input\Input;
-
-use function PHPUnit\Framework\isEmpty;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class JobUserRatingController extends BaseController
 {
-
     public function getJobUserRatingByID($id, $jmID)
     {
         try {
             if ($this->isAuthorizedUser($id)) {
-
                 $jobMain = JobUserRating::where('jur_jm_ref', $jmID)->first();
 
                 if ($jobMain) {
                     return $this->sendResponse(message: 'Get User Rating Details', result: $jobMain);
                 }
+
                 return $this->sendError(errorMEssage: 'No review found', code: 404);
             }
 
             return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
         } catch (Exception $e) {
-            return $this->sendError(errorMEssage: 'Error : ' . $e->getMessage(), code: 500);
+            return $this->sendError(errorMEssage: 'Error : '.$e->getMessage(), code: 500);
         }
     }
 
@@ -49,29 +33,26 @@ class JobUserRatingController extends BaseController
     {
         try {
             if ($this->isAuthorizedUser($id)) {
-
                 $review = JobUserRating::where('jur_int_cps_ref', $serviceID)->get();
                 $rating = $review->avg('jur_rating_point');
 
                 if ($review) {
                     return $this->sendResponse(message: 'Get User Rating Details', result: round($rating, 1));
                 }
+
                 return $this->sendError(errorMEssage: 'No rating found', code: 404);
             }
 
             return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
         } catch (Exception $e) {
-            return $this->sendError(errorMEssage: 'Error : ' . $e->getMessage(), code: 500);
+            return $this->sendError(errorMEssage: 'Error : '.$e->getMessage(), code: 500);
         }
     }
-
-
 
     public function getReviewByServiceID(Request $request, $id, $serviceID)
     {
         try {
             if ($this->isAuthorizedUser($id)) {
-
                 $limit = $request->input('limit') ?? 10;
 
                 $review = JobUserRating::join('user_profile', 'user_profile.up_int_ref', '=', 'job_user_rating.jur_var_up_ref')
@@ -82,17 +63,17 @@ class JobUserRatingController extends BaseController
 
                 if ($review->isEmpty()) {
                     return $this->sendError(errorMEssage: 'No review found', code: 404);
-
                 }
+
                 return $this->sendResponse(message: 'Get User Review Details', result: [
                     'rating' => round($rating, 1),
-                    'review' => $review
+                    'review' => $review,
                 ]);
             }
 
             return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
         } catch (Exception $e) {
-            return $this->sendError(errorMEssage: 'Error : ' . $e->getMessage(), code: 500);
+            return $this->sendError(errorMEssage: 'Error : '.$e->getMessage(), code: 500);
         }
     }
 
@@ -100,12 +81,11 @@ class JobUserRatingController extends BaseController
     {
         try {
             if ($this->isAuthorizedUser($id)) {
-
                 $validator = Validator::make($request->all(), [
                     'jmID' => 'required:integer',
                     'serviceID' => 'required:integer',
                     'rating_point' => 'required:double',
-                    'comment' => 'required:string'
+                    'comment' => 'required:string',
                 ]);
 
                 if ($validator->fails()) {
@@ -123,17 +103,16 @@ class JobUserRatingController extends BaseController
 
                 if ($jobUserRating) {
                     $data = JobUserRating::find($jobUserRating->jur_int_ref);
+
                     return $this->sendResponse(message: 'Thank you for feedback.', result: $data);
-                }else{
+                } else {
                     return $this->sendError(errorMEssage: 'Error in adding rating', code: 500);
                 }
-
-
             }
 
             return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
         } catch (Exception $e) {
-            return $this->sendError(errorMEssage: 'Error : ' . $e->getMessage(), code: 500);
+            return $this->sendError(errorMEssage: 'Error : '.$e->getMessage(), code: 500);
         }
     }
 }
