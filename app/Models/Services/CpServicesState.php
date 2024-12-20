@@ -13,16 +13,17 @@ class CpServicesState extends Model
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    protected $table = 'cp_services_state';
+    protected $table = 'cps_states';
 
-    protected $primaryKey = 'css_int_ref';
+    protected $primaryKey = 'cs_int_ref';
 
     protected $fillable = [
-        'css_int_services_ref',
-        'css_int_states_ref'
+        'cs_int_cps_ref',
+        'cs_int_states_ref',
+        'cs_int_status'
     ];
 
     //! FIXME: Add this in database (Prod)
-    const CREATED_AT = 'css_ts_created_at';
-    const UPDATED_AT = 'css_ts_updated_at';
+    const CREATED_AT = 'cs_dt_created_at';
+    const UPDATED_AT = 'cs_dt_updated_at';
 }
