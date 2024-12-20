@@ -242,7 +242,6 @@ class BookingMainController extends BaseController
                         )
                     );
 
-
                     $jobMain = new JobMain([
                         'jm_br_ref' => $request->input('bookingRequestID'),
                         'jm_double_price' => $request->input('newPrice'),
