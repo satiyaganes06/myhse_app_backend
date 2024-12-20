@@ -17,7 +17,7 @@ class JobUserRatingController extends BaseController
                 $jobMain = JobUserRating::all();
 
                 if (!$jobMain->isEmpty()) {
-                    return $this->sendResponse(message: 'Get User Rating Details', result: $jobMain);
+                    return $this->sendResponse(message: 'Get User Rating Details ds', result: $jobMain);
                 }
 
                 return $this->sendError(errorMEssage: 'No review found', code: 404);
