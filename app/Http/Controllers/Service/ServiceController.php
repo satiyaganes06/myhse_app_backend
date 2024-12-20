@@ -300,8 +300,8 @@ class ServiceController extends BaseController
 
             foreach ($states as $state) {
                 $stateTable = new CpServicesState();
-                $stateTable->css_int_services_ref = $service->cps_int_ref;
-                $stateTable->css_int_states_ref = $state;
+                $stateTable->cs_int_cps_ref = $service->cps_int_ref;
+                $stateTable->cs_int_cps_ref = $state;
                 $stateTable->save();
             }
 
