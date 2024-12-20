@@ -19,6 +19,7 @@ class JobUserRating extends Model
         'jur_rating_point',
         'jur_txt_comment',
         'jur_int_cps_ref',
+        'jur_int_user_type'
     ];
 
     const CREATED_AT = 'jur_ts_created_at';
