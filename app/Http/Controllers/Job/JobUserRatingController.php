@@ -93,6 +93,8 @@ class JobUserRatingController extends BaseController
                     return $this->sendError(errorMEssage: $validator->errors(), code: 400);
                 }
 
+                dd($request->all());
+
                 $jobUserRating = new JobUserRating();
                 $jobUserRating->jur_jm_ref = $request->input('jmID');
                 $jobUserRating->jur_var_up_ref = $id;
