@@ -14,7 +14,7 @@ class JobUserRatingController extends BaseController
     {
         try {
             if ($this->isAuthorizedUser($id)) {
-                $jobMain = JobUserRating::where('jur_jm_ref', $jmID)->get();
+                $jobMain = JobUserRating::all();
 
                 if (!$jobMain->isEmpty()) {
                     return $this->sendResponse(message: 'Get User Rating Details', result: $jobMain);
