@@ -115,13 +115,20 @@ class ServiceController extends BaseController
             return $this->sendError(errorMEssage: 'Error : ' . $e, code: 500);
         }
     }
-
+    // "Error : PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'cp_
+    // I/flutter ( 9405): ║          services_state.cs_int_states_ref' in 'on clause' in /home/myhsecom/repositories/my
+    // I/flutter ( 9405): ║          hse_app_backend/vendor/laravel/framework/src/Illuminate/Database/Connection.php:41
+    // I/flutter ( 9405): ║          4 Stack trace: #0 /home/myhsecom/repositories/myhse_app_backend/vendor/laravel/fra
+    // I/flutter ( 9405): ║          mework/src/Illuminate/Database/Connection.php(414): PDO->prepare('select `states_.
+    // I/flutter ( 9405): ║          ..') #1 /home/myhsecom/repositories/myhse_app_backend/vendor/laravel/framework/src
+    // I/flutter ( 9405): ║          /Illuminate/Database/Connection.php(753): Illuminate\Database\Connection->Illumina
+    // I/flutter ( 9405): ║          te\Database\{closure}('select `states_...'
     public function getRelatedState($id, $serviceID)
     {
         try {
             if ($this->isAuthorizedUser($id)) {
-                $states = CpServicesState::join('states_ref', 'cp_services_state.cs_int_states_ref', '=', 'states_ref.s_int_ref')
-                    ->where('cs_int_cps_ref', $serviceID)
+                $states = CpServicesState::join('states_ref', 'cps_states.cs_int_states_ref', '=', 'states_ref.s_int_ref')
+                    ->where('cps_states.cs_int_cps_ref', $serviceID)
                     ->select('states_ref.*')
                     ->get();
 
