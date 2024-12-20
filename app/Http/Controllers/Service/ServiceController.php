@@ -120,9 +120,9 @@ class ServiceController extends BaseController
     {
         try {
             if ($this->isAuthorizedUser($id)) {
-                $states = CpServicesState::join('states', 'cp_services_state.cs_int_states_ref', '=', 'states.s_int_ref')
+                $states = CpServicesState::join('states_ref', 'cp_services_state.cs_int_states_ref', '=', 'states_ref.s_int_ref')
                     ->where('cs_int_cps_ref', $serviceID)
-                    ->select('states.*')
+                    ->select('states_ref.*')
                     ->get();
 
                 if ($states->isEmpty()) {
