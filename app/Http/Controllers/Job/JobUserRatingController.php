@@ -14,7 +14,7 @@ class JobUserRatingController extends BaseController
     {
         try {
             if ($this->isAuthorizedUser($id)) {
-                $jobMain = JobUserRating::where('jur_jm_ref', $jmID)->first();
+                $jobMain = JobUserRating::where('jur_jm_ref', $jmID)->get();
 
                 if ($jobMain) {
                     return $this->sendResponse(message: 'Get User Rating Details', result: $jobMain);
@@ -33,7 +33,7 @@ class JobUserRatingController extends BaseController
     {
         try {
             if ($this->isAuthorizedUser($id)) {
-                $review = JobUserRating::where('jur_int_cps_ref', $serviceID)->get();
+                $review = JobUserRating::where('jur_int_cps_ref', $serviceID)->first();
                 $rating = $review->avg('jur_rating_point');
 
                 if ($review) {
@@ -93,7 +93,6 @@ class JobUserRatingController extends BaseController
                     return $this->sendError(errorMEssage: $validator->errors(), code: 400);
                 }
 
-                dd($request->all());
 
                 $jobUserRating = new JobUserRating();
                 $jobUserRating->jur_jm_ref = $request->input('jmID');
