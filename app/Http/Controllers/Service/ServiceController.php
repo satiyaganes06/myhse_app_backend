@@ -295,7 +295,7 @@ class ServiceController extends BaseController
                 $tagLink->save();
             }
 
-            $states = json_decode($request->input('serviceState'), true);
+            $states = json_decode($request->input('serviceStates'), true);
             foreach ($states as $state) {
                 $stateTable = new CpServicesState();
                 $stateTable->css_int_services_ref = $service->cps_int_ref;
@@ -455,6 +455,33 @@ class ServiceController extends BaseController
                 // Delete removed tags
                 CpTag::where('cpst_int_cps_ref', $service->cps_int_ref)
                     ->whereIn('cpst_int_tag_ref', $tagsToDelete)
+                    ->delete();
+
+
+                // States
+                $existingStates = CpServicesState::where('css_int_services_ref', $service->cps_int_ref)
+                    ->pluck('css_int_states_ref')
+                    ->toArray();
+
+                $newStates = json_decode($request->input('serviceStates'), true);
+
+                // Determine state to add
+                $statesToAdd = array_diff($newStates, $existingStates);
+
+                // Determine state to delete
+                $statesToDelete = array_diff($existingStates, $newStates);
+
+                // Add new states
+                foreach ($statesToAdd as $state) {
+                    $stateTable = new CpServicesState();
+                    $stateTable->css_int_services_ref = $service->cps_int_ref;
+                    $stateTable->css_int_states_ref = $state;
+                    $stateTable->save();
+                }
+
+                // Delete removed states
+                CpServicesState::where('css_int_services_ref', $service->cps_int_ref)
+                    ->whereIn('css_int_states_ref', $statesToDelete)
                     ->delete();
 
 
