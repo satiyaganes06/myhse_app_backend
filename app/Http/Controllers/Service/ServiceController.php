@@ -116,6 +116,26 @@ class ServiceController extends BaseController
         }
     }
 
+    public function getRelatedState($id, $serviceID)
+    {
+        try {
+            if ($this->isAuthorizedUser($id)) {
+                $states = CpServicesState::where('cs_int_cps_ref', $serviceID)
+                    ->get();
+
+                if ($states->isEmpty()) {
+                    return $this->sendError(errorMEssage: 'No state found', code: 404);
+                }
+
+                return $this->sendResponse(message: 'Get State List', result: $states);
+            }
+
+            return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
+        } catch (\Exception $e) {
+            return $this->sendError(errorMEssage: 'Error : ' . $e, code: 500);
+        }
+    }
+
     public function getServicesDetailByID(Request $request, $id)
     {
         try {
@@ -482,6 +502,11 @@ class ServiceController extends BaseController
                     $stateTable->cs_int_states_ref = $state;
                     $stateTable->save();
                 }
+
+                // Delete removed states
+                CpServicesState::where('cs_int_cps_ref', $service->cps_int_ref)
+                    ->whereIn('cs_int_states_ref', $statesToDelete)
+                    ->delete();
 
 
                 DB::commit();
