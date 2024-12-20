@@ -286,6 +286,7 @@ class ServiceController extends BaseController
                 $certLink->save();
             }
 
+
             // Store the tag one by one
             $tags = json_decode($request->input('serviceTags'), true);
             foreach ($tags as $tag) {
@@ -297,7 +298,6 @@ class ServiceController extends BaseController
 
             $states = json_decode($request->input('serviceStates'), true);
 
-            dd($states);
             foreach ($states as $state) {
                 $stateTable = new CpServicesState();
                 $stateTable->css_int_services_ref = $service->cps_int_ref;
