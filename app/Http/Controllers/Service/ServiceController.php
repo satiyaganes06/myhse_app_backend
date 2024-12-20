@@ -115,14 +115,6 @@ class ServiceController extends BaseController
             return $this->sendError(errorMEssage: 'Error : ' . $e, code: 500);
         }
     }
-    // "Error : PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'cp_
-    // I/flutter ( 9405): ║          services_state.cs_int_states_ref' in 'on clause' in /home/myhsecom/repositories/my
-    // I/flutter ( 9405): ║          hse_app_backend/vendor/laravel/framework/src/Illuminate/Database/Connection.php:41
-    // I/flutter ( 9405): ║          4 Stack trace: #0 /home/myhsecom/repositories/myhse_app_backend/vendor/laravel/fra
-    // I/flutter ( 9405): ║          mework/src/Illuminate/Database/Connection.php(414): PDO->prepare('select `states_.
-    // I/flutter ( 9405): ║          ..') #1 /home/myhsecom/repositories/myhse_app_backend/vendor/laravel/framework/src
-    // I/flutter ( 9405): ║          /Illuminate/Database/Connection.php(753): Illuminate\Database\Connection->Illumina
-    // I/flutter ( 9405): ║          te\Database\{closure}('select `states_...'
     public function getRelatedState($id, $serviceID)
     {
         try {

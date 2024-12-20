@@ -25,7 +25,7 @@ class JobUserRatingController extends BaseController
 
             return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
         } catch (Exception $e) {
-            return $this->sendError(errorMEssage: 'Error : '.$e->getMessage(), code: 500);
+            return $this->sendError(errorMEssage: 'Error : ' . $e->getMessage(), code: 500);
         }
     }
 
@@ -45,7 +45,7 @@ class JobUserRatingController extends BaseController
 
             return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
         } catch (Exception $e) {
-            return $this->sendError(errorMEssage: 'Error : '.$e->getMessage(), code: 500);
+            return $this->sendError(errorMEssage: 'Error : ' . $e->getMessage(), code: 500);
         }
     }
 
@@ -56,8 +56,8 @@ class JobUserRatingController extends BaseController
                 $limit = $request->input('limit') ?? 10;
 
                 $review = JobUserRating::join('user_profile', 'user_profile.up_int_ref', '=', 'job_user_rating.jur_var_up_ref')
-                ->where('jur_int_cps_ref', $serviceID)
-                ->orderby('jur_ts_created_at', 'desc')->paginate($limit);
+                    ->where('jur_int_cps_ref', $serviceID)
+                    ->orderby('jur_ts_created_at', 'desc')->paginate($limit);
 
                 $rating = JobUserRating::where('jur_int_cps_ref', $serviceID)->avg('jur_rating_point');
 
@@ -73,7 +73,7 @@ class JobUserRatingController extends BaseController
 
             return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
         } catch (Exception $e) {
-            return $this->sendError(errorMEssage: 'Error : '.$e->getMessage(), code: 500);
+            return $this->sendError(errorMEssage: 'Error : ' . $e->getMessage(), code: 500);
         }
     }
 
@@ -86,6 +86,7 @@ class JobUserRatingController extends BaseController
                     'serviceID' => 'required:integer',
                     'rating_point' => 'required:double',
                     'comment' => 'required:string',
+                    'user_type' => 'integer',
                 ]);
 
                 if ($validator->fails()) {
@@ -98,6 +99,7 @@ class JobUserRatingController extends BaseController
                 $jobUserRating->jur_rating_point = $request->input('rating_point');
                 $jobUserRating->jur_txt_comment = $request->input('comment');
                 $jobUserRating->jur_int_cps_ref = $request->input('serviceID');
+                $jobUserRating->jur_int_user_type = 0;
 
                 $jobUserRating->save();
 
@@ -112,7 +114,7 @@ class JobUserRatingController extends BaseController
 
             return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
         } catch (Exception $e) {
-            return $this->sendError(errorMEssage: 'Error : '.$e->getMessage(), code: 500);
+            return $this->sendError(errorMEssage: 'Error : ' . $e->getMessage(), code: 500);
         }
     }
 }
