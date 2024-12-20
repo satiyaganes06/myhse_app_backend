@@ -463,8 +463,8 @@ class ServiceController extends BaseController
 
 
                 // States
-                $existingStates = CpServicesState::where('css_int_services_ref', $service->cps_int_ref)
-                    ->pluck('css_int_states_ref')
+                $existingStates = CpServicesState::where('cs_int_cps_ref', $service->cps_int_ref)
+                    ->pluck('cs_int_states_ref')
                     ->toArray();
 
                 $newStates = json_decode($request->input('serviceStates'), true);
@@ -478,15 +478,10 @@ class ServiceController extends BaseController
                 // Add new states
                 foreach ($statesToAdd as $state) {
                     $stateTable = new CpServicesState();
-                    $stateTable->css_int_services_ref = $service->cps_int_ref;
-                    $stateTable->css_int_states_ref = $state;
+                    $stateTable->cs_int_cps_ref = $service->cps_int_ref;
+                    $stateTable->cs_int_states_ref = $state;
                     $stateTable->save();
                 }
-
-                // Delete removed states
-                CpServicesState::where('css_int_services_ref', $service->cps_int_ref)
-                    ->whereIn('css_int_states_ref', $statesToDelete)
-                    ->delete();
 
 
                 DB::commit();
