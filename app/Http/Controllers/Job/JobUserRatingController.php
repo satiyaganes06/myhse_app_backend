@@ -86,7 +86,7 @@ class JobUserRatingController extends BaseController
                     'serviceID' => 'required:integer',
                     'rating_point' => 'required:double',
                     'comment' => 'required:string',
-                    'user_type' => 'integer',
+                    'user_type' => 'required:integer',
                 ]);
 
                 if ($validator->fails()) {
@@ -99,7 +99,7 @@ class JobUserRatingController extends BaseController
                 $jobUserRating->jur_rating_point = $request->input('rating_point');
                 $jobUserRating->jur_txt_comment = $request->input('comment');
                 $jobUserRating->jur_int_cps_ref = $request->input('serviceID');
-                $jobUserRating->jur_int_user_type = 0;
+                $jobUserRating->jur_int_user_type = $request->input('user_type');
 
                 $jobUserRating->save();
 
