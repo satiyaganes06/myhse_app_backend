@@ -298,10 +298,12 @@ class ServiceController extends BaseController
 
             $states = json_decode($request->input('serviceStates'), true);
 
+
+
             foreach ($states as $state) {
                 $stateTable = new CpServicesState();
                 $stateTable->cs_int_cps_ref = $service->cps_int_ref;
-                $stateTable->cs_int_cps_ref = $state;
+                $stateTable->cs_int_states_ref = $state;
                 $stateTable->save();
             }
 
