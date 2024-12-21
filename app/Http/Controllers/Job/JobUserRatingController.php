@@ -14,10 +14,10 @@ class JobUserRatingController extends BaseController
     {
         try {
             if ($this->isAuthorizedUser($id)) {
-                $jobMain = JobUserRating::where('jur_jm_ref', $jmID)->get();
+                $ratings = JobUserRating::where('jur_jm_ref', $jmID)->get();
 
-                if ($jobMain) {
-                    return $this->sendResponse(message: 'Get User Rating Details', result: $jobMain);
+                if (count($ratings) > 0) {
+                    return $this->sendResponse(message: 'Get User Rating Details', result: $ratings);
                 }
 
                 return $this->sendError(errorMEssage: 'No review found', code: 404);
