@@ -38,11 +38,9 @@ class SubscriptionController extends BaseController
             ]);
             $userSubscription->save();
 
-            if($returnValue){
+            if ($returnValue) {
                 return $this->sendResponse(message: 'Created Subscription', result: $userSubscription);
             }
-
-
         } catch (\Throwable $th) {
             return $this->sendError(errorMEssage: 'Error : ' . $th->getMessage(), code: 500);
         }
@@ -53,20 +51,22 @@ class SubscriptionController extends BaseController
         try {
             if ($this->isAuthorizedUser($id)) {
                 $subscriptionPlans = SubscriptionPlan::join('subscription_feature', 'subscription_plan.sp_int_ref', '=', 'subscription_feature.sf_int_sp_ref')
-                ->select('subscription_plan.*', DB::raw('GROUP_CONCAT(subscription_feature.sf_var_feature_description) as features'))
-                ->groupBy('subscription_plan.sp_int_ref')
-                ->get();
+                    ->select('subscription_plan.*', DB::raw('GROUP_CONCAT(subscription_feature.sf_var_feature_description) as features'))
+                    ->groupBy('subscription_plan.sp_int_ref')
+                    ->get();
 
-            // Prepare the final response with features
-            foreach ($subscriptionPlans as $subscriptionPlan) {
-                $subscriptionPlan->features = explode(',', $subscriptionPlan->features); // Convert concatenated string to array
-            }
+                dd($subscriptionPlans);
 
-            if ($subscriptionPlans->isEmpty()) {
-                return $this->sendError(errorMEssage: 'No Subscription Plans found', code: 404);
-            }
+                // Prepare the final response with features
+                foreach ($subscriptionPlans as $subscriptionPlan) {
+                    $subscriptionPlan->features = explode(',', $subscriptionPlan->features); // Convert concatenated string to array
+                }
 
-            return $this->sendResponse(message: 'Get Subscription Plans', result: $subscriptionPlans);
+                if ($subscriptionPlans->isEmpty()) {
+                    return $this->sendError(errorMEssage: 'No Subscription Plans found', code: 404);
+                }
+
+                return $this->sendResponse(message: 'Get Subscription Plans', result: $subscriptionPlans);
             }
             return $this->sendError(errorMEssage: 'Unauthorized Request', code: 401);
         } catch (Exception $e) {
@@ -92,12 +92,13 @@ class SubscriptionController extends BaseController
         }
     }
 
-    public function checkUserSubscription($id){
+    public function checkUserSubscription($id)
+    {
         try {
             if ($this->isAuthorizedUser($id)) {
                 $subscriptionUser = SubscriptionUser::join('subscription_plan', 'subscription_user.su_int_sp_ref', '=', 'subscription_plan.sp_int_ref')
-                ->select('subscription_plan.sp_var_name', 'subscription_user.su_enum_status') // Fixed column selection
-                ->where('su_int_up_ref', $id)->first();
+                    ->select('subscription_plan.sp_var_name', 'subscription_user.su_enum_status') // Fixed column selection
+                    ->where('su_int_up_ref', $id)->first();
 
                 if (!$subscriptionUser) {
                     return $this->sendError(errorMEssage: 'User has no subscription', code: 404);
