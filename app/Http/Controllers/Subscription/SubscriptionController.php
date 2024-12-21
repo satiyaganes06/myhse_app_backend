@@ -55,7 +55,6 @@ class SubscriptionController extends BaseController
                     ->groupBy('subscription_plan.sp_int_ref')
                     ->get();
 
-                dd($subscriptionPlans);
 
                 // Prepare the final response with features
                 foreach ($subscriptionPlans as $subscriptionPlan) {
