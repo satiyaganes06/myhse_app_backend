@@ -29,7 +29,7 @@ class SubscriptionController extends BaseController
                 return $this->sendError(errorMEssage: 'Subscription already exists', code: 409);
             }
 
-            //Fetch free subscription plan
+            //Fetch free subscription plan for cp
             $subscriptionPlan = SubscriptionPlan::where('sp_int_user_category', 2)->where('sp_var_price_slug', 'free')->first();
 
             $userSubscription = new SubscriptionUser([
@@ -122,6 +122,7 @@ class SubscriptionController extends BaseController
         try {
             $validator = Validator::make($request->all(), [
                 'userID' => 'required:integer',
+                'sPlanID' => 'required:integer',
                 'suID' => 'required:integer',
                 'accountName' => 'required:string',
                 'paymentDate' => 'required:date',
@@ -141,6 +142,7 @@ class SubscriptionController extends BaseController
 
             $payment = new SubscriptionPayment();
             $payment->spay_int_up_ref = $request->userID;
+            $payment->spay_int_sp_ref = $request->sPlanID;
             $payment->spay_int_su_ref = $request->suID;
             $payment->spay_var_account_name = $request->accountName;
             $payment->spay_date_payment_date = $request->paymentDate;

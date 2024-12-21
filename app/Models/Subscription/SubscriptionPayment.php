@@ -18,6 +18,7 @@ class SubscriptionPayment extends Model
     // Define fillable attributes for mass assignment
     protected $fillable = [
         'spay_int_up_ref',
+        'spay_int_sp_ref',
         'spay_int_su_ref',
         'spay_var_account_name',
         'spay_dou_amount',
