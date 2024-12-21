@@ -29,9 +29,12 @@ class SubscriptionController extends BaseController
                 return $this->sendError(errorMEssage: 'Subscription already exists', code: 409);
             }
 
+            //Fetch free subscription plan
+            $subscriptionPlan = SubscriptionPlan::where('sp_int_user_category', 2)->where('sp_var_price_slug', 'free')->first();
+
             $userSubscription = new SubscriptionUser([
                 'su_int_up_ref' => $id,
-                'su_int_sp_ref' => 1,
+                'su_int_sp_ref' => $subscriptionPlan->sp_int_ref,
                 'su_date_start_date' => now(),
                 'su_date_end_date' => null,
                 'su_enum_status' => 'Active'
