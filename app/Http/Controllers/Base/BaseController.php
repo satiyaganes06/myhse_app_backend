@@ -94,7 +94,8 @@ class BaseController extends Controller
     public function imageViewer($filepath)
     {
         //    dd($this->decode_data($filepath));
-        $path = storage_path($this->decode_data($filepath));
+        // $path = storage_path('app/'.$this->decode_data($filepath));
+        $path = $this->decode_data($filepath);
         $contents = file_get_contents($path);
         $mime = mime_content_type($path);
 
