@@ -52,10 +52,11 @@ class BaseController extends Controller
         $folderName = ['UserProfileImage', 'PostImage', 'CertificateImage', 'ServiceImage', 'ServiceDocument', 'PaymentReceipt', 'JobResultFile', 'JobPaymentReceipt'];
 
         try {
+            $projectBPath = '/home/myhsecom/public_html/myhse/storage/app/public/uploads';
             $fileName = time().'_'.$file->getClientOriginalName();
 
-            $path = $file->storeAs('uploads/'.$folderName[$folder], $fileName);
-
+            // $path = $file->storeAs('uploads/'.$folderName[$folder], $fileName);
+            $path = $file->move($projectBPath, $fileName);
             //    // $path = $file->store('uploads/images/profile'); // 'pdfs' is the storage folder, you can change it as needed
             // $path = $file->store('uploads/images'); // 'pdfs' is the storage folder, you can change it as needed
             // //  $path = Storage::disk('local')->put('uploads/documents', $pdf);
