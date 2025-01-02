@@ -52,7 +52,7 @@ class BaseController extends Controller
         $folderName = ['UserProfileImage', 'PostImage', 'CertificateImage', 'ServiceImage', 'ServiceDocument', 'PaymentReceipt', 'JobResultFile', 'JobPaymentReceipt'];
 
         try {
-            $projectBPath = '/home/myhsecom/public_html/myhse/storage/app/public/uploads';
+            $projectBPath = '/home/myhsecom/public_html/myhse/storage/app/public/uploads'.$folderName[$folder];
             $fileName = time().'_'.$file->getClientOriginalName();
 
             // $path = $file->storeAs('uploads/'.$folderName[$folder], $fileName);
