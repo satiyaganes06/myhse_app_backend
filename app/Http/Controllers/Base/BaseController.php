@@ -52,8 +52,8 @@ class BaseController extends Controller
         $folderName = ['UserProfileImage', 'PostImage', 'CertificateImage', 'ServiceImage', 'ServiceDocument', 'PaymentReceipt', 'JobResultFile', 'JobPaymentReceipt'];
 
         try {
-            $projectBPath = '/home/myhsecom/public_html/myhse/storage/app/public/uploads/'.$folderName[$folder];
-            $fileName = time().'_'.$file->getClientOriginalName();
+            $projectBPath = 'uploads/' . $folderName[$folder];
+            $fileName = time() . '_' . $file->getClientOriginalName();
 
             // $path = $file->storeAs('uploads/'.$folderName[$folder], $fileName);
             $path = $file->move($projectBPath, $fileName);
@@ -87,7 +87,7 @@ class BaseController extends Controller
 
             return $this->sendResponse(message: 'Image Uploaded Successfully', result: $fileURL);
         } catch (Exception $e) {
-            return $this->sendError(errorMEssage: 'Error : '.$e->getMessage(), code: 500);
+            return $this->sendError(errorMEssage: 'Error : ' . $e->getMessage(), code: 500);
         }
     }
 
@@ -95,7 +95,7 @@ class BaseController extends Controller
     {
         //    dd($this->decode_data($filepath));
         // $path = storage_path('app/'.$this->decode_data($filepath));
-        $path = $this->decode_data($filepath);
+        $path = '/home/myhsecom/public_html/myhse/storage/app/public/' . $this->decode_data($filepath);
         $contents = file_get_contents($path);
         $mime = mime_content_type($path);
 
