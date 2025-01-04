@@ -52,14 +52,15 @@ class BaseController extends Controller
         $folderName = ['UserProfileImage', 'PostImage', 'CertificateImage', 'ServiceImage', 'ServiceDocument', 'PaymentReceipt', 'JobResultFile', 'JobPaymentReceipt'];
 
         try {
-            $projectBPath = 'uploads/' . $folderName[$folder];
+            $projectBPath = '/home/myhsecom/public_html/myhse/storage/app/public/uploads/' . $folderName[$folder];
             $fileName = time() . '_' . $file->getClientOriginalName();
 
             // $path = $file->storeAs('uploads/'.$folderName[$folder], $fileName);
             $path = $file->move($projectBPath, $fileName);
             //    // $path = $file->store('uploads/images/profile'); // 'pdfs' is the storage folder, you can change it as needed
-            // $path = $file->store('uploads/images'); // 'pdfs' is the storage folder, you can change it as needed
-            // //  $path = Storage::disk('local')->put('uploads/documents', $pdf);
+
+            //remove until public
+            $path = str_replace('/home/myhsecom/public_html/myhse/storage/app/public/', '', $path);
 
             return $path;
         } catch (Exception $e) {
