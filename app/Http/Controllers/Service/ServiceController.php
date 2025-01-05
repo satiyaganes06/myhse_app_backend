@@ -38,7 +38,8 @@ class ServiceController extends BaseController
         try {
             $categoryID = $request->input('categoryID');
 
-            $serviceMainList = ServiceMainRef::where('smr_int_category_ref', $categoryID)->get();
+            $serviceMainList = ServiceMainRef::all();
+            //ServiceMainRef::where('smr_int_category_ref', $categoryID)->get();
 
             if ($serviceMainList->isEmpty()) {
                 return $this->sendError(errorMEssage: 'No service found', code: 404);
